@@ -41,6 +41,9 @@
         a { color: var(--primary); text-decoration: none; font-weight: 600; }
         a:hover { text-decoration: underline; }
 
+        /* ================================================
+           HEADER
+        ================================================ */
         header {
             background: linear-gradient(135deg, #112244 0%, #0056b3 100%);
             color: white;
@@ -115,6 +118,9 @@
             white-space: nowrap;
         }
 
+        /* ================================================
+           MAIN / VIEWS
+        ================================================ */
         main {
             max-width: 940px;
             margin: 0 auto;
@@ -124,6 +130,9 @@
         .view { display: none; }
         .view.aktiv { display: block; }
 
+        /* ================================================
+           CARDS
+        ================================================ */
         .card {
             background: var(--white);
             border-radius: var(--radius-lg);
@@ -153,6 +162,9 @@
             margin-bottom: 24px;
         }
 
+        /* ================================================
+           FORMS
+        ================================================ */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -196,6 +208,12 @@
             box-shadow: 0 0 0 3px rgba(0,86,179,0.1);
         }
 
+        .field input:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
         .field textarea {
             resize: vertical;
             min-height: 80px;
@@ -215,6 +233,9 @@
             gap: 7px;
         }
 
+        /* ================================================
+           BUTTONS
+        ================================================ */
         .btn {
             display: inline-block;
             padding: 11px 20px;
@@ -249,6 +270,13 @@
         }
         .btn-outline:hover:not(:disabled) { background: var(--bg); border-color: #b0bcc8; }
 
+        .btn-danger-outline {
+            background: transparent;
+            color: var(--danger);
+            border: 1.5px solid #f5c6cb;
+        }
+        .btn-danger-outline:hover:not(:disabled) { background: #fde8ea; }
+
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
         .btn-sm { padding: 7px 14px; font-size: 13px; width: auto; }
 
@@ -259,6 +287,9 @@
         }
         .btn-row .btn { flex: 1; }
 
+        /* ================================================
+           ALERTS
+        ================================================ */
         .alert {
             padding: 11px 15px;
             border-radius: 9px;
@@ -270,7 +301,11 @@
         .alert.on { display: block; }
         .alert-err  { background: #fde8ea; border: 1px solid #f5c6cb; color: #922; }
         .alert-ok   { background: #e8f5e9; border: 1px solid #c3e6cb; color: #155724; }
+        .alert-info { background: #e3f0ff; border: 1px solid #b8d4f0; color: #0056b3; }
 
+        /* ================================================
+           STATUS BADGES
+        ================================================ */
         .badge {
             display: inline-block;
             padding: 3px 10px;
@@ -286,6 +321,9 @@
         .b-rot   { background: #fde8ea; color: var(--danger); }
         .b-grau  { background: #f0f0f0; color: #666; }
 
+        /* ================================================
+           HERO / START SCREEN
+        ================================================ */
         .hero {
             text-align: center;
             padding: 36px 16px 28px;
@@ -343,6 +381,9 @@
         .oc-title { font-size: 0.97em; font-weight: 700; margin-bottom: 6px; }
         .oc-desc  { font-size: 0.78em; color: var(--text-l); line-height: 1.55; }
 
+        /* ================================================
+           PROFIL BOX (Dashboard)
+        ================================================ */
         .profil-box {
             display: flex;
             align-items: center;
@@ -378,6 +419,9 @@
             flex-shrink: 0;
         }
 
+        /* ================================================
+           ORDER TABLE
+        ================================================ */
         .order-wrap { overflow-x: auto; margin-top: 4px; }
 
         .order-table {
@@ -403,6 +447,18 @@
             font-weight: 700;
         }
 
+        .order-table tr:last-child td { border-bottom: none; }
+        .order-table tr:hover td { background: #fafcff; }
+
+        .order-detail {
+            font-size: 0.8em;
+            color: var(--text-l);
+            margin-top: 2px;
+        }
+
+        /* ================================================
+           BESTÄTIGUNG
+        ================================================ */
         .confirm-wrap {
             text-align: center;
             padding: 32px 20px;
@@ -434,13 +490,20 @@
             color: var(--text);
         }
 
+        /* ================================================
+           EMPTY STATE
+        ================================================ */
         .empty {
             text-align: center;
             padding: 44px 20px;
             color: var(--text-l);
         }
         .empty .empty-icon { font-size: 44px; margin-bottom: 14px; }
+        .empty p { font-size: 0.9em; margin-bottom: 18px; }
 
+        /* ================================================
+           LADE-OVERLAY
+        ================================================ */
         #ladeOverlay {
             position: fixed;
             inset: 0;
@@ -464,9 +527,17 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ================================================
+           RESPONSIVE
+        ================================================ */
         @media (max-width: 560px) {
             .form-grid { grid-template-columns: 1fr; }
             .option-grid { grid-template-columns: 1fr; }
+            .option-card.full-width { grid-column: 1; }
+            .card { padding: 20px 16px; }
+            .profil-box { flex-wrap: wrap; }
+            .profil-actions { width: 100%; }
+            .profil-actions .btn { flex: 1; }
         }
     </style>
 </head>
@@ -481,262 +552,11 @@
                 <div class="logo-sub">Kundenportal</div>
             </div>
         </div>
-        <nav class="header-nav" id="headerNav"></nav>
+        <nav class="header-nav" id="headerNav">
+            </nav>
     </div>
 </header>
 
 <div id="ladeOverlay">
     <div class="spinner"></div>
-    <span style="font-size:14px;font-weight:600;color:var(--primary)">Bitte warten…</span>
-</div>
-
-<main>
-
-    <div class="view aktiv" id="view-start">
-        <div class="hero">
-            <div class="hero-logo">🖨️</div>
-            <h1>Willkommen im Kundenportal</h1>
-            <p>Gib deinen Druckauftrag auf, verfolge den Status deiner Bestellungen und verwalte dein persönliches Kundenkonto.</p>
-
-            <div class="option-grid">
-                <div class="option-card" onclick="zeige('view-login')">
-                    <div class="oc-icon">🔑</div>
-                    <div class="oc-title">Anmelden</div>
-                    <div class="oc-desc">Mit deinem Kundenkonto einloggen und alle Aufträge verwalten.</div>
-                </div>
-                <div class="option-card" onclick="zeige('view-register')">
-                    <div class="oc-icon">👤</div>
-                    <div class="oc-title">Registrieren</div>
-                    <div class="oc-desc">Neu hier? Kostenloses Kundenkonto mit gespeicherter Adresse anlegen.</div>
-                </div>
-                <div class="option-card full-width" onclick="zeige('view-gast')">
-                    <div class="oc-icon">📦</div>
-                    <div class="oc-title">Als Gast bestellen</div>
-                    <div class="oc-desc">Schnell & ohne Registrierung – einfach Auftrag aufgeben.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="view" id="view-login">
-        <div class="card card-sm">
-            <h2>Anmelden</h2>
-            <div class="alert alert-err" id="loginFehler"></div>
-            <div class="form-grid" style="grid-template-columns:1fr">
-                <div class="field"><label>E-Mail</label><input type="email" id="loginEmail"></div>
-                <div class="field"><label>Passwort</label><input type="password" id="loginPW"></div>
-            </div>
-            <div class="btn-row">
-                <button class="btn btn-outline" onclick="zeige('view-start')">Zurück</button>
-                <button class="btn btn-primary" id="btnLogin" onclick="anmelden()">Anmelden</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="view" id="view-register">
-        <div class="card">
-            <h2>Konto erstellen</h2>
-            <div class="alert alert-err" id="regFehler"></div>
-            <div class="section-sep">👤 Daten</div>
-            <div class="form-grid">
-                <div class="field col-full"><label>Name *</label><input type="text" id="regName"></div>
-                <div class="field"><label>E-Mail *</label><input type="email" id="regEmail"></div>
-                <div class="field"><label>Telefon</label><input type="tel" id="regTelefon"></div>
-                <div class="field"><label>Passwort *</label><input type="password" id="regPW"></div>
-                <div class="field"><label>Wiederholen *</label><input type="password" id="regPW2"></div>
-            </div>
-            <div class="btn-row">
-                <button class="btn btn-outline" onclick="zeige('view-start')">Zurück</button>
-                <button class="btn btn-primary" id="btnRegister" onclick="registrieren()">Konto erstellen</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="view" id="view-dashboard">
-        <div class="profil-box" id="profilBox"></div>
-        <div class="card">
-            <div style="display:flex;justify-content:space-between;margin-bottom:18px">
-                <h2>Meine Aufträge</h2>
-                <button class="btn btn-success btn-sm" onclick="zeige('view-bestellung')">+ Neuer Auftrag</button>
-            </div>
-            <div id="auftragsListe"></div>
-        </div>
-    </div>
-
-    <div class="view" id="view-bestellung">
-        <div class="card">
-            <h2>Neuer Druckauftrag</h2>
-            <div class="alert alert-err" id="bestellFehler"></div>
-            <div class="section-sep">🖨️ Auftrag</div>
-            <div class="form-grid">
-                <div class="field"><label>Projektname *</label><input type="text" id="bProjekt"></div>
-                <div class="field"><label>Material</label>
-                    <select id="bMaterial">
-                        <option value="Keine Präferenz">Keine Präferenz</option>
-                        <option value="PLA">PLA</option>
-                        <option value="PETG">PETG</option>
-                    </select>
-                </div>
-                <div class="field col-full"><label>Beschreibung</label><textarea id="bBeschreibung"></textarea></div>
-            </div>
-            <div class="section-sep">📍 Lieferadresse</div>
-            <div class="form-grid">
-                <div class="field col-full"><label>Straße *</label><input type="text" id="bAdresse"></div>
-                <div class="field"><label>PLZ *</label><input type="text" id="bPlz"></div>
-                <div class="field"><label>Ort *</label><input type="text" id="bOrt"></div>
-            </div>
-            <div class="btn-row">
-                <button class="btn btn-outline" onclick="zeige('view-dashboard')">Zurück</button>
-                <button class="btn btn-primary" onclick="bestellungAbschicken()">Auftrag absenden ✓</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="view" id="view-gast">
-        <div class="card">
-            <h2>Als Gast bestellen</h2>
-            <div class="alert alert-err" id="gastFehler"></div>
-            <div class="section-sep">👤 Kontakt</div>
-            <div class="form-grid">
-                <div class="field"><label>Name *</label><input type="text" id="gName"></div>
-                <div class="field"><label>E-Mail *</label><input type="email" id="gEmail"></div>
-            </div>
-            <div class="section-sep">🖨️ Auftrag</div>
-            <div class="form-grid">
-                <div class="field"><label>Projektname *</label><input type="text" id="gProjekt"></div>
-                <div class="field col-full"><label>Beschreibung</label><textarea id="gBeschreibung"></textarea></div>
-            </div>
-            <div class="section-sep">📍 Lieferadresse</div>
-            <div class="form-grid">
-                <div class="field col-full"><label>Straße *</label><input type="text" id="gAdresse"></div>
-                <div class="field"><label>PLZ *</label><input type="text" id="gPlz"></div>
-                <div class="field"><label>Ort *</label><input type="text" id="gOrt"></div>
-            </div>
-            <div class="btn-row">
-                <button class="btn btn-outline" onclick="zeige('view-start')">Zurück</button>
-                <button class="btn btn-primary" onclick="gastBestellung()">Auftrag absenden ✓</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="view" id="view-bestaetigung">
-        <div class="card">
-            <div class="confirm-wrap">
-                <div class="confirm-icon">✅</div>
-                <h2>Erfolgreich!</h2>
-                <div class="confirm-id" id="confirmId">—</div>
-                <div id="confirmButtons"></div>
-            </div>
-        </div>
-    </div>
-
-</main>
-
-<script>
-/* ================================================
-   SUPABASE CLIENT (MIT DEINEM LEGACY KEY)
-================================================ */
-const supabaseUrl = 'https://zasufuyaiturzgohqkky.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inphc3VmdXlhaXR1cnpnb2hxa2t5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjU0MDQsImV4cCI6MjA5MDQ0MTQwNH0.jOtN5Ls_-8JnQJQyPKP2URgWQdKa5GPLhpUs55LB0is';
-const sb = supabase.createClient(supabaseUrl, supabaseKey);
-
-let aktKunde = null;
-
-async function sha256(str) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function laden(an) { document.getElementById('ladeOverlay').style.display = an ? 'flex' : 'none'; }
-function alert$(id, text, show = true) {
-    const el = document.getElementById(id);
-    if (el) { el.textContent = text; el.classList.toggle('on', show); }
-}
-function alertsReset(...ids) { ids.forEach(id => alert$(id, '', false)); }
-function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-function genId() { return 'B-' + Date.now().toString().slice(-8).toUpperCase(); }
-
-function zeige(viewId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('aktiv'));
-    document.getElementById(viewId).classList.add('aktiv');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function headerAktualisieren() {
-    const nav = document.getElementById('headerNav');
-    if (aktKunde) {
-        nav.innerHTML = `<button class="nav-btn" onclick="zeige('view-dashboard')">Aufträge</button><button class="nav-btn" onclick="abmelden()">Abmelden</button>`;
-    } else {
-        nav.innerHTML = `<button class="nav-btn" onclick="zeige('view-login')">Anmelden</button>`;
-    }
-}
-
-async function anmelden() {
-    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-    const pw = document.getElementById('loginPW').value;
-    laden(true);
-    try {
-        const hash = await sha256(pw);
-        const { data: rows } = await sb.from('kunden').select('*').eq('email', email).eq('passwort_hash', hash).limit(1);
-        if (!rows || rows.length === 0) { alert$('loginFehler', 'Falsche Daten.'); return; }
-        aktKunde = rows[0];
-        headerAktualisieren();
-        await ladeDashboard();
-        zeige('view-dashboard');
-    } catch (e) { console.error(e); } finally { laden(false); }
-}
-
-async function registrieren() {
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim().toLowerCase();
-    const pw = document.getElementById('regPW').value;
-    if (!name || !email || pw.length < 8) { alert$('regFehler', 'Daten prüfen.'); return; }
-    laden(true);
-    try {
-        const hash = await sha256(pw);
-        const neuerKunde = { id: 'k_' + Date.now(), name, email, passwort_hash: hash, erstellt: new Date().toLocaleDateString() };
-        const { error } = await sb.from('kunden').insert([neuerKunde]);
-        if (error) throw error;
-        aktKunde = neuerKunde;
-        headerAktualisieren();
-        zeige('view-dashboard');
-    } catch (e) { console.error(e); } finally { laden(false); }
-}
-
-async function ladeDashboard() {
-    if (!aktKunde) return;
-    document.getElementById('profilBox').innerHTML = `<h3>${aktKunde.name}</h3>`;
-    try {
-        const { data } = await sb.from('bestellAnfragen').select('*').eq('kunden_id', aktKunde.id);
-        const liste = document.getElementById('auftragsListe');
-        if (!data || data.length === 0) { liste.innerHTML = '<p>Keine Aufträge.</p>'; return; }
-        liste.innerHTML = data.map(a => `<div>${a.projekt} - ${a.status}</div>`).join('');
-    } catch (e) { console.error(e); }
-}
-
-async function gastBestellung() {
-    const name = document.getElementById('gName').value.trim();
-    const email = document.getElementById('gEmail').value.trim();
-    const projekt = document.getElementById('gProjekt').value.trim();
-    const adresse = document.getElementById('gAdresse').value.trim();
-    const plz = document.getElementById('gPlz').value.trim();
-    const ort = document.getElementById('gOrt').value.trim();
-    if (!name || !email || !projekt) { alert$('gastFehler', 'Pflichtfelder!'); return; }
-    laden(true);
-    const orderId = genId();
-    try {
-        const { error } = await sb.from('bestellAnfragen').insert([{
-            id: orderId, gastname: name, gast_email: email, projekt, adresse, plz, ort, datum: new Date().toLocaleDateString()
-        }]);
-        if (error) throw error;
-        document.getElementById('confirmId').textContent = orderId;
-        zeige('view-bestaetigung');
-    } catch (e) { alert$('gastFehler', 'Fehler beim Senden.'); console.error(e); } finally { laden(false); }
-}
-
-function abmelden() { aktKunde = null; headerAktualisieren(); zeige('view-start'); }
-
-window.addEventListener('DOMContentLoaded', headerAktualisieren);
-</script>
-</body>
-</html>
+    <span style="font-size:14px
