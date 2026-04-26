@@ -69,7 +69,7 @@
 
         .card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 28px; margin-bottom: 20px; }
 
-        /* NEU: NACHRICHTEN BOX */
+        /* NACHRICHTEN BOX */
         .msg-box {
             background: #fff9db;
             border-left: 4px solid #fcc419;
@@ -80,6 +80,20 @@
             color: #856404;
         }
         .msg-label { font-weight: 700; text-transform: uppercase; font-size: 0.75em; display: block; margin-bottom: 4px; color: #b48902; }
+
+        /* NEU: KUNDEN CHAT INPUT */
+        .chat-input-area {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
 
         /* GAST-STATUS BOX */
         .status-search {
@@ -94,6 +108,8 @@
         .btn { padding: 11px 20px; border-radius: 9px; font-weight: 600; cursor: pointer; border: none; width: 100%; transition: 0.2s; text-align: center; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-m); }
+        .btn-danger { background: var(--danger); color: white; font-size: 0.75em; padding: 5px 10px; width: auto; margin-top: 5px; }
+        
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .field label { font-size: 0.78em; font-weight: 700; color: var(--text-l); text-transform: uppercase; }
@@ -106,6 +122,7 @@
         .b-blau { background: #e3f0ff; color: #0056b3; }
         .b-gruen { background: #e8f5e9; color: #155724; }
         .b-gelb { background: #fff3e0; color: #e65100; }
+        .b-rot { background: #fde8ea; color: #dc3545; }
 
         .hero { text-align: center; }
         .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
@@ -190,6 +207,23 @@
         </div>
     </div>
 
+    <div class="view" id="view-bestellung">
+        <div class="card">
+            <h2>Neuer Auftrag</h2>
+            <div class="alert alert-err" id="bestellFehler"></div>
+            <div class="form-grid">
+                <div class="field"><label>Projektname *</label><input type="text" id="bProjekt"></div>
+                <div class="field"><label>Material</label><select id="bMaterial"><option>Keine Präferenz</option><option>PLA</option><option>PETG</option></select></div>
+                <div class="field" style="grid-column: 1 / -1"><label>Beschreibung</label><textarea id="bBeschreibung"></textarea></div>
+                <div class="field" style="grid-column: 1 / -1"><label>Lieferadresse *</label><input type="text" id="bAdresse"></div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn btn-outline" onclick="zeige('view-dashboard')">Abbrechen</button>
+                <button class="btn btn-primary" onclick="bestellungAbschicken()">Auftrag absenden</button>
+            </div>
+        </div>
+    </div>
+
     <div class="view" id="view-bestaetigung">
         <div class="card" style="text-align:center;">
             <div style="font-size:40px; margin-bottom:15px;">✅</div>
@@ -236,7 +270,6 @@ const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
 let aktKunde = null;
 
-// Hilfsfunktionen
 function laden(on) { document.getElementById('ladeOverlay').style.display = on ? 'flex' : 'none'; }
 function zeige(id) { 
     document.querySelectorAll('.view').forEach(v => v.classList.remove('aktiv'));
@@ -249,12 +282,52 @@ async function sha256(str) {
 }
 function genId() { return 'B-' + Date.now().toString().slice(-8); }
 function badge(s) {
-    const cls = s === 'Abgeschlossen' ? 'b-gruen' : (s === 'In Bearbeitung' || s === 'Im Druck' ? 'b-gelb' : 'b-blau');
+    const cls = s === 'Abgeschlossen' ? 'b-gruen' : (s === 'In Bearbeitung' || s === 'Im Druck' ? 'b-gelb' : s === 'Storniert' ? 'b-rot' : 'b-blau');
     return `<span class="badge ${cls}">${s}</span>`;
 }
 
 /* ================================================
-   NEU: GAST STATUS PRÜFEN
+   NEU: KUNDE NACHRICHT SENDEN
+================================================ */
+async function nachrichtSenden(id) {
+    const input = document.getElementById('input-'+id);
+    const msg = input.value.trim();
+    if(!msg) return;
+
+    laden(true);
+    try {
+        // Wir hängen die neue Nachricht an die bestehende Beschreibung an
+        const { data: current } = await sb.from('bestellanfragen').select('beschreibung').eq('id', id).single();
+        const updatedDesc = (current.beschreibung || "") + "\n\n--- Kunde: " + msg;
+        
+        const { error } = await sb.from('bestellanfragen').update({ beschreibung: updatedDesc }).eq('id', id);
+        if(!error) {
+            input.value = "";
+            alert("Nachricht wurde an den Admin gesendet!");
+            await ladeDashboard();
+        }
+    } catch(e) { console.error(e); }
+    finally { laden(false); }
+}
+
+/* ================================================
+   NEU: KUNDE STORNO
+================================================ */
+async function kundeStorno(id) {
+    if(!confirm("Möchtest du diesen Auftrag wirklich stornieren?")) return;
+    
+    laden(true);
+    try {
+        const { error } = await sb.from('bestellanfragen').update({ status: 'Storniert' }).eq('id', id);
+        if(!error) {
+            await ladeDashboard();
+        }
+    } catch(e) { console.error(e); }
+    finally { laden(false); }
+}
+
+/* ================================================
+   GAST STATUS PRÜFEN
 ================================================ */
 async function gastStatusPruefen() {
     const nr = document.getElementById('sucheBestellNr').value.trim();
@@ -269,6 +342,10 @@ async function gastStatusPruefen() {
             erg.innerHTML = `<div class="alert alert-err on">❌ Bestellnummer nicht gefunden.</div>`;
         } else {
             let msgHtml = data.admin_notiz ? `<div class="msg-box"><span class="msg-label">Nachricht vom Studio:</span>${data.admin_notiz}</div>` : '';
+            
+            // Storno-Button für Gast (nur wenn Status "Anfrage eingegangen")
+            let stornoBtn = data.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger" onclick="kundeStorno('${data.id}').then(()=>gastStatusPruefen())">Diesen Auftrag stornieren</button>` : '';
+
             erg.innerHTML = `
                 <div class="card" style="border:1.5px solid #a5d8ff; box-shadow:none; padding:15px; margin:0;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -277,6 +354,7 @@ async function gastStatusPruefen() {
                     </div>
                     <div style="margin-top:10px; font-size:0.9em;">Projekt: <b>${data.projekt}</b></div>
                     ${msgHtml}
+                    ${stornoBtn}
                 </div>`;
         }
     } catch(e) { console.error(e); }
@@ -284,7 +362,7 @@ async function gastStatusPruefen() {
 }
 
 /* ================================================
-   KUNDEN-DASHBOARD (Inkl. Nachrichten)
+   KUNDEN-DASHBOARD
 ================================================ */
 async function ladeDashboard() {
     if(!aktKunde) return;
@@ -299,13 +377,20 @@ async function ladeDashboard() {
         } else {
             liste.innerHTML = `
                 <table class="order-table">
-                    <thead><tr><th>Projekt</th><th>Status</th><th>Kosten</th></tr></thead>
+                    <thead><tr><th>Projekt & Kommunikation</th><th>Status</th><th>Kosten</th></tr></thead>
                     <tbody>
                         ${data.map(a => `
                             <tr>
                                 <td>
                                     <b>${a.projekt}</b><br><small>${a.datum}</small>
                                     ${a.admin_notiz ? `<div class="msg-box"><span class="msg-label">Nachricht:</span>${a.admin_notiz}</div>` : ''}
+                                    
+                                    <div class="chat-input-area">
+                                        <input type="text" id="input-${a.id}" placeholder="Nachricht an Admin...">
+                                        <button class="btn btn-primary" style="width:auto; padding:5px 10px; font-size:10px;" onclick="nachrichtSenden('${a.id}')">Senden</button>
+                                    </div>
+
+                                    ${a.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger" onclick="kundeStorno('${a.id}')">Stornieren</button>` : ''}
                                 </td>
                                 <td>${badge(a.status)}</td>
                                 <td>${a.kosten ? a.kosten.toFixed(2)+'€' : 'ausstehend'}</td>
@@ -325,16 +410,55 @@ async function anmelden() {
     const e = document.getElementById('loginEmail').value;
     const p = document.getElementById('loginPW').value;
     laden(true);
-    const hash = await sha256(p);
-    const { data } = await sb.from('kunden').select('*').eq('email', e).eq('passwort_hash', hash).single();
-    if(data) {
-        aktKunde = data;
-        headerAktualisieren();
-        await ladeDashboard();
-        zeige('view-dashboard');
-    } else {
-        document.getElementById('loginFehler').classList.add('on');
-        document.getElementById('loginFehler').innerText = "❌ Login-Daten falsch.";
+    try {
+        const hash = await sha256(p);
+        const { data } = await sb.from('kunden').select('*').eq('email', e).eq('passwort_hash', hash).single();
+        if(data) {
+            aktKunde = data;
+            headerAktualisieren();
+            await ladeDashboard();
+            zeige('view-dashboard');
+        } else {
+            document.getElementById('loginFehler').classList.add('on');
+            document.getElementById('loginFehler').innerText = "❌ Login-Daten falsch.";
+        }
+    } catch(e) { console.error(e); }
+    finally { laden(false); }
+}
+
+async function registrieren() {
+    const n = document.getElementById('regName').value;
+    const e = document.getElementById('regEmail').value;
+    const p = document.getElementById('regPW').value;
+    if(!n || !e || p.length < 8) return alert("Bitte alle Felder korrekt ausfüllen.");
+    
+    laden(true);
+    try {
+        const hash = await sha256(p);
+        const { error } = await sb.from('kunden').insert([{ id: 'k_'+Date.now(), name: n, email: e, passwort_hash: hash }]);
+        if(!error) {
+            alert("Konto erstellt! Bitte einloggen.");
+            zeige('view-login');
+        }
+    } catch(e) { console.error(e); }
+    finally { laden(false); }
+}
+
+async function bestellungAbschicken() {
+    const p = document.getElementById('bProjekt').value;
+    const m = document.getElementById('bMaterial').value;
+    const d = document.getElementById('bBeschreibung').value;
+    const a = document.getElementById('bAdresse').value;
+    if(!p || !a) return alert("Projektname und Adresse sind Pflicht!");
+
+    laden(true);
+    const orderId = genId();
+    const { error } = await sb.from('bestellanfragen').insert([{
+        id: orderId, kunden_id: aktKunde.id, projekt: p, material_wunsch: m, beschreibung: d, adresse: a, datum: new Date().toLocaleDateString('de-DE'), status: 'Anfrage eingegangen'
+    }]);
+    if(!error) {
+        document.getElementById('confirmId').innerText = orderId;
+        zeige('view-bestaetigung');
     }
     laden(false);
 }
