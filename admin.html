@@ -1,77 +1,789 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin PRO</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-body{font-family:Arial;background:#eef2f5;padding:20px}
-.box{background:white;padding:20px;border-radius:10px;max-width:1000px;margin:auto}
-.order{border:1px solid #ccc;margin:10px;padding:10px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D-Druck Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --blau:      #0056b3;
+            --blau-dark: #004494;
+            --gruen:     #28a745;
+            --gruen-dark:#218838;
+            --rot:       #dc3545;
+            --rot-dark:  #c82333;
+            --orange:    #e65100;
+            --lila:      #6a1b9a;
+            --bg:        #f4f7f6;
+            --weiss:     #ffffff;
+            --grau-hell: #eef2f5;
+            --text:      #333;
+            --text-light:#555;
+            --border:    #dde4ee;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); min-height: 100vh; }
+
+        /* LOGIN */
+        #loginScreen {
+            position: fixed; inset: 0;
+            background: linear-gradient(135deg, #1a2a4a 0%, #0056b3 100%);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.4s ease;
+        }
+        #loginScreen.ausblenden { opacity: 0; pointer-events: none; }
+        .login-box {
+            background: var(--weiss); border-radius: 16px; padding: 40px 44px;
+            width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
+        }
+        .login-logo {
+            width: 60px; height: 60px; background: linear-gradient(135deg, #0056b3, #28a745);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 28px; margin: 0 auto 20px;
+        }
+        .login-box h1 { font-size: 1.4em; color: var(--text); margin-bottom: 4px; }
+        .login-box .login-sub { font-size: 0.85em; color: #888; margin-bottom: 28px; }
+        .login-box label { display: block; text-align: left; font-size: 0.82em; font-weight: 600; color: var(--text-light); margin-bottom: 6px; }
+        .login-input-wrap { position: relative; margin-bottom: 18px; }
+        .login-input-wrap input {
+            width: 100%; padding: 12px 44px 12px 14px; border: 1.5px solid #ddd;
+            border-radius: 8px; font-size: 15px; transition: border-color 0.2s; outline: none;
+        }
+        .login-input-wrap input:focus { border-color: var(--blau); }
+        .login-input-wrap input.fehler { border-color: var(--rot); animation: shake 0.35s ease; }
+        .toggle-pw {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; color: #999; width: auto;
+        }
+        .toggle-pw:hover { color: var(--blau); }
+        .login-fehler {
+            background: #fde8ea; border: 1px solid #f5c6cb; color: var(--rot);
+            border-radius: 8px; padding: 10px 14px; font-size: 0.83em; margin-bottom: 16px; display: none;
+        }
+        .login-fehler.sichtbar { display: block; }
+        .btn-login {
+            width: 100%; padding: 13px; background: linear-gradient(135deg, var(--blau), #0073e6);
+            color: white; border: none; border-radius: 8px; font-size: 15px;
+            font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn-login:hover { opacity: 0.92; }
+        .btn-login:active { transform: scale(0.98); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-hinweis { margin-top: 18px; font-size: 0.78em; color: #aaa; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+        /* TOPBAR */
+        #adminTopbar {
+            background: linear-gradient(90deg, #1a2a4a 0%, #0056b3 100%);
+            color: white; padding: 0 24px; height: 56px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .topbar-title { font-size: 1em; font-weight: 600; letter-spacing: 0.02em; }
+        .topbar-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 2px 10px; font-size: 0.72em; font-weight: 500; letter-spacing: 0.05em; }
+        .sync-status { font-size: 12px; color: var(--gruen); font-weight: normal; background: #e8f5e9; padding: 4px 10px; border-radius: 12px; }
+        .btn-logout { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: white; padding: 7px 16px; border-radius: 8px; font-size: 0.83em; cursor: pointer; transition: background 0.2s; width: auto; }
+        .btn-logout:hover { background: rgba(255,255,255,0.22); }
+
+        /* NAV TABS */
+        #navTabs {
+            background: var(--weiss); border-bottom: 2px solid var(--border);
+            display: flex; gap: 0; padding: 0 24px;
+            position: sticky; top: 56px; z-index: 99;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 14px 20px; font-size: 0.88em; font-weight: 600;
+            color: var(--text-light); border: none; background: none;
+            cursor: pointer; border-bottom: 3px solid transparent;
+            white-space: nowrap; width: auto;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tab-btn:hover { color: var(--blau); }
+        .tab-btn.aktiv { color: var(--blau); border-bottom-color: var(--blau); }
+        .tab-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--rot); color: white;
+            width: 18px; height: 18px; border-radius: 50%;
+            font-size: 0.72em; font-weight: 700; margin-left: 6px;
+        }
+
+        /* PANELS */
+        #dashboard { padding: 24px; }
+        .tab-panel { display: none; }
+        .tab-panel.aktiv { display: block; }
+        .panels-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+
+        /* CARDS */
+        .container { background: var(--weiss); padding: 25px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); width: 100%; max-width: 600px; }
+        .container-wide { max-width: 1260px; margin: 0 auto; }
+        h2 { color: var(--text); margin-top: 0; border-bottom: 2px solid var(--blau); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.1em; }
+        h3 { color: var(--text); margin-top: 24px; font-size: 1em; }
+
+        /* FORMS */
+        .form-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+        .form-group { flex: 1; min-width: 120px; }
+        .form-group-full { width: 100%; margin-bottom: 14px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-light); font-size: 0.88em; }
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%; padding: 10px 12px; border: 1.5px solid #ddd;
+            border-radius: 6px; font-size: 14px; font-family: inherit;
+            transition: border-color 0.2s; outline: none;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--blau); }
+        input[readonly] { background: var(--grau-hell); color: #888; cursor: not-allowed; }
+        textarea { resize: vertical; min-height: 80px; }
+
+        /* BUTTONS */
+        button { width: 100%; padding: 11px; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+        button:disabled { background-color: #ccc !important; cursor: not-allowed; }
+        button:active:not(:disabled) { transform: scale(0.99); }
+        .btn-add  { background: var(--blau);  margin-top: 10px; }
+        .btn-add:hover  { background: var(--blau-dark); }
+        .btn-save { background: var(--gruen); margin-top: 10px; }
+        .btn-save:hover { background: var(--gruen-dark); }
+        .btn-delete { background: var(--rot); padding: 5px 10px; font-size: 12px; width: auto; border-radius: 5px; }
+        .btn-delete:hover { background: var(--rot-dark); }
+        .btn-sm-blue { background: var(--blau); padding: 6px 14px; font-size: 12px; width: auto; border-radius: 5px; }
+        .btn-sm-blue:hover { background: var(--blau-dark); }
+
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.88em; }
+        th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+        th { background: var(--grau-hell); color: var(--text); font-size: 0.85em; }
+        tr:hover td { background: #fafcff; }
+
+        /* KALKULATION */
+        .kalkulation-box { background: var(--grau-hell); padding: 14px 16px; border-radius: 8px; border-left: 5px solid var(--gruen); margin-top: 14px; line-height: 1.7; font-size: 0.93em; }
+        .kalkulation-box strong { font-size: 1.15em; color: #d9534f; }
+        .rabatt-text { color: var(--gruen); font-weight: bold; }
+        .warning { color: var(--rot); font-size: 0.82em; font-weight: bold; display: none; margin-top: 4px; }
+        .empty-state { text-align: center; color: #aaa; font-style: italic; padding: 20px; }
+        .checkbox-large { width: 20px; height: 20px; cursor: pointer; accent-color: var(--gruen); }
+
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .stat-card { background: var(--weiss); border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); border-left: 4px solid var(--blau); }
+        .stat-card.orange { border-left-color: var(--orange); }
+        .stat-card.gruen  { border-left-color: var(--gruen); }
+        .stat-card.lila   { border-left-color: var(--lila); }
+        .stat-card.rot    { border-left-color: var(--rot); }
+        .stat-label { font-size: 0.75em; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        .stat-wert  { font-size: 1.7em; font-weight: 700; color: var(--text); margin: 4px 0 0; }
+
+        /* BADGES */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.76em; font-weight: 600; white-space: nowrap; }
+        .b-blau  { background: #e3f0ff; color: #0056b3; }
+        .b-gelb  { background: #fff3e0; color: var(--orange); }
+        .b-lila  { background: #f3e5f5; color: var(--lila); }
+        .b-gruen { background: #e8f5e9; color: #155724; }
+        .b-rot   { background: #fde8ea; color: var(--rot); }
+        .b-grau  { background: #f0f0f0; color: #666; }
+
+        /* FILTER BAR */
+        .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+        .filter-bar select { width: auto; font-size: 13px; padding: 7px 10px; }
+        .filter-bar input  { flex: 1; min-width: 180px; font-size: 13px; padding: 7px 10px; }
+
+        /* MODAL */
+        #modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            display: none; align-items: center; justify-content: center;
+            z-index: 5000; padding: 16px; backdrop-filter: blur(3px);
+        }
+        #modal-overlay.on { display: flex; }
+        .modal-box { background: var(--weiss); border-radius: 14px; width: 100%; max-width: 560px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .modal-header h3 { font-size: 1.05em; color: var(--text); margin: 0; }
+        .modal-close { background: var(--grau-hell); border: none; color: var(--text); width: 30px; height: 30px; border-radius: 50%; font-size: 16px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .modal-close:hover { background: #dde; }
+        .modal-body { padding: 18px 22px; }
+        .modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .modal-footer button { flex: 1; margin: 0; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+        .info-item { background: var(--grau-hell); border-radius: 8px; padding: 10px 13px; }
+        .info-item.full { grid-column: 1/-1; }
+        .ilabel { font-size: 0.72em; color: var(--text-light); font-weight: 600; text-transform: uppercase; margin-bottom: 3px; }
+        .ival   { font-size: 0.9em; color: var(--text); word-break: break-word; line-height: 1.5; }
+        .modal-section { font-size: 0.75em; font-weight: 700; color: var(--blau); text-transform: uppercase; letter-spacing: 0.06em; margin: 16px 0 8px; padding-bottom: 5px; border-bottom: 1.5px solid #e0eaf8; }
+
+        /* LADE-OVERLAY */
+        #loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); display: none; justify-content: center; align-items: center; font-size: 18px; font-weight: 600; color: var(--blau); z-index: 8888; backdrop-filter: blur(2px); }
+        .loading-spinner { width: 28px; height: 28px; border: 3px solid #dde; border-top-color: var(--blau); border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 600px) {
+            #navTabs { padding: 0 8px; }
+            .tab-btn { padding: 12px 11px; font-size: 0.8em; }
+            .info-grid { grid-template-columns: 1fr; }
+            .modal-box { max-height: 95vh; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="box">
-<h2>Admin Login</h2>
-<input type="password" id="pw">
-<button onclick="login()">Login</button>
+<!-- LOGIN -->
+<div id="loginScreen">
+    <div class="login-box">
+        <div class="login-logo">🖨️</div>
+        <h1>3D-Druck Admin</h1>
+        <p class="login-sub">Nur für Administratoren</p>
+        <label for="pwInput">Passwort</label>
+        <div class="login-input-wrap">
+            <input type="password" id="pwInput" placeholder="Passwort eingeben…"
+                   autocomplete="current-password"
+                   onkeydown="if(event.key==='Enter') pruefePW()">
+            <button class="toggle-pw" type="button" onclick="toggleSichtbarkeit()">👁</button>
+        </div>
+        <div class="login-fehler" id="loginFehler">❌ Falsches Passwort.</div>
+        <button class="btn-login" onclick="pruefePW()">Anmelden</button>
+        <p class="login-hinweis">Sitzung gilt nur für diese Browser-Session.</p>
+    </div>
+</div>
 
-<div id="panel" style="display:none">
-<h2>Dashboard</h2>
-<div id="orders"></div>
+<!-- LADE-OVERLAY -->
+<div id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    Bitte warten…
 </div>
+
+<!-- MODAL: Anfrage bearbeiten -->
+<div id="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modal-title">Bestellanfrage bearbeiten</h3>
+            <button class="modal-close" onclick="modalSchliessen()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer">
+            <button style="background:#eee;color:#333;border:1.5px solid #ddd;font-size:14px" onclick="modalSchliessen()">Abbrechen</button>
+            <button style="background:var(--gruen);margin:0;font-size:14px" onclick="anfrageSpeichern()">✓ Speichern</button>
+        </div>
+    </div>
 </div>
+
+<!-- TOPBAR -->
+<div id="adminTopbar" style="display:none">
+    <div class="topbar-left">
+        <div class="topbar-logo">🖨️</div>
+        <span class="topbar-title">3D-Druck Dashboard</span>
+        <span class="topbar-badge">ADMIN</span>
+        <span class="sync-status" id="topbarStatus">🟢 Online</span>
+    </div>
+    <button class="btn-logout" onclick="abmelden()">⬡ Abmelden</button>
+</div>
+
+<!-- TABS -->
+<div id="navTabs" style="display:none">
+    <button class="tab-btn aktiv" onclick="zeigeTab('tab-anfragen',this)">
+        📥 Kundenanfragen
+        <span class="tab-badge" id="badgeAnfragen" style="display:none">0</span>
+    </button>
+    <button class="tab-btn" onclick="zeigeTab('tab-lager',this)">🧵 Filamentlager</button>
+    <button class="tab-btn" onclick="zeigeTab('tab-auftraege',this)">📋 Druckaufträge</button>
+    <button class="tab-btn" onclick="zeigeTab('tab-neuer-auftrag',this)">➕ Neuer Auftrag</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
+
+    <!-- ===== TAB 1: KUNDENANFRAGEN ===== -->
+    <div class="tab-panel aktiv" id="tab-anfragen">
+        <div style="padding:24px">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Alle Anfragen</div>
+                    <div class="stat-wert" id="statAlle">—</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-label">Neu / Offen</div>
+                    <div class="stat-wert" id="statNeu">—</div>
+                </div>
+                <div class="stat-card lila">
+                    <div class="stat-label">Im Druck</div>
+                    <div class="stat-wert" id="statDruck">—</div>
+                </div>
+                <div class="stat-card gruen">
+                    <div class="stat-label">Abgeschlossen</div>
+                    <div class="stat-wert" id="statAbge">—</div>
+                </div>
+                <div class="stat-card rot">
+                    <div class="stat-label">Umsatz gesamt (€)</div>
+                    <div class="stat-wert" id="statUmsatz">—</div>
+                </div>
+            </div>
+
+            <div class="container container-wide">
+                <h2>Alle Kundenanfragen
+                    <button class="btn-sm-blue" style="margin:0" onclick="ladeAnfragen()">↻ Aktualisieren</button>
+                </h2>
+                <div class="filter-bar">
+                    <select id="filterStatus" onchange="filterAnfragen()">
+                        <option value="">— Alle Status —</option>
+                        <option value="Anfrage eingegangen">Anfrage eingegangen</option>
+                        <option value="In Bearbeitung">In Bearbeitung</option>
+                        <option value="Im Druck">Im Druck</option>
+                        <option value="Qualitätsprüfung">Qualitätsprüfung</option>
+                        <option value="Versandbereit">Versandbereit</option>
+                        <option value="Abgeschlossen">Abgeschlossen</option>
+                        <option value="Storniert">Storniert</option>
+                    </select>
+                    <input type="text" id="filterSuche"
+                           placeholder="🔍 Name, Projekt, E-Mail, Bestellnr. suchen…"
+                           oninput="filterAnfragen()">
+                </div>
+                <div style="overflow-x:auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Bestellnr.</th>
+                                <th>Kunde</th>
+                                <th>Projekt</th>
+                                <th>Material-Wunsch</th>
+                                <th>Lieferadresse</th>
+                                <th>Status</th>
+                                <th>Preis</th>
+                                <th>Aktion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelleAnfragen">
+                            <tr><td colspan="9" class="empty-state">Lade Daten…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 2: FILAMENTLAGER ===== -->
+    <div class="tab-panel" id="tab-lager">
+        <div class="panels-row" style="padding:24px">
+            <div class="container">
+                <h2>Filament Lager</h2>
+                <form id="lagerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Hersteller:</label>
+                            <input type="text" id="hersteller" required placeholder="z.B. Anycubic">
+                        </div>
+                        <div class="form-group">
+                            <label>Farbe:</label>
+                            <input type="text" id="farbe" required placeholder="z.B. Schwarz">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Material:</label>
+                            <select id="materialTyp">
+                                <optgroup label="PLA Varianten">
+                                    <option>PLA</option><option>XPLA</option>
+                                    <option>PLA+</option><option>PLA Silk</option><option>PLA Matt</option>
+                                </optgroup>
+                                <optgroup label="Weitere">
+                                    <option>PETG</option><option>ABS</option><option>ASA</option>
+                                    <option>TPU</option><option>Nylon</option><option>PC</option><option>CF</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Gewicht (g):</label>
+                            <input type="number" id="gewicht" required value="1000" min="1" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label>Preis (€):</label>
+                            <input type="number" id="kaufpreis" required value="16.99" step="any">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-add" id="btnLagerAdd">+ Zum Bestand hinzufügen</button>
+                </form>
+                <h3>Aktueller Bestand</h3>
+                <table>
+                    <thead><tr><th>Filament</th><th>Rest</th><th>Preis</th><th></th></tr></thead>
+                    <tbody id="tabellenBodyLager"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 3: DRUCKAUFTRÄGE ===== -->
+    <div class="tab-panel" id="tab-auftraege">
+        <div style="padding:24px">
+            <div class="container container-wide">
+                <h2>Auftragshistorie (eigene Buchungen)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Datum</th><th>Status</th><th>Projekt</th>
+                            <th>Kunde</th><th>Material</th><th>Verbrauch</th><th>Kosten</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabellenBodyHistorie"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 4: NEUER AUFTRAG ===== -->
+    <div class="tab-panel" id="tab-neuer-auftrag">
+        <div class="panels-row" style="padding:24px">
+            <div class="container">
+                <h2>Druckauftrag erfassen</h2>
+                <form id="druckForm">
+                    <div class="form-group-full">
+                        <label>Auftrag / Projekt:</label>
+                        <input type="text" id="auftrag" required placeholder="z.B. Gehäuse">
+                    </div>
+                    <div class="form-group-full">
+                        <label>Auftraggeber (Name):</label>
+                        <input type="text" id="name" required placeholder="Max Mustermann">
+                    </div>
+                    <div class="form-group-full">
+                        <label>Verwendetes Filament:</label>
+                        <select id="jobFilament" required onchange="berechneKosten()"></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Verbrauch (g):</label>
+                            <input type="number" id="verbrauch" required placeholder="125" step="any" oninput="berechneKosten()">
+                            <div id="warnungGewicht" class="warning">⚠ Mehr als Restgewicht!</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Verschleiß (€):</label>
+                            <input type="number" id="zusatzKosten" step="any" value="4.50" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Rabatt (%):</label>
+                            <input type="number" id="rabatt" step="any" value="0" min="0" max="100" oninput="berechneKosten()">
+                        </div>
+                    </div>
+                    <div class="kalkulation-box">
+                        Material: <span id="anzeigeMaterial">0.00</span> €<br>
+                        Verschleiß: <span id="anzeigeZusatz">4.50</span> €<br>
+                        Rabatt: <span id="anzeigeRabatt" class="rabatt-text">-0.00</span> €<br>
+                        <strong>Gesamt: <span id="anzeigeGesamt">4.50</span> €</strong>
+                    </div>
+                    <button type="submit" class="btn-save" id="btnAuftragAdd">✓ Auftrag buchen &amp; speichern</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /#dashboard -->
+
 
 <script>
-const ADMIN_PASSWORD = "DEIN_PASSWORT_BEIBEHALTEN";
+/* ================================================  LOGIN  ================================================ */
+const _p = atob('S3g5bS1EcnVjayMyMDI1');
 
-if(!window.sbClient){
-  window.sbClient = window.supabase.createClient("https://YOUR_URL.supabase.co","YOUR_KEY");
+function pruefePW() {
+    const eingabe = document.getElementById('pwInput').value;
+    const fehler  = document.getElementById('loginFehler');
+    const input   = document.getElementById('pwInput');
+    if (eingabe === _p) {
+        sessionStorage.setItem('adminAuth','1');
+        document.getElementById('loginScreen').classList.add('ausblenden');
+        setTimeout(() => { document.getElementById('loginScreen').style.display='none'; zeigeAdmin(); }, 400);
+    } else {
+        fehler.classList.add('sichtbar');
+        input.classList.add('fehler');
+        input.value = '';
+        setTimeout(() => input.classList.remove('fehler'), 400);
+        input.focus();
+    }
 }
-const db = window.sbClient;
+function toggleSichtbarkeit() { const el=document.getElementById('pwInput'); el.type = el.type==='password'?'text':'password'; }
+function abmelden() { if(confirm('Wirklich abmelden?')) { sessionStorage.removeItem('adminAuth'); location.reload(); } }
+function zeigeAdmin() {
+    document.getElementById('adminTopbar').style.display = 'flex';
+    document.getElementById('navTabs').style.display     = 'flex';
+    document.getElementById('dashboard').style.display  = 'block';
+    ladeDaten();
+    ladeAnfragen();
+}
+window.addEventListener('DOMContentLoaded', () => {
+    if (sessionStorage.getItem('adminAuth')==='1') { document.getElementById('loginScreen').style.display='none'; zeigeAdmin(); }
+    else document.getElementById('pwInput').focus();
+});
 
-function login(){
-  if(pw.value===ADMIN_PASSWORD){
-    panel.style.display="block";
-    load();
-  } else alert("Falsch");
+/* ================================================  SUPABASE  ================================================ */
+const supabaseUrl = 'https://zasufuyaiturzgohqkky.supabase.co';
+const supabaseKey = 'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj';
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+/* ================================================  TABS  ================================================ */
+function zeigeTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('aktiv'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('aktiv'));
+    document.getElementById(id).classList.add('aktiv');
+    btn.classList.add('aktiv');
 }
 
-async function load(){
-  const {data} = await db.from("bestellAnfragen").select("*").order("datum",{ascending:false});
+/* ================================================  DATEN  ================================================ */
+const standardFilamente = [
+    {id:"std_1",Material:"ASA (Schwarz)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"20.99"},
+    {id:"std_2",Material:"ASA (Weiß)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"20.99"},
+    {id:"std_3",Material:"PLA (Galaxy Violette)",Hertseller:"Anycubic",startGewicht:"116",restGewicht:"116",Preis:"16.99"},
+    {id:"std_4",Material:"PLA (Grün)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"16.99"},
+    {id:"std_5",Material:"PLA (Rot)",Hertseller:"Anycubic",startGewicht:"450",restGewicht:"450",Preis:"16.99"},
+    {id:"std_6",Material:"PLA (Blau)",Hertseller:"Anycubic",startGewicht:"852",restGewicht:"852",Preis:"16.99"},
+    {id:"std_7",Material:"PLA (Braun)",Hertseller:"Anycubic",startGewicht:"300",restGewicht:"300",Preis:"16.99"},
+    {id:"std_8",Material:"PETG (Schwarz)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"19.99"},
+    {id:"std_9",Material:"PLA (Rot/Blau Matt)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"20.99"},
+    {id:"std_10",Material:"PLA (Pink Gold Silk)",Hertseller:"Anycubic",startGewicht:"323",restGewicht:"323",Preis:"16.99"},
+    {id:"std_11",Material:"PLA (Weiß Pro)",Hertseller:"Deeplee",startGewicht:"1000",restGewicht:"1000",Preis:"11.99"},
+    {id:"std_12",Material:"PLA (Tri Color)",Hertseller:"Amolen",startGewicht:"630",restGewicht:"630",Preis:"20.99"},
+    {id:"std_13",Material:"PETG (Hautfarbe)",Hertseller:"IEMAI",startGewicht:"1000",restGewicht:"1000",Preis:"9.99"},
+    {id:"std_14",Material:"XPLA (Marmor)",Hertseller:"Winkle",startGewicht:"1000",restGewicht:"1000",Preis:"19.67"},
+    {id:"std_15",Material:"PLA (Marmor Dunkel)",Hertseller:"Techbears",startGewicht:"1000",restGewicht:"1000",Preis:"16.40"},
+    {id:"std_16",Material:"PETG (Schwarz)",Hertseller:"Geetech",startGewicht:"800",restGewicht:"800",Preis:"16.99"}
+];
 
-  orders.innerHTML="";
+let filamentLager = [], auftragsHistorie = [], alleAnfragen = [];
+let aktuelleKosten = 0, aktModalId = null;
 
-  data.forEach(o=>{
-    orders.innerHTML += `<div class="order">
-      <b>${o.projekt}</b><br>
-      Status: ${o.status}<br>
-      <input placeholder="Preis" onchange="setPrice('${o.id}',this.value)">
-      <button onclick="setStatus('${o.id}','In Bearbeitung')">Start</button>
-      <button onclick="setStatus('${o.id}','Druck läuft')">Druck</button>
-      <button onclick="setStatus('${o.id}','Fertig')">Fertig</button>
-      <button onclick="setStatus('${o.id}','Storniert')">Storno</button>
-    </div>`;
-  });
+async function ladeDaten() {
+    ladeOverlay(true);
+    try {
+        let { data: ld } = await supabaseClient.from('FilamentLager').select('*');
+        if (ld && ld.length===0) { await supabaseClient.from('FilamentLager').insert(standardFilamente); ld=(await supabaseClient.from('FilamentLager').select('*')).data; }
+        if (ld) filamentLager = ld;
+        let { data: hd } = await supabaseClient.from('auftragsHistorie').select('*');
+        if (hd) auftragsHistorie = hd.sort((a,b)=>b.id.localeCompare(a.id));
+        uiAktualisieren();
+        document.getElementById('topbarStatus').textContent='🟢 Online';
+    } catch(e) { document.getElementById('topbarStatus').textContent='🔴 Fehler'; console.error(e); }
+    finally { ladeOverlay(false); }
 }
 
-async function setStatus(id,status){
-  await db.from("bestellAnfragen").update({status}).eq("id",id);
+/* ================================================  KUNDENANFRAGEN  ================================================ */
+async function ladeAnfragen() {
+    try {
+        const { data } = await supabaseClient.from('bestellAnfragen').select('*').order('erstellt_am',{ascending:false});
+        if (data) { alleAnfragen=data; filterAnfragen(); statsAktualisieren(); }
+    } catch(e) { console.error('Anfragen:',e); }
 }
 
-async function setPrice(id,price){
-  await db.from("bestellAnfragen").update({kosten:price}).eq("id",id);
+function statsAktualisieren() {
+    const neu    = alleAnfragen.filter(a=>a.status==='Anfrage eingegangen'||a.status==='In Bearbeitung').length;
+    const druck  = alleAnfragen.filter(a=>a.status==='Im Druck'||a.status==='Qualitätsprüfung').length;
+    const abge   = alleAnfragen.filter(a=>a.status==='Abgeschlossen').length;
+    const umsatz = alleAnfragen.reduce((s,a)=>s+parseFloat(a.kosten||0),0);
+    document.getElementById('statAlle').textContent   = alleAnfragen.length;
+    document.getElementById('statNeu').textContent    = neu;
+    document.getElementById('statDruck').textContent  = druck;
+    document.getElementById('statAbge').textContent   = abge;
+    document.getElementById('statUmsatz').textContent = umsatz.toFixed(2);
+    const b = document.getElementById('badgeAnfragen');
+    b.textContent=neu; b.style.display=neu>0?'inline-flex':'none';
 }
 
-// 🔥 Realtime Admin
- db.channel('admin-orders')
-  .on('postgres_changes',{event:'*',schema:'public',table:'bestellAnfragen'},payload=>{
-    load();
-  })
-  .subscribe();
+function filterAnfragen() {
+    const sf = document.getElementById('filterStatus').value;
+    const su = document.getElementById('filterSuche').value.toLowerCase();
+    const list = alleAnfragen.filter(a=>{
+        const ms = !sf || a.status===sf;
+        const mx = !su || `${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
+        return ms && mx;
+    });
+    const tb = document.getElementById('tabelleAnfragen');
+    if (!list.length) { tb.innerHTML=`<tr><td colspan="9" class="empty-state">Keine Einträge gefunden.</td></tr>`; return; }
+    tb.innerHTML = list.map(a=>{
+        const name = a.gastname ? `${esc(a.gastname)} <span style="font-size:.78em;color:#aaa">(Gast)</span>` : `<span style="color:var(--blau)">🔑 Kundenkonto</span>`;
+        const adr  = a.adresse  ? `<span style="font-size:.82em">${esc(a.adresse)}<br>${esc(a.plz)} ${esc(a.ort)}</span>` : `<span style="color:#bbb;font-size:.82em">—</span>`;
+        const pr   = a.kosten!=null ? `<strong style="color:var(--gruen)">${parseFloat(a.kosten).toFixed(2)} €</strong>` : `<span style="color:#bbb;font-size:.82em">Offen</span>`;
+        return `<tr>
+            <td style="font-size:.82em;color:var(--text-light);white-space:nowrap">${esc(a.datum)}</td>
+            <td style="font-family:monospace;font-size:.8em">${esc(a.id)}</td>
+            <td>${name}</td>
+            <td><strong>${esc(a.projekt)}</strong>${a.beschreibung?`<div style="font-size:.78em;color:#888;margin-top:2px">${esc(a.beschreibung.slice(0,50))}${a.beschreibung.length>50?'…':''}</div>`:''}</td>
+            <td style="font-size:.83em">${esc(a.material_wunsch)}</td>
+            <td>${adr}</td>
+            <td>${badgeHtml(a.status)}</td>
+            <td>${pr}</td>
+            <td><button class="btn-sm-blue" onclick="modalOeffnen('${a.id}')">✏ Bearbeiten</button></td>
+        </tr>`;
+    }).join('');
+}
+
+/* ================================================  MODAL  ================================================ */
+function modalOeffnen(id) {
+    const a = alleAnfragen.find(x=>x.id===id);
+    if (!a) return;
+    aktModalId = id;
+    document.getElementById('modal-title').textContent = `Anfrage: ${a.id}`;
+    document.getElementById('modal-body').innerHTML = `
+        <div class="modal-section">📋 Auftragsdetails</div>
+        <div class="info-grid">
+            <div class="info-item"><div class="ilabel">Eingegangen</div><div class="ival">${esc(a.datum)}</div></div>
+            <div class="info-item"><div class="ilabel">Bestellnummer</div><div class="ival" style="font-family:monospace;font-size:.85em">${esc(a.id)}</div></div>
+            <div class="info-item"><div class="ilabel">Kunde / Gast</div><div class="ival">${esc(a.gastname||'(Kundenkonto)')}</div></div>
+            <div class="info-item"><div class="ilabel">E-Mail</div><div class="ival">${a.gast_email?`<a href="mailto:${esc(a.gast_email)}">${esc(a.gast_email)}</a>`:'—'}</div></div>
+            <div class="info-item"><div class="ilabel">Telefon</div><div class="ival">${esc(a.telefon||'—')}</div></div>
+            <div class="info-item"><div class="ilabel">Material-Wunsch</div><div class="ival">${esc(a.material_wunsch)}</div></div>
+            <div class="info-item full"><div class="ilabel">Projekt / Beschreibung</div><div class="ival"><strong>${esc(a.projekt)}</strong>${a.beschreibung?'<br>'+esc(a.beschreibung):''}</div></div>
+        </div>
+
+        <div class="modal-section">📍 Lieferadresse</div>
+        <div class="info-grid">
+            <div class="info-item full"><div class="ilabel">Adresse</div><div class="ival">
+                ${a.adresse?`${esc(a.adresse)}<br>${esc(a.plz)} ${esc(a.ort)}`:'Keine Adresse angegeben'}
+                ${a.liefer_hinweis?`<br><span style="font-size:.85em;color:var(--orange)">💬 ${esc(a.liefer_hinweis)}</span>`:''}
+            </div></div>
+        </div>
+
+        <div class="modal-section">⚙️ Bearbeitung</div>
+        <div class="form-row" style="margin-bottom:12px">
+            <div class="form-group">
+                <label>Status</label>
+                <select id="m-status">
+                    <option ${a.status==='Anfrage eingegangen'?'selected':''}>Anfrage eingegangen</option>
+                    <option ${a.status==='In Bearbeitung'?'selected':''}>In Bearbeitung</option>
+                    <option ${a.status==='Im Druck'?'selected':''}>Im Druck</option>
+                    <option ${a.status==='Qualitätsprüfung'?'selected':''}>Qualitätsprüfung</option>
+                    <option ${a.status==='Versandbereit'?'selected':''}>Versandbereit</option>
+                    <option ${a.status==='Abgeschlossen'?'selected':''}>Abgeschlossen</option>
+                    <option ${a.status==='Storniert'?'selected':''}>Storniert</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Preis für Kunden (€)</label>
+                <input type="number" id="m-kosten" step="0.01" min="0"
+                       value="${a.kosten!=null?a.kosten:''}" placeholder="Noch offen">
+            </div>
+        </div>
+        <label>Notiz / Nachricht an Kunden (optional)</label>
+        <textarea id="m-notiz" placeholder="z.B. Bitte STL-Datei senden. Lieferung ca. 3–5 Werktage…">${esc(a.admin_notiz||'')}</textarea>
+    `;
+    document.getElementById('modal-overlay').classList.add('on');
+}
+
+function modalSchliessen() {
+    document.getElementById('modal-overlay').classList.remove('on');
+    aktModalId = null;
+}
+
+async function anfrageSpeichern() {
+    if (!aktModalId) return;
+    const status = document.getElementById('m-status').value;
+    const kv     = document.getElementById('m-kosten').value;
+    const notiz  = document.getElementById('m-notiz').value.trim();
+    const kosten = kv!==''?parseFloat(kv):null;
+    ladeOverlay(true);
+    try {
+        await supabaseClient.from('bestellAnfragen').update({status,kosten,admin_notiz:notiz}).eq('id',aktModalId);
+        const i = alleAnfragen.findIndex(a=>a.id===aktModalId);
+        if (i>-1) alleAnfragen[i]={...alleAnfragen[i],status,kosten,admin_notiz:notiz};
+        filterAnfragen(); statsAktualisieren(); modalSchliessen();
+    } catch(e) { alert('Fehler beim Speichern!'); console.error(e); }
+    finally { ladeOverlay(false); }
+}
+
+// Modal schließen bei Klick außerhalb
+document.getElementById('modal-overlay').addEventListener('click',function(e){ if(e.target===this) modalSchliessen(); });
+
+/* ================================================  FILAMENT  ================================================ */
+document.getElementById('lagerForm').addEventListener('submit',e=>{e.preventDefault();filamentHinzufuegen();});
+async function filamentHinzufuegen() {
+    document.getElementById('btnLagerAdd').disabled=true;
+    const neueSpule = {
+        id:'spule_'+Date.now(),
+        Hertseller:document.getElementById('hersteller').value.trim(),
+        Material:`${document.getElementById('materialTyp').value} (${document.getElementById('farbe').value.trim()})`,
+        startGewicht:(parseFloat(document.getElementById('gewicht').value)||0).toString(),
+        restGewicht:(parseFloat(document.getElementById('gewicht').value)||0).toString(),
+        Preis:(parseFloat(document.getElementById('kaufpreis').value)||0).toString()
+    };
+    await supabaseClient.from('FilamentLager').insert([neueSpule]);
+    document.getElementById('lagerForm').reset();
+    document.getElementById('gewicht').value=1000; document.getElementById('kaufpreis').value=16.99;
+    await ladeDaten(); document.getElementById('btnLagerAdd').disabled=false;
+}
+async function filamentLoeschen(id) {
+    if(confirm('Spule wirklich löschen?')) { ladeOverlay(true); await supabaseClient.from('FilamentLager').delete().eq('id',id); await ladeDaten(); }
+}
+
+/* ================================================  KALKULATION  ================================================ */
+function berechneKosten() {
+    const id=document.getElementById('jobFilament').value, v=parseFloat(document.getElementById('verbrauch').value)||0;
+    const zk=parseFloat(document.getElementById('zusatzKosten').value)||4.5, rb=parseFloat(document.getElementById('rabatt').value)||0;
+    let mk=0;
+    if(id){const s=filamentLager.find(f=>f.id===id);if(s){mk=(parseFloat(s.Preis)/parseFloat(s.startGewicht))*v;document.getElementById('warnungGewicht').style.display=v>parseFloat(s.restGewicht)?'block':'none';}}
+    else document.getElementById('warnungGewicht').style.display='none';
+    const zw=mk+zk, rbw=zw*(rb/100); aktuelleKosten=zw-rbw;
+    document.getElementById('anzeigeMaterial').textContent=mk.toFixed(2);
+    document.getElementById('anzeigeZusatz').textContent=zk.toFixed(2);
+    document.getElementById('anzeigeRabatt').textContent='-'+rbw.toFixed(2);
+    document.getElementById('anzeigeGesamt').textContent=aktuelleKosten.toFixed(2);
+}
+
+/* ================================================  AUFTRÄGE  ================================================ */
+document.getElementById('druckForm').addEventListener('submit',e=>{e.preventDefault();auftragSpeichern();});
+async function auftragSpeichern() {
+    const id=document.getElementById('jobFilament').value;
+    if(!id){alert('Bitte Filament auswählen!');return;}
+    const v=parseFloat(document.getElementById('verbrauch').value)||0;
+    const s=filamentLager.find(f=>f.id===id); if(!s)return;
+    document.getElementById('btnAuftragAdd').disabled=true; ladeOverlay(true);
+    await supabaseClient.from('auftragsHistorie').insert([{
+        id:'job_'+Date.now(), spuled:id, erledigt:false,
+        datum:new Date().toLocaleDateString('de-DE'),
+        projekt:document.getElementById('auftrag').value.trim(),
+        kunde:document.getElementById('name').value.trim(),
+        material:s.Material, verbrauchG:v, kosten:aktuelleKosten
+    }]);
+    const nr=parseFloat(s.restGewicht)-v;
+    await supabaseClient.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',id);
+    ['auftrag','verbrauch','name'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('rabatt').value='0';
+    if(nr<=0)alert('⚠ Spule ist jetzt leer!');
+    await ladeDaten(); document.getElementById('btnAuftragAdd').disabled=false;
+}
+async function statusAendern(jobId) {
+    const j=auftragsHistorie.find(a=>a.id===jobId);
+    if(j){ladeOverlay(true);await supabaseClient.from('auftragsHistorie').update({erledigt:!j.erledigt}).eq('id',jobId);await ladeDaten();}
+}
+async function historienLoeschen(jobId) {
+    const j=auftragsHistorie.find(a=>a.id===jobId); if(!j)return;
+    if(confirm(`Auftrag löschen?\n${j.verbrauchG}g Filament wird zurückgebucht.`)){
+        ladeOverlay(true);
+        if(j.spuled){const s=filamentLager.find(f=>f.id===j.spuled);if(s){const ng=parseFloat(s.restGewicht)+j.verbrauchG;await supabaseClient.from('FilamentLager').update({restGewicht:ng.toString()}).eq('id',s.id);}}
+        await supabaseClient.from('auftragsHistorie').delete().eq('id',jobId);await ladeDaten();
+    }
+}
+
+/* ================================================  UI  ================================================ */
+function uiAktualisieren() {
+    const tl=document.getElementById('tabellenBodyLager'), dd=document.getElementById('jobFilament'), th=document.getElementById('tabellenBodyHistorie');
+    tl.innerHTML=''; dd.innerHTML=''; th.innerHTML='';
+    if(!filamentLager.length){tl.innerHTML='<tr><td colspan="4" class="empty-state">Kein Filament.</td></tr>';dd.innerHTML='<option value="">Erst Filament anlegen…</option>';}
+    else{
+        dd.innerHTML='<option value="" disabled selected>— Spule wählen —</option>';
+        filamentLager.forEach(f=>{
+            const r=parseFloat(f.restGewicht),s=r<100?'color:var(--rot);font-weight:bold;':'';
+            tl.innerHTML+=`<tr><td><strong>${esc(f.Material)}</strong> — ${esc(f.Hertseller)}</td><td style="${s}">${r.toFixed(0)} g</td><td>${parseFloat(f.Preis).toFixed(2)} €</td><td><button class="btn-delete" onclick="filamentLoeschen('${f.id}')">✕</button></td></tr>`;
+            dd.innerHTML+=`<option value="${f.id}">${f.Material} | ${f.Hertseller} (${r.toFixed(0)} g)</option>`;
+        });
+    }
+    if(!auftragsHistorie.length){th.innerHTML='<tr><td colspan="8" class="empty-state">Keine Aufträge.</td></tr>';}
+    else auftragsHistorie.forEach(j=>{
+        const ok=j.erledigt?'checked':'',rs=j.erledigt?'text-decoration:line-through;opacity:.5;background:#fafafa;':'';
+        th.innerHTML+=`<tr style="${rs}"><td>${esc(j.datum)}</td><td style="text-align:center"><input type="checkbox" class="checkbox-large" ${ok} onchange="statusAendern('${j.id}')"></td><td><strong>${esc(j.projekt)}</strong></td><td>${esc(j.kunde)}</td><td>${esc(j.material)}</td><td>${j.verbrauchG} g</td><td><strong>${j.kosten.toFixed(2)} €</strong></td><td><button class="btn-delete" onclick="historienLoeschen('${j.id}')">✕</button></td></tr>`;
+    });
+    berechneKosten();
+}
+
+function ladeOverlay(an) { document.getElementById('loadingOverlay').style.display=an?'flex':'none'; }
+
+function esc(s) { return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
+
+function badgeHtml(st) {
+    const m={'Anfrage eingegangen':'b-blau','In Bearbeitung':'b-gelb','Im Druck':'b-lila','Qualitätsprüfung':'b-gelb','Versandbereit':'b-gruen','Abgeschlossen':'b-gruen','Storniert':'b-rot'};
+    return `<span class="badge ${m[st]||'b-grau'}">${esc(st)}</span>`;
+}
 </script>
-
 </body>
 </html>
