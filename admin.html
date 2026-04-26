@@ -232,9 +232,7 @@
         <p class="login-sub">Nur für Administratoren</p>
         <label for="pwInput">Passwort</label>
         <div class="login-input-wrap">
-            <input type="password" id="pwInput" placeholder="Passwort eingeben…"
-                   autocomplete="current-password"
-                   onkeydown="if(event.key==='Enter') pruefePW()">
+            <input type="password" id="pwInput" placeholder="Passwort eingeben…" autocomplete="current-password" onkeydown="if(event.key==='Enter') pruefePW()">
             <button class="toggle-pw" type="button" onclick="toggleSichtbarkeit()">👁</button>
         </div>
         <div class="login-fehler" id="loginFehler">❌ Falsches Passwort.</div>
@@ -243,10 +241,7 @@
     </div>
 </div>
 
-<div id="loadingOverlay">
-    <div class="loading-spinner"></div>
-    Bitte warten…
-</div>
+<div id="loadingOverlay"><div class="loading-spinner"></div>Bitte warten…</div>
 
 <div id="modal-overlay">
     <div class="modal-box">
@@ -273,81 +268,29 @@
 </div>
 
 <div id="navTabs" style="display:none">
-    <button class="tab-btn aktiv" onclick="zeigeTab('tab-anfragen',this)">
-        📥 Kundenanfragen
-        <span class="tab-badge" id="badgeAnfragen" style="display:none">0</span>
-    </button>
+    <button class="tab-btn aktiv" onclick="zeigeTab('tab-anfragen',this)">📥 Kundenanfragen <span class="tab-badge" id="badgeAnfragen" style="display:none">0</span></button>
     <button class="tab-btn" onclick="zeigeTab('tab-lager',this)">🧵 Filamentlager</button>
     <button class="tab-btn" onclick="zeigeTab('tab-auftraege',this)">📋 Druckaufträge</button>
     <button class="tab-btn" onclick="zeigeTab('tab-neuer-auftrag',this)">➕ Neuer Auftrag</button>
 </div>
 
 <div id="dashboard" style="display:none">
-
     <div class="tab-panel aktiv" id="tab-anfragen">
         <div style="padding:24px">
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Alle Anfragen</div>
-                    <div class="stat-wert" id="statAlle">—</div>
-                </div>
-                <div class="stat-card orange">
-                    <div class="stat-label">Neu / Offen</div>
-                    <div class="stat-wert" id="statNeu">—</div>
-                </div>
-                <div class="stat-card lila">
-                    <div class="stat-label">Im Druck</div>
-                    <div class="stat-wert" id="statDruck">—</div>
-                </div>
-                <div class="stat-card gruen">
-                    <div class="stat-label">Abgeschlossen</div>
-                    <div class="stat-wert" id="statAbge">—</div>
-                </div>
-                <div class="stat-card rot">
-                    <div class="stat-label">Umsatz gesamt (€)</div>
-                    <div class="stat-wert" id="statUmsatz">—</div>
-                </div>
+                <div class="stat-card"><div class="stat-label">Alle Anfragen</div><div class="stat-wert" id="statAlle">—</div></div>
+                <div class="stat-card orange"><div class="stat-label">Neu / Offen</div><div class="stat-wert" id="statNeu">—</div></div>
+                <div class="stat-card lila"><div class="stat-label">Im Druck</div><div class="stat-wert" id="statDruck">—</div></div>
+                <div class="stat-card gruen"><div class="stat-label">Abgeschlossen</div><div class="stat-wert" id="statAbge">—</div></div>
+                <div class="stat-card rot"><div class="stat-label">Umsatz gesamt (€)</div><div class="stat-wert" id="statUmsatz">—</div></div>
             </div>
-
             <div class="container container-wide">
-                <h2>Alle Kundenanfragen
-                    <button class="btn-sm-blue" style="margin:0" onclick="ladeAnfragen()">↻ Aktualisieren</button>
-                </h2>
+                <h2>Alle Kundenanfragen <button class="btn-sm-blue" style="margin:0" onclick="ladeAnfragen()">↻</button></h2>
                 <div class="filter-bar">
-                    <select id="filterStatus" onchange="filterAnfragen()">
-                        <option value="">— Alle Status —</option>
-                        <option value="Anfrage eingegangen">Anfrage eingegangen</option>
-                        <option value="In Bearbeitung">In Bearbeitung</option>
-                        <option value="Im Druck">Im Druck</option>
-                        <option value="Qualitätsprüfung">Qualitätsprüfung</option>
-                        <option value="Versandbereit">Versandbereit</option>
-                        <option value="Abgeschlossen">Abgeschlossen</option>
-                        <option value="Storniert">Storniert</option>
-                    </select>
-                    <input type="text" id="filterSuche"
-                           placeholder="🔍 Name, Projekt, E-Mail, Bestellnr. suchen…"
-                           oninput="filterAnfragen()">
+                    <select id="filterStatus" onchange="filterAnfragen()"><option value="">— Alle Status —</option><option value="Anfrage eingegangen">Anfrage eingegangen</option><option value="In Bearbeitung">In Bearbeitung</option><option value="Im Druck">Im Druck</option><option value="Abgeschlossen">Abgeschlossen</option><option value="Storniert">Storniert</option></select>
+                    <input type="text" id="filterSuche" placeholder="🔍 Suchen..." oninput="filterAnfragen()">
                 </div>
-                <div style="overflow-x:auto">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Datum</th>
-                                <th>Bestellnr.</th>
-                                <th>Kunde</th>
-                                <th>Projekt</th>
-                                <th>Material-Wunsch</th>
-                                <th>Lieferadresse</th>
-                                <th>Status</th>
-                                <th>Preis</th>
-                                <th>Aktion</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelleAnfragen">
-                            <tr><td colspan="9" class="empty-state">Lade Daten…</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div style="overflow-x:auto"><table><thead><tr><th>Datum</th><th>Bestellnr.</th><th>Kunde</th><th>Projekt & Nachricht</th><th>Material</th><th>Status</th><th>Preis</th><th>Aktion</th></tr></thead><tbody id="tabelleAnfragen"></tbody></table></div>
             </div>
         </div>
     </div>
@@ -358,428 +301,121 @@
                 <h2>Filament Lager</h2>
                 <form id="lagerForm">
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Hersteller:</label>
-                            <input type="text" id="hersteller" required placeholder="z.B. Anycubic">
-                        </div>
-                        <div class="form-group">
-                            <label>Farbe:</label>
-                            <input type="text" id="farbe" required placeholder="z.B. Schwarz">
-                        </div>
+                        <div class="form-group"><label>Hersteller:</label><input type="text" id="hersteller" required></div>
+                        <div class="form-group"><label>Farbe:</label><input type="text" id="farbe" required></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Material:</label>
-                            <select id="materialTyp">
-                                <optgroup label="PLA Varianten">
-                                    <option>PLA</option><option>XPLA</option>
-                                    <option>PLA+</option><option>PLA Silk</option><option>PLA Matt</option>
-                                </optgroup>
-                                <optgroup label="Weitere">
-                                    <option>PETG</option><option>ABS</option><option>ASA</option>
-                                    <option>TPU</option><option>Nylon</option><option>PC</option><option>CF</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Gewicht (g):</label>
-                            <input type="number" id="gewicht" required value="1000" min="1" step="any">
-                        </div>
-                        <div class="form-group">
-                            <label>Preis (€):</label>
-                            <input type="number" id="kaufpreis" required value="16.99" step="any">
-                        </div>
+                        <div class="form-group"><label>Material:</label><select id="materialTyp"><option>PLA</option><option>PETG</option><option>ASA</option></select></div>
+                        <div class="form-group"><label>Gewicht (g):</label><input type="number" id="gewicht" value="1000"></div>
+                        <div class="form-group"><label>Preis (€):</label><input type="number" id="kaufpreis" value="16.99" step="any"></div>
                     </div>
-                    <button type="submit" class="btn-add" id="btnLagerAdd">+ Zum Bestand hinzufügen</button>
+                    <button type="submit" class="btn-add" id="btnLagerAdd">+ Hinzufügen</button>
                 </form>
-                <h3>Aktueller Bestand</h3>
-                <table>
-                    <thead><tr><th>Filament</th><th>Rest</th><th>Preis</th><th></th></tr></thead>
-                    <tbody id="tabellenBodyLager"></tbody>
-                </table>
+                <h3>Bestand</h3><table><thead><tr><th>Filament</th><th>Rest</th><th>Preis</th><th></th></tr></thead><tbody id="tabellenBodyLager"></tbody></table>
             </div>
         </div>
     </div>
 
     <div class="tab-panel" id="tab-auftraege">
         <div style="padding:24px">
-            <div class="container container-wide">
-                <h2>Auftragshistorie (eigene Buchungen)</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Datum</th><th>Status</th><th>Projekt</th>
-                            <th>Kunde</th><th>Material</th><th>Verbrauch</th><th>Kosten</th><th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabellenBodyHistorie"></tbody>
-                </table>
-            </div>
+            <div class="container container-wide"><h2>Druckhistorie</h2><table><thead><tr><th>Datum</th><th>Status</th><th>Projekt</th><th>Kunde</th><th>Material</th><th>g</th><th>€</th><th></th></tr></thead><tbody id="tabellenBodyHistorie"></tbody></table></div>
         </div>
     </div>
 
     <div class="tab-panel" id="tab-neuer-auftrag">
         <div class="panels-row" style="padding:24px">
             <div class="container">
-                <h2>Druckauftrag erfassen</h2>
+                <h2>Auftrag manuell buchen</h2>
                 <form id="druckForm">
-                    <div class="form-group-full">
-                        <label>Auftrag / Projekt:</label>
-                        <input type="text" id="auftrag" required placeholder="z.B. Gehäuse">
-                    </div>
-                    <div class="form-group-full">
-                        <label>Auftraggeber (Name):</label>
-                        <input type="text" id="name" required placeholder="Max Mustermann">
-                    </div>
-                    <div class="form-group-full">
-                        <label>Verwendetes Filament:</label>
-                        <select id="jobFilament" required onchange="berechneKosten()"></select>
-                    </div>
+                    <div class="form-group-full"><label>Projekt:</label><input type="text" id="auftrag" required></div>
+                    <div class="form-group-full"><label>Filament:</label><select id="jobFilament" onchange="berechneKosten()"></select></div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Verbrauch (g):</label>
-                            <input type="number" id="verbrauch" required placeholder="125" step="any" oninput="berechneKosten()">
-                            <div id="warnungGewicht" class="warning">⚠ Mehr als Restgewicht!</div>
-                        </div>
-                        <div class="form-group">
-                            <label>Verschleiß (€):</label>
-                            <input type="number" id="zusatzKosten" step="any" value="4.50" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Rabatt (%):</label>
-                            <input type="number" id="rabatt" step="any" value="0" min="0" max="100" oninput="berechneKosten()">
-                        </div>
+                        <div class="form-group"><label>Verbrauch (g):</label><input type="number" id="verbrauch" oninput="berechneKosten()"></div>
+                        <div class="form-group"><label>Rabatt (%):</label><input type="number" id="rabatt" value="0" oninput="berechneKosten()"></div>
                     </div>
-                    <div class="kalkulation-box">
-                        Material: <span id="anzeigeMaterial">0.00</span> €<br>
-                        Verschleiß: <span id="anzeigeZusatz">4.50</span> €<br>
-                        Rabatt: <span id="anzeigeRabatt" class="rabatt-text">-0.00</span> €<br>
-                        <strong>Gesamt: <span id="anzeigeGesamt">4.50</span> €</strong>
-                    </div>
-                    <button type="submit" class="btn-save" id="btnAuftragAdd">✓ Auftrag buchen &amp; speichern</button>
+                    <div class="kalkulation-box"><strong>Gesamt: <span id="anzeigeGesamt">4.50</span> €</strong></div>
+                    <button type="submit" class="btn-save">✓ Speichern & Lager abziehen</button>
                 </form>
             </div>
         </div>
     </div>
+</div>
 
-</div><script>
-/* ================================================  LOGIN  ================================================ */
+<script>
 const _p = atob('S3g5bS1EcnVjayMyMDI1');
-
-function pruefePW() {
-    const eingabe = document.getElementById('pwInput').value;
-    const fehler  = document.getElementById('loginFehler');
-    const input   = document.getElementById('pwInput');
-    if (eingabe === _p) {
-        sessionStorage.setItem('adminAuth','1');
-        document.getElementById('loginScreen').classList.add('ausblenden');
-        setTimeout(() => { document.getElementById('loginScreen').style.display='none'; zeigeAdmin(); }, 400);
-    } else {
-        fehler.classList.add('sichtbar');
-        input.classList.add('fehler');
-        input.value = '';
-        setTimeout(() => input.classList.remove('fehler'), 400);
-        input.focus();
-    }
-}
-function toggleSichtbarkeit() { const el=document.getElementById('pwInput'); el.type = el.type==='password'?'text':'password'; }
-function abmelden() { if(confirm('Wirklich abmelden?')) { sessionStorage.removeItem('adminAuth'); location.reload(); } }
-function zeigeAdmin() {
-    document.getElementById('adminTopbar').style.display = 'flex';
-    document.getElementById('navTabs').style.display     = 'flex';
-    document.getElementById('dashboard').style.display  = 'block';
-    ladeDaten();
-    ladeAnfragen();
-}
-window.addEventListener('DOMContentLoaded', () => {
-    if (sessionStorage.getItem('adminAuth')==='1') { document.getElementById('loginScreen').style.display='none'; zeigeAdmin(); }
-    else document.getElementById('pwInput').focus();
-});
-
-/* ================================================  SUPABASE  ================================================ */
 const supabaseUrl = 'https://zasufuyaiturzgohqkky.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inphc3VmdXlhaXR1cnpnb2hxa2t5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjU0MDQsImV4cCI6MjA5MDQ0MTQwNH0.jOtN5Ls_-8JnQJQyPKP2URgWQdKa5GPLhpUs55LB0is';
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ================================================  TABS  ================================================ */
-function zeigeTab(id, btn) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('aktiv'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('aktiv'));
-    document.getElementById(id).classList.add('aktiv');
-    btn.classList.add('aktiv');
-}
+let filamentLager = [], auftragsHistorie = [], alleAnfragen = [], aktModalId = null;
 
-/* ================================================  DATEN  ================================================ */
-const standardFilamente = [
-    {id:"std_1",Material:"ASA (Schwarz)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"20.99"},
-    {id:"std_2",Material:"ASA (Weiß)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"20.99"},
-    {id:"std_3",Material:"PLA (Galaxy Violette)",Hertseller:"Anycubic",startGewicht:"116",restGewicht:"116",Preis:"16.99"},
-    {id:"std_4",Material:"PLA (Grün)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"16.99"},
-    {id:"std_5",Material:"PLA (Rot)",Hertseller:"Anycubic",startGewicht:"450",restGewicht:"450",Preis:"16.99"},
-    {id:"std_6",Material:"PLA (Blau)",Hertseller:"Anycubic",startGewicht:"852",restGewicht:"852",Preis:"16.99"},
-    {id:"std_7",Material:"PLA (Braun)",Hertseller:"Anycubic",startGewicht:"300",restGewicht:"300",Preis:"16.99"},
-    {id:"std_8",Material:"PETG (Schwarz)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"19.99"},
-    {id:"std_9",Material:"PLA (Rot/Blau Matt)",Hertseller:"Anycubic",startGewicht:"1000",restGewicht:"1000",Preis:"20.99"},
-    {id:"std_10",Material:"PLA (Pink Gold Silk)",Hertseller:"Anycubic",startGewicht:"323",restGewicht:"323",Preis:"16.99"},
-    {id:"std_11",Material:"PLA (Weiß Pro)",Hertseller:"Deeplee",startGewicht:"1000",restGewicht:"1000",Preis:"11.99"},
-    {id:"std_12",Material:"PLA (Tri Color)",Hertseller:"Amolen",startGewicht:"630",restGewicht:"630",Preis:"20.99"},
-    {id:"std_13",Material:"PETG (Hautfarbe)",Hertseller:"IEMAI",startGewicht:"1000",restGewicht:"1000",Preis:"9.99"},
-    {id:"std_14",Material:"XPLA (Marmor)",Hertseller:"Winkle",startGewicht:"1000",restGewicht:"1000",Preis:"19.67"},
-    {id:"std_15",Material:"PLA (Marmor Dunkel)",Hertseller:"Techbears",startGewicht:"1000",restGewicht:"1000",Preis:"16.40"},
-    {id:"std_16",Material:"PETG (Schwarz)",Hertseller:"Geetech",startGewicht:"800",restGewicht:"800",Preis:"16.99"}
-];
-
-let filamentLager = [], auftragsHistorie = [], alleAnfragen = [];
-let aktuelleKosten = 0, aktModalId = null;
+function pruefePW() { if(document.getElementById('pwInput').value===_p){sessionStorage.setItem('adminAuth','1');zeigeAdmin();document.getElementById('loginScreen').style.display='none';}else{document.getElementById('loginFehler').style.display='block';} }
+function abmelden() { sessionStorage.removeItem('adminAuth'); location.reload(); }
+function zeigeAdmin() { document.getElementById('adminTopbar').style.display='flex'; document.getElementById('navTabs').style.display='flex'; document.getElementById('dashboard').style.display='block'; ladeDaten(); ladeAnfragen(); }
 
 async function ladeDaten() {
-    ladeOverlay(true);
-    try {
-        let { data: ld } = await supabaseClient.from('FilamentLager').select('*');
-        if (ld && ld.length===0) { await supabaseClient.from('FilamentLager').insert(standardFilamente); ld=(await supabaseClient.from('FilamentLager').select('*')).data; }
-        if (ld) filamentLager = ld;
-        let { data: hd } = await supabaseClient.from('auftragsHistorie').select('*');
-        if (hd) auftragsHistorie = hd.sort((a,b)=>b.id.localeCompare(a.id));
-        uiAktualisieren();
-        document.getElementById('topbarStatus').textContent='🟢 Online';
-    } catch(e) { document.getElementById('topbarStatus').textContent='🔴 Fehler'; console.error(e); }
-    finally { ladeOverlay(false); }
+    let { data: ld } = await supabaseClient.from('FilamentLager').select('*');
+    filamentLager = ld || [];
+    let { data: hd } = await supabaseClient.from('auftragsHistorie').select('*');
+    auftragsHistorie = hd ? hd.sort((a,b)=>b.id.localeCompare(a.id)) : [];
+    uiAktualisieren();
 }
 
-/* ================================================  KUNDENANFRAGEN  ================================================ */
 async function ladeAnfragen() {
-    try {
-        const { data } = await supabaseClient.from('bestellAnfragen').select('*').order('erstellt_am',{ascending:false});
-        if (data) { alleAnfragen=data; filterAnfragen(); statsAktualisieren(); }
-    } catch(e) { console.error('Anfragen:',e); }
+    const { data } = await supabaseClient.from('bestellAnfragen').select('*').order('erstellt_am',{ascending:false});
+    if(data) { alleAnfragen = data; filterAnfragen(); stats(); }
 }
 
-function statsAktualisieren() {
-    const neu    = alleAnfragen.filter(a=>a.status==='Anfrage eingegangen'||a.status==='In Bearbeitung').length;
-    const druck  = alleAnfragen.filter(a=>a.status==='Im Druck'||a.status==='Qualitätsprüfung').length;
-    const abge   = alleAnfragen.filter(a=>a.status==='Abgeschlossen').length;
-    
-    // NEU: Stornierte Aufträge werden vom Umsatz abgezogen
-    const umsatz = alleAnfragen
-        .filter(a => a.status !== 'Storniert')
-        .reduce((s,a)=>s+parseFloat(a.kosten||0),0);
-
-    document.getElementById('statAlle').textContent   = alleAnfragen.length;
-    document.getElementById('statNeu').textContent    = neu;
-    document.getElementById('statDruck').textContent  = druck;
-    document.getElementById('statAbge').textContent   = abge;
+function stats() {
+    const neu = alleAnfragen.filter(a=>a.status==='Anfrage eingegangen').length;
+    const umsatz = alleAnfragen.filter(a=>a.status!=='Storniert').reduce((s,a)=>s+parseFloat(a.kosten||0),0);
+    document.getElementById('statNeu').textContent = neu;
     document.getElementById('statUmsatz').textContent = umsatz.toFixed(2);
-    const b = document.getElementById('badgeAnfragen');
-    b.textContent=neu; b.style.display=neu>0?'inline-flex':'none';
 }
 
 function filterAnfragen() {
-    const sf = document.getElementById('filterStatus').value;
-    const su = document.getElementById('filterSuche').value.toLowerCase();
-    const list = alleAnfragen.filter(a=>{
-        const ms = !sf || a.status===sf;
-        const mx = !su || `${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
-        return ms && mx;
-    });
     const tb = document.getElementById('tabelleAnfragen');
-    if (!list.length) { tb.innerHTML=`<tr><td colspan="9" class="empty-state">Keine Einträge gefunden.</td></tr>`; return; }
-    tb.innerHTML = list.map(a=>{
-        const name = a.gastname ? `${esc(a.gastname)} <span style="font-size:.78em;color:#aaa">(Gast)</span>` : `<span style="color:var(--blau)">🔑 Kundenkonto</span>`;
-        const adr  = a.adresse  ? `<span style="font-size:.82em">${esc(a.adresse)}<br>${esc(a.plz)} ${esc(a.ort)}</span>` : `<span style="color:#bbb;font-size:.82em">—</span>`;
-        const pr   = a.kosten!=null ? `<strong style="color:var(--gruen)">${parseFloat(a.kosten).toFixed(2)} €</strong>` : `<span style="color:#bbb;font-size:.82em">Offen</span>`;
-        
-        // NEU: Kunden-Nachricht wird gelb markiert angezeigt
-        const kmsg = a.beschreibung ? `<div style="background:#fff9db; padding:5px 8px; border-radius:5px; font-size:0.85em; margin-top:5px; color:#856404; border:1px solid #ffe066;">💬 ${esc(a.beschreibung)}</div>` : '';
-
-        return `<tr>
-            <td style="font-size:.82em;color:var(--text-light);white-space:nowrap">${esc(a.datum)}</td>
-            <td style="font-family:monospace;font-size:.8em">${esc(a.id)}</td>
-            <td>${name}</td>
-            <td><strong>${esc(a.projekt)}</strong>${kmsg}</td>
-            <td style="font-size:.83em">${esc(a.material_wunsch)}</td>
-            <td>${adr}</td>
-            <td>${badgeHtml(a.status)}</td>
-            <td>${pr}</td>
-            <td><button class="btn-sm-blue" onclick="modalOeffnen('${a.id}')">✏ Bearbeiten</button></td>
-        </tr>`;
+    tb.innerHTML = alleAnfragen.map(a => {
+        const kmsg = a.beschreibung ? `<div style="background:#fff9db; padding:5px; border-radius:5px; font-size:0.8em; margin-top:5px; border:1px solid #ffe066;">💬 ${a.beschreibung}</div>` : '';
+        return `<tr><td>${a.datum}</td><td>${a.id}</td><td><b>${a.gastname||'Kunde'}</b></td><td><strong>${a.projekt}</strong>${kmsg}</td><td>${a.material_wunsch}</td><td>${a.status}</td><td>${a.kosten?a.kosten+'€':'—'}</td><td><button class="btn-sm-blue" onclick="modalOeffnen('${a.id}')">✏ Edit</button></td></tr>`;
     }).join('');
 }
 
-/* ================================================  MODAL  ================================================ */
 function modalOeffnen(id) {
-    const a = alleAnfragen.find(x=>x.id===id);
-    if (!a) return;
+    const a = alleAnfragen.find(x=>x.id===id); if(!a) return;
     aktModalId = id;
-    document.getElementById('modal-title').textContent = `Anfrage: ${a.id}`;
-    document.getElementById('modal-body').innerHTML = `
-        <div class="modal-section">📋 Auftragsdetails</div>
-        <div class="info-grid">
-            <div class="info-item"><div class="ilabel">Eingegangen</div><div class="ival">${esc(a.datum)}</div></div>
-            <div class="info-item"><div class="ilabel">Bestellnummer</div><div class="ival" style="font-family:monospace;font-size:.85em">${esc(a.id)}</div></div>
-            <div class="info-item"><div class="ilabel">Kunde / Gast</div><div class="ival">${esc(a.gastname||'(Kundenkonto)')}</div></div>
-            <div class="info-item"><div class="ilabel">E-Mail</div><div class="ival">${a.gast_email?`<a href="mailto:${esc(a.gast_email)}">${esc(a.gast_email)}</a>`:'—'}</div></div>
-            <div class="info-item"><div class="ilabel">Telefon</div><div class="ival">${esc(a.telefon||'—')}</div></div>
-            <div class="info-item"><div class="ilabel">Material-Wunsch</div><div class="ival">${esc(a.material_wunsch)}</div></div>
-            <div class="info-item full"><div class="ilabel">Projekt / Beschreibung</div><div class="ival"><strong>${esc(a.projekt)}</strong>${a.beschreibung?'<br><br><span style="color:var(--orange)">💬 Nachricht vom Kunden:</span><br>'+esc(a.beschreibung):''}</div></div>
-        </div>
-
-        <div class="modal-section">📍 Lieferadresse</div>
-        <div class="info-grid">
-            <div class="info-item full"><div class="ilabel">Adresse</div><div class="ival">
-                ${a.adresse?`${esc(a.adresse)}<br>${esc(a.plz)} ${esc(a.ort)}`:'Keine Adresse angegeben'}
-                ${a.liefer_hinweis?`<br><span style="font-size:.85em;color:var(--orange)">💬 ${esc(a.liefer_hinweis)}</span>`:''}
-            </div></div>
-        </div>
-
-        <div class="modal-section">⚙️ Bearbeitung</div>
-        <div class="form-row" style="margin-bottom:12px">
-            <div class="form-group">
-                <label>Status</label>
-                <select id="m-status">
-                    <option ${a.status==='Anfrage eingegangen'?'selected':''}>Anfrage eingegangen</option>
-                    <option ${a.status==='In Bearbeitung'?'selected':''}>In Bearbeitung</option>
-                    <option ${a.status==='Im Druck'?'selected':''}>Im Druck</option>
-                    <option ${a.status==='Qualitätsprüfung'?'selected':''}>Qualitätsprüfung</option>
-                    <option ${a.status==='Versandbereit'?'selected':''}>Versandbereit</option>
-                    <option ${a.status==='Abgeschlossen'?'selected':''}>Abgeschlossen</option>
-                    <option ${a.status==='Storniert'?'selected':''}>Storniert</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Preis für Kunden (€)</label>
-                <input type="number" id="m-kosten" step="0.01" min="0"
-                       value="${a.kosten!=null?a.kosten:''}" placeholder="Noch offen">
-            </div>
-        </div>
-        <label>Notiz / Nachricht an Kunden (optional)</label>
-        <textarea id="m-notiz" placeholder="z.B. Bitte STL-Datei senden. Lieferung ca. 3–5 Werktage…">${esc(a.admin_notiz||'')}</textarea>
-    `;
+    document.getElementById('modal-body').innerHTML = `<label>Status:</label><select id="m-status"><option ${a.status==='Anfrage eingegangen'?'selected':''}>Anfrage eingegangen</option><option ${a.status==='In Bearbeitung'?'selected':''}>In Bearbeitung</option><option value="Storniert" ${a.status==='Storniert'?'selected':''}>Storniert</option></select><label style="margin-top:10px; display:block;">Preis (€):</label><input type="number" id="m-kosten" step="0.01" value="${a.kosten||''}"> <label style="margin-top:10px; display:block;">Admin-Notiz:</label><textarea id="m-notiz">${a.admin_notiz||''}</textarea>`;
     document.getElementById('modal-overlay').classList.add('on');
 }
-
-function modalSchliessen() {
-    document.getElementById('modal-overlay').classList.remove('on');
-    aktModalId = null;
-}
-
+function modalSchliessen() { document.getElementById('modal-overlay').classList.remove('on'); }
 async function anfrageSpeichern() {
-    if (!aktModalId) return;
-    const status = document.getElementById('m-status').value;
-    const kv     = document.getElementById('m-kosten').value;
-    const notiz  = document.getElementById('m-notiz').value.trim();
-    const kosten = kv!==''?parseFloat(kv):null;
-    ladeOverlay(true);
-    try {
-        await supabaseClient.from('bestellAnfragen').update({status,kosten,admin_notiz:notiz}).eq('id',aktModalId);
-        const i = alleAnfragen.findIndex(a=>a.id===aktModalId);
-        if (i>-1) alleAnfragen[i]={...alleAnfragen[i],status,kosten,admin_notiz:notiz};
-        filterAnfragen(); statsAktualisieren(); modalSchliessen();
-    } catch(e) { alert('Fehler beim Speichern!'); console.error(e); }
-    finally { ladeOverlay(false); }
+    const s = document.getElementById('m-status').value, k = parseFloat(document.getElementById('m-kosten').value)||null, n = document.getElementById('m-notiz').value;
+    await supabaseClient.from('bestellAnfragen').update({status:s, kosten:k, admin_notiz:n}).eq('id',aktModalId);
+    modalSchliessen(); ladeAnfragen();
 }
 
-// Modal schließen bei Klick außerhalb
-document.getElementById('modal-overlay').addEventListener('click',function(e){ if(e.target===this) modalSchliessen(); });
-
-/* ================================================  FILAMENT  ================================================ */
-document.getElementById('lagerForm').addEventListener('submit',e=>{e.preventDefault();filamentHinzufuegen();});
-async function filamentHinzufuegen() {
-    document.getElementById('btnLagerAdd').disabled=true;
-    const neueSpule = {
-        id:'spule_'+Date.now(),
-        Hertseller:document.getElementById('hersteller').value.trim(),
-        Material:`${document.getElementById('materialTyp').value} (${document.getElementById('farbe').value.trim()})`,
-        startGewicht:(parseFloat(document.getElementById('gewicht').value)||0).toString(),
-        restGewicht:(parseFloat(document.getElementById('gewicht').value)||0).toString(),
-        Preis:(parseFloat(document.getElementById('kaufpreis').value)||0).toString()
-    };
-    await supabaseClient.from('FilamentLager').insert([neueSpule]);
-    document.getElementById('lagerForm').reset();
-    document.getElementById('gewicht').value=1000; document.getElementById('kaufpreis').value=16.99;
-    await ladeDaten(); document.getElementById('btnLagerAdd').disabled=false;
-}
-async function filamentLoeschen(id) {
-    if(confirm('Spule wirklich löschen?')) { ladeOverlay(true); await supabaseClient.from('FilamentLager').delete().eq('id',id); await ladeDaten(); }
+function zeigeTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('aktiv'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('aktiv'));
+    document.getElementById(id).classList.add('aktiv'); btn.classList.add('aktiv');
 }
 
-/* ================================================  KALKULATION  ================================================ */
-function berechneKosten() {
-    const id=document.getElementById('jobFilament').value, v=parseFloat(document.getElementById('verbrauch').value)||0;
-    const zk=parseFloat(document.getElementById('zusatzKosten').value)||4.5, rb=parseFloat(document.getElementById('rabatt').value)||0;
-    let mk=0;
-    if(id){const s=filamentLager.find(f=>f.id===id);if(s){mk=(parseFloat(s.Preis)/parseFloat(s.startGewicht))*v;document.getElementById('warnungGewicht').style.display=v>parseFloat(s.restGewicht)?'block':'none';}}
-    else document.getElementById('warnungGewicht').style.display='none';
-    const zw=mk+zk, rbw=zw*(rb/100); aktuelleKosten=zw-rbw;
-    document.getElementById('anzeigeMaterial').textContent=mk.toFixed(2);
-    document.getElementById('anzeigeZusatz').textContent=zk.toFixed(2);
-    document.getElementById('anzeigeRabatt').textContent='-'+rbw.toFixed(2);
-    document.getElementById('anzeigeGesamt').textContent=aktuelleKosten.toFixed(2);
-}
+document.getElementById('lagerForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const n = { id:'s_'+Date.now(), Hertseller:document.getElementById('hersteller').value, Material:document.getElementById('materialTyp').value+' ('+document.getElementById('farbe').value+')', startGewicht:document.getElementById('gewicht').value, restGewicht:document.getElementById('gewicht').value, Preis:document.getElementById('kaufpreis').value };
+    await supabaseClient.from('FilamentLager').insert([n]); ladeDaten();
+});
 
-/* ================================================  AUFTRÄGE  ================================================ */
-document.getElementById('druckForm').addEventListener('submit',e=>{e.preventDefault();auftragSpeichern();});
-async function auftragSpeichern() {
-    const id=document.getElementById('jobFilament').value;
-    if(!id){alert('Bitte Filament auswählen!');return;}
-    const v=parseFloat(document.getElementById('verbrauch').value)||0;
-    const s=filamentLager.find(f=>f.id===id); if(!s)return;
-    document.getElementById('btnAuftragAdd').disabled=true; ladeOverlay(true);
-    await supabaseClient.from('auftragsHistorie').insert([{
-        id:'job_'+Date.now(), spuled:id, erledigt:false,
-        datum:new Date().toLocaleDateString('de-DE'),
-        projekt:document.getElementById('auftrag').value.trim(),
-        kunde:document.getElementById('name').value.trim(),
-        material:s.Material, verbrauchG:v, kosten:aktuelleKosten
-    }]);
-    const nr=parseFloat(s.restGewicht)-v;
-    await supabaseClient.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',id);
-    ['auftrag','verbrauch','name'].forEach(i=>document.getElementById(i).value='');
-    document.getElementById('rabatt').value='0';
-    if(nr<=0)alert('⚠ Spule ist jetzt leer!');
-    await ladeDaten(); document.getElementById('btnAuftragAdd').disabled=false;
-}
-async function statusAendern(jobId) {
-    const j=auftragsHistorie.find(a=>a.id===jobId);
-    if(j){ladeOverlay(true);await supabaseClient.from('auftragsHistorie').update({erledigt:!j.erledigt}).eq('id',jobId);await ladeDaten();}
-}
-async function historienLoeschen(jobId) {
-    const j=auftragsHistorie.find(a=>a.id===jobId); if(!j)return;
-    if(confirm(`Auftrag löschen?\n${j.verbrauchG}g Filament wird zurückgebucht.`)){
-        ladeOverlay(true);
-        if(j.spuled){const s=filamentLager.find(f=>f.id===j.spuled);if(s){const ng=parseFloat(s.restGewicht)+j.verbrauchG;await supabaseClient.from('FilamentLager').update({restGewicht:ng.toString()}).eq('id',s.id);}}
-        await supabaseClient.from('auftragsHistorie').delete().eq('id',jobId);await ladeDaten();
-    }
-}
-
-/* ================================================  UI  ================================================ */
 function uiAktualisieren() {
-    const tl=document.getElementById('tabellenBodyLager'), dd=document.getElementById('jobFilament'), th=document.getElementById('tabellenBodyHistorie');
-    tl.innerHTML=''; dd.innerHTML=''; th.innerHTML='';
-    if(!filamentLager.length){tl.innerHTML='<tr><td colspan="4" class="empty-state">Kein Filament.</td></tr>';dd.innerHTML='<option value="">Erst Filament anlegen…</option>';}
-    else{
-        dd.innerHTML='<option value="" disabled selected>— Spule wählen —</option>';
-        filamentLager.forEach(f=>{
-            const r=parseFloat(f.restGewicht),s=r<100?'color:var(--rot);font-weight:bold;':'';
-            tl.innerHTML+=`<tr><td><strong>${esc(f.Material)}</strong> — ${esc(f.Hertseller)}</td><td style="${s}">${r.toFixed(0)} g</td><td>${parseFloat(f.Preis).toFixed(2)} €</td><td><button class="btn-delete" onclick="filamentLoeschen('${f.id}')">✕</button></td></tr>`;
-            dd.innerHTML+=`<option value="${f.id}">${f.Material} | ${f.Hertseller} (${r.toFixed(0)} g)</option>`;
-        });
-    }
-    if(!auftragsHistorie.length){th.innerHTML='<tr><td colspan="8" class="empty-state">Keine Aufträge.</td></tr>';}
-    else auftragsHistorie.forEach(j=>{
-        const ok=j.erledigt?'checked':'',rs=j.erledigt?'text-decoration:line-through;opacity:.5;background:#fafafa;':'';
-        th.innerHTML+=`<tr style="${rs}"><td>${esc(j.datum)}</td><td style="text-align:center"><input type="checkbox" class="checkbox-large" ${ok} onchange="statusAendern('${j.id}')"></td><td><strong>${esc(j.projekt)}</strong></td><td>${esc(j.kunde)}</td><td>${esc(j.material)}</td><td>${j.verbrauchG} g</td><td><strong>${j.kosten.toFixed(2)} €</strong></td><td><button class="btn-delete" onclick="historienLoeschen('${j.id}')">✕</button></td></tr>`;
+    const tl=document.getElementById('tabellenBodyLager'), dd=document.getElementById('jobFilament');
+    tl.innerHTML=''; dd.innerHTML='<option value="">Wählen</option>';
+    filamentLager.forEach(f=>{
+        tl.innerHTML+=`<tr><td>${f.Material}</td><td>${f.restGewicht}g</td><td>${f.Preis}€</td><td><button class="btn-delete" onclick="filamentLoeschen('${f.id}')">✕</button></td></tr>`;
+        dd.innerHTML+=`<option value="${f.id}">${f.Material}</option>`;
     });
-    berechneKosten();
 }
 
-function ladeOverlay(an) { document.getElementById('loadingOverlay').style.display=an?'flex':'none'; }
-
-function esc(s) { return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
-
-function badgeHtml(st) {
-    const m={'Anfrage eingegangen':'b-blau','In Bearbeitung':'b-gelb','Im Druck':'b-lila','Qualitätsprüfung':'b-gelb','Versandbereit':'b-gruen','Abgeschlossen':'b-gruen','Storniert':'b-rot'};
-    return `<span class="badge ${m[st]||'b-grau'}">${esc(st)}</span>`;
-}
+window.addEventListener('DOMContentLoaded', () => { if(sessionStorage.getItem('adminAuth')==='1') zeigeAdmin(); });
 </script>
 </body>
 </html>
