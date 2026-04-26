@@ -225,7 +225,6 @@
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginScreen">
     <div class="login-box">
         <div class="login-logo">🖨️</div>
@@ -244,13 +243,11 @@
     </div>
 </div>
 
-<!-- LADE-OVERLAY -->
 <div id="loadingOverlay">
     <div class="loading-spinner"></div>
     Bitte warten…
 </div>
 
-<!-- MODAL: Anfrage bearbeiten -->
 <div id="modal-overlay">
     <div class="modal-box">
         <div class="modal-header">
@@ -265,7 +262,6 @@
     </div>
 </div>
 
-<!-- TOPBAR -->
 <div id="adminTopbar" style="display:none">
     <div class="topbar-left">
         <div class="topbar-logo">🖨️</div>
@@ -276,7 +272,6 @@
     <button class="btn-logout" onclick="abmelden()">⬡ Abmelden</button>
 </div>
 
-<!-- TABS -->
 <div id="navTabs" style="display:none">
     <button class="tab-btn aktiv" onclick="zeigeTab('tab-anfragen',this)">
         📥 Kundenanfragen
@@ -287,10 +282,8 @@
     <button class="tab-btn" onclick="zeigeTab('tab-neuer-auftrag',this)">➕ Neuer Auftrag</button>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dashboard" style="display:none">
 
-    <!-- ===== TAB 1: KUNDENANFRAGEN ===== -->
     <div class="tab-panel aktiv" id="tab-anfragen">
         <div style="padding:24px">
             <div class="stats-grid">
@@ -359,7 +352,6 @@
         </div>
     </div>
 
-    <!-- ===== TAB 2: FILAMENTLAGER ===== -->
     <div class="tab-panel" id="tab-lager">
         <div class="panels-row" style="padding:24px">
             <div class="container">
@@ -409,7 +401,6 @@
         </div>
     </div>
 
-    <!-- ===== TAB 3: DRUCKAUFTRÄGE ===== -->
     <div class="tab-panel" id="tab-auftraege">
         <div style="padding:24px">
             <div class="container container-wide">
@@ -427,7 +418,6 @@
         </div>
     </div>
 
-    <!-- ===== TAB 4: NEUER AUFTRAG ===== -->
     <div class="tab-panel" id="tab-neuer-auftrag">
         <div class="panels-row" style="padding:24px">
             <div class="container">
@@ -472,10 +462,7 @@
         </div>
     </div>
 
-</div><!-- /#dashboard -->
-
-
-<script>
+</div><script>
 /* ================================================  LOGIN  ================================================ */
 const _p = atob('S3g5bS1EcnVjayMyMDI1');
 
@@ -511,7 +498,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 /* ================================================  SUPABASE  ================================================ */
 const supabaseUrl = 'https://zasufuyaiturzgohqkky.supabase.co';
-const supabaseKey = 'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inphc3VmdXlhaXR1cnpnb2hxa2t5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjU0MDQsImV4cCI6MjA5MDQ0MTQwNH0.jOtN5Ls_-8JnQJQyPKP2URgWQdKa5GPLhpUs55LB0is';
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 /* ================================================  TABS  ================================================ */
@@ -548,10 +535,10 @@ let aktuelleKosten = 0, aktModalId = null;
 async function ladeDaten() {
     ladeOverlay(true);
     try {
-        let { data: ld } = await supabaseClient.from('FilamentLager').select('*');
-        if (ld && ld.length===0) { await supabaseClient.from('FilamentLager').insert(standardFilamente); ld=(await supabaseClient.from('FilamentLager').select('*')).data; }
+        let { data: ld } = await supabaseClient.from('filamentlager').select('*');
+        if (ld && ld.length===0) { await supabaseClient.from('filamentlager').insert(standardFilamente); ld=(await supabaseClient.from('filamentlager').select('*')).data; }
         if (ld) filamentLager = ld;
-        let { data: hd } = await supabaseClient.from('auftragsHistorie').select('*');
+        let { data: hd } = await supabaseClient.from('auftragshistorie').select('*');
         if (hd) auftragsHistorie = hd.sort((a,b)=>b.id.localeCompare(a.id));
         uiAktualisieren();
         document.getElementById('topbarStatus').textContent='🟢 Online';
@@ -562,7 +549,7 @@ async function ladeDaten() {
 /* ================================================  KUNDENANFRAGEN  ================================================ */
 async function ladeAnfragen() {
     try {
-        const { data } = await supabaseClient.from('bestellAnfragen').select('*').order('erstellt_am',{ascending:false});
+        const { data } = await supabaseClient.from('bestellanfragen').select('*').order('erstellt_am',{ascending:false});
         if (data) { alleAnfragen=data; filterAnfragen(); statsAktualisieren(); }
     } catch(e) { console.error('Anfragen:',e); }
 }
@@ -674,7 +661,7 @@ async function anfrageSpeichern() {
     const kosten = kv!==''?parseFloat(kv):null;
     ladeOverlay(true);
     try {
-        await supabaseClient.from('bestellAnfragen').update({status,kosten,admin_notiz:notiz}).eq('id',aktModalId);
+        await supabaseClient.from('bestellanfragen').update({status,kosten,admin_notiz:notiz}).eq('id',aktModalId);
         const i = alleAnfragen.findIndex(a=>a.id===aktModalId);
         if (i>-1) alleAnfragen[i]={...alleAnfragen[i],status,kosten,admin_notiz:notiz};
         filterAnfragen(); statsAktualisieren(); modalSchliessen();
@@ -697,13 +684,13 @@ async function filamentHinzufuegen() {
         restGewicht:(parseFloat(document.getElementById('gewicht').value)||0).toString(),
         Preis:(parseFloat(document.getElementById('kaufpreis').value)||0).toString()
     };
-    await supabaseClient.from('FilamentLager').insert([neueSpule]);
+    await supabaseClient.from('filamentlager').insert([neueSpule]);
     document.getElementById('lagerForm').reset();
     document.getElementById('gewicht').value=1000; document.getElementById('kaufpreis').value=16.99;
     await ladeDaten(); document.getElementById('btnLagerAdd').disabled=false;
 }
 async function filamentLoeschen(id) {
-    if(confirm('Spule wirklich löschen?')) { ladeOverlay(true); await supabaseClient.from('FilamentLager').delete().eq('id',id); await ladeDaten(); }
+    if(confirm('Spule wirklich löschen?')) { ladeOverlay(true); await supabaseClient.from('filamentlager').delete().eq('id',id); await ladeDaten(); }
 }
 
 /* ================================================  KALKULATION  ================================================ */
@@ -728,7 +715,7 @@ async function auftragSpeichern() {
     const v=parseFloat(document.getElementById('verbrauch').value)||0;
     const s=filamentLager.find(f=>f.id===id); if(!s)return;
     document.getElementById('btnAuftragAdd').disabled=true; ladeOverlay(true);
-    await supabaseClient.from('auftragsHistorie').insert([{
+    await supabaseClient.from('auftragshistorie').insert([{
         id:'job_'+Date.now(), spuled:id, erledigt:false,
         datum:new Date().toLocaleDateString('de-DE'),
         projekt:document.getElementById('auftrag').value.trim(),
@@ -736,7 +723,7 @@ async function auftragSpeichern() {
         material:s.Material, verbrauchG:v, kosten:aktuelleKosten
     }]);
     const nr=parseFloat(s.restGewicht)-v;
-    await supabaseClient.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',id);
+    await supabaseClient.from('filamentlager').update({restGewicht:nr.toString()}).eq('id',id);
     ['auftrag','verbrauch','name'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('rabatt').value='0';
     if(nr<=0)alert('⚠ Spule ist jetzt leer!');
@@ -744,14 +731,14 @@ async function auftragSpeichern() {
 }
 async function statusAendern(jobId) {
     const j=auftragsHistorie.find(a=>a.id===jobId);
-    if(j){ladeOverlay(true);await supabaseClient.from('auftragsHistorie').update({erledigt:!j.erledigt}).eq('id',jobId);await ladeDaten();}
+    if(j){ladeOverlay(true);await supabaseClient.from('auftragshistorie').update({erledigt:!j.erledigt}).eq('id',jobId);await ladeDaten();}
 }
 async function historienLoeschen(jobId) {
     const j=auftragsHistorie.find(a=>a.id===jobId); if(!j)return;
     if(confirm(`Auftrag löschen?\n${j.verbrauchG}g Filament wird zurückgebucht.`)){
         ladeOverlay(true);
-        if(j.spuled){const s=filamentLager.find(f=>f.id===j.spuled);if(s){const ng=parseFloat(s.restGewicht)+j.verbrauchG;await supabaseClient.from('FilamentLager').update({restGewicht:ng.toString()}).eq('id',s.id);}}
-        await supabaseClient.from('auftragsHistorie').delete().eq('id',jobId);await ladeDaten();
+        if(j.spuled){const s=filamentLager.find(f=>f.id===j.spuled);if(s){const ng=parseFloat(s.restGewicht)+j.verbrauchG;await supabaseClient.from('filamentlager').update({restGewicht:ng.toString()}).eq('id',s.id);}}
+        await supabaseClient.from('auftragshistorie').delete().eq('id',jobId);await ladeDaten();
     }
 }
 
