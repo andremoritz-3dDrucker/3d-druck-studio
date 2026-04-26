@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* ================================================
-           BASIS & DESIGN (Vollständiges Original-Styling)
+           BASIS (Original-Design beibehalten)
         ================================================ */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -38,6 +38,9 @@
             line-height: 1.5;
         }
 
+        a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        a:hover { text-decoration: underline; }
+
         header {
             background: linear-gradient(135deg, #112244 0%, #0056b3 100%);
             color: white;
@@ -60,7 +63,7 @@
         .logo { display: flex; align-items: center; gap: 10px; }
         .logo-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
-        .header-nav { display: flex; align-items: center; gap: 8px; }
+        .header-nav { display: flex; align-items: center; gap: 6px; }
         .nav-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); color: white; padding: 6px 13px; border-radius: 8px; font-size: 0.8em; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
         .nav-btn:hover { background: rgba(255,255,255,0.22); }
 
@@ -69,40 +72,61 @@
         .view.aktiv { display: block; }
 
         .card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 28px; margin-bottom: 20px; }
+        .card-sm { max-width: 480px; margin-left: auto; margin-right: auto; }
+        .card h2 { font-size: 1.25em; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+        .card-sub { font-size: 0.85em; color: var(--text-l); margin-bottom: 24px; }
+
+        /* NEUE ELEMENTE FÜR CHAT & STATUS */
+        .msg-box { background: #fff9db; border-left: 4px solid #fcc419; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 0.88em; color: #856404; }
+        .chat-input-row { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .chat-input-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85em; }
+        .status-search { background: #e7f5ff; border: 2px solid #a5d8ff; padding: 24px; border-radius: var(--radius-lg); margin-top: 30px; }
 
         /* FORMULARE */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .col-full { grid-column: 1 / -1; }
         .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .field label { font-size: 0.78em; font-weight: 700; color: var(--text-l); text-transform: uppercase; }
         .field input, .field select, .field textarea { padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; outline: none; }
-        .field textarea { min-height: 100px; resize: vertical; }
+        .field input:disabled { background: #f5f5f5; color: #999; }
+        .field textarea { min-height: 80px; resize: vertical; }
 
         .btn { padding: 11px 20px; border-radius: 9px; font-weight: 600; cursor: pointer; border: none; width: 100%; transition: 0.2s; text-align: center; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-m); }
         .btn-danger { background: var(--danger); color: white; font-size: 0.8em; padding: 6px 12px; width: auto; margin-top: 10px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-sm { width: auto; padding: 7px 14px; font-size: 13px; }
 
-        /* BADGES & CHAT */
+        .alert { padding: 11px 15px; border-radius: 9px; font-size: 0.85em; margin-bottom: 18px; display: none; }
+        .alert.on { display: block; }
+        .alert-err  { background: #fde8ea; border: 1px solid #f5c6cb; color: #922; }
+        .alert-ok   { background: #e8f5e9; border: 1px solid #c3e6cb; color: #155724; }
+
         .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.76em; font-weight: 600; }
-        .b-blau { background: #e3f0ff; color: #0056b3; }
-        .b-gelb { background: #fff3e0; color: var(--warn); }
+        .b-blau  { background: #e3f0ff; color: #0056b3; }
+        .b-gelb  { background: #fff3e0; color: var(--warn); }
         .b-gruen { background: #e8f5e9; color: #155724; }
-        .b-rot { background: #fde8ea; color: var(--danger); }
+        .b-rot   { background: #fde8ea; color: var(--danger); }
 
-        .msg-box { background: #fff9db; border-left: 4px solid #fcc419; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 0.88em; color: #856404; }
-        .chat-input-row { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
-        .chat-input-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85em; }
+        .hero { text-align: center; padding: 36px 16px 28px; }
+        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+        .option-card { background: var(--white); border: 2px solid var(--border); padding: 24px; border-radius: var(--radius-lg); cursor: pointer; transition: 0.2s; text-align: center; }
+        .option-card:hover { border-color: var(--primary); transform: translateY(-3px); }
 
-        /* STATUS SUCHE */
-        .status-search { background: #e7f5ff; border: 2px solid #a5d8ff; padding: 24px; border-radius: var(--radius-lg); margin-top: 30px; }
-        
-        #ladeOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 9999; }
-        .spinner { width: 32px; height: 32px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .profil-box { display: flex; align-items: center; gap: 16px; background: linear-gradient(135deg, #eef5ff 0%, #eef8f0 100%); border: 1px solid #d6e8f8; border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 20px; }
+        .profil-avatar { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--success)); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
 
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+        .order-table { width: 100%; border-collapse: collapse; font-size: 0.87em; }
+        .order-table th { background: #f8fafc; text-align: left; padding: 10px; color: var(--text-l); }
+        .order-table td { padding: 12px 10px; border-bottom: 1px solid #f0f4f8; }
+
+        #ladeOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.82); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .spinner { width: 28px; height: 28px; border: 3px solid #d8e2ef; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.65s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .option-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -111,7 +135,7 @@
     <div class="header-inner">
         <div class="logo">
             <div class="logo-icon">🖨️</div>
-            <div style="font-weight:700;">3D-Druck Studio</div>
+            <div style="font-weight:700">3D-Druck Studio</div>
         </div>
         <nav class="header-nav" id="headerNav"></nav>
     </div>
@@ -121,18 +145,17 @@
 
 <main>
     <div class="view aktiv" id="view-start">
-        <div class="card" style="text-align:center; padding:50px 30px;">
+        <div class="hero">
             <h1>Willkommen im Kundenportal</h1>
-            <p style="color:var(--text-l); margin-bottom:40px;">Verwalte deine Druckaufträge schnell und unkompliziert.</p>
-            
-            <div class="form-grid">
-                <div class="card" style="cursor:pointer; border:1px solid #eee;" onclick="zeige('view-login')">🔑 <b>Anmelden</b><br><small>Bestehende Aufträge</small></div>
-                <div class="card" style="cursor:pointer; border:1px solid #eee;" onclick="zeige('view-register')">👤 <b>Konto erstellen</b><br><small>Neu registrieren</small></div>
+            <p>Gib deinen Druckauftrag auf oder verfolge deine Bestellungen.</p>
+            <div class="option-grid">
+                <div class="option-card" onclick="zeige('view-login')">🔑 <b>Anmelden</b><br><small>Bestehende Aufträge</small></div>
+                <div class="option-card" onclick="zeige('view-register')">👤 <b>Registrieren</b><br><small>Kundenkonto anlegen</small></div>
             </div>
-            <button class="btn btn-primary" onclick="zeige('view-gast')">📦 Als Gast bestellen</button>
+            <button class="btn btn-primary" style="margin-top:15px;" onclick="zeige('view-gast')">📦 Als Gast bestellen</button>
 
             <div class="status-search">
-                <h3 style="margin-bottom:15px; font-size:1em;">🔍 Gast-Status abfragen</h3>
+                <h3 style="margin-bottom:12px; font-size:1em;">🔍 Gast-Status abfragen</h3>
                 <div style="display:flex; gap:10px;">
                     <input type="text" id="sucheBestellNr" placeholder="Bestellnummer (B-...)" style="flex:1; padding:12px; border-radius:10px; border:1px solid #a5d8ff;">
                     <button class="btn btn-primary btn-sm" onclick="gastStatusPruefen()">Prüfen</button>
@@ -143,30 +166,32 @@
     </div>
 
     <div class="view" id="view-login">
-        <div class="card" style="max-width:400px; margin:auto;">
+        <div class="card card-sm">
             <h2>Anmelden</h2>
-            <div id="loginFehler" style="color:var(--danger); font-size:0.85em; margin-bottom:15px; display:none;"></div>
+            <div class="alert alert-err" id="loginFehler"></div>
             <div class="field"><label>E-Mail</label><input type="email" id="loginEmail"></div>
             <div class="field"><label>Passwort</label><input type="password" id="loginPW"></div>
             <button class="btn btn-primary" onclick="anmelden()">Login</button>
-            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Zurück</button>
+            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Abbrechen</button>
         </div>
     </div>
 
     <div class="view" id="view-register">
-        <div class="card" style="max-width:450px; margin:auto;">
-            <h2>Konto erstellen</h2>
-            <div id="regFehler" style="color:var(--danger); font-size:0.85em; margin-bottom:15px; display:none;"></div>
-            <div class="field"><label>Vollständiger Name *</label><input type="text" id="regName"></div>
-            <div class="field"><label>E-Mail *</label><input type="email" id="regEmail"></div>
-            <div class="field"><label>Passwort * (min. 8 Zeichen)</label><input type="password" id="regPW"></div>
-            <button class="btn btn-primary" onclick="registrieren()">Konto erstellen</button>
-            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Zurück</button>
+        <div class="card" style="max-width:500px; margin:auto;">
+            <h2>Kundenkonto erstellen</h2>
+            <div class="alert alert-err" id="regFehler"></div>
+            <div class="form-grid">
+                <div class="field col-full"><label>Vollständiger Name *</label><input type="text" id="regName"></div>
+                <div class="field"><label>E-Mail *</label><input type="email" id="regEmail"></div>
+                <div class="field"><label>Passwort * (min. 8 Zeichen)</label><input type="password" id="regPW"></div>
+            </div>
+            <button class="btn btn-primary" onclick="registrieren()">Registrieren</button>
+            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Abbrechen</button>
         </div>
     </div>
 
     <div class="view" id="view-dashboard">
-        <div class="card" id="profilBox" style="background: linear-gradient(135deg, #eef5ff, #f8faff);"></div>
+        <div class="profil-box" id="profilBox"></div>
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2>Meine Aufträge</h2>
@@ -179,15 +204,16 @@
     <div class="view" id="view-bestellung">
         <div class="card">
             <h2>Neuer Druckauftrag</h2>
+            <div class="alert alert-err" id="bestellFehler"></div>
             <div class="form-grid">
                 <div class="field"><label>Projektname *</label><input type="text" id="bProjekt" placeholder="z.B. Monitor-Halterung"></div>
                 <div class="field"><label>Material-Wunsch</label><select id="bMaterial"><option>PLA</option><option>PETG</option><option>ASA</option><option>TPU</option></select></div>
-                <div class="field" style="grid-column: 1 / -1;"><label>Beschreibung & Wünsche</label><textarea id="bBeschreibung" placeholder="Farbe, Details, Maße..."></textarea></div>
-                <div class="field" style="grid-column: 1 / -1;"><label>Lieferadresse *</label><input type="text" id="bAdresse"></div>
+                <div class="field col-full"><label>Beschreibung & Wünsche</label><textarea id="bBeschreibung" placeholder="Farbe, Details, Maße..."></textarea></div>
+                <div class="field col-full"><label>Lieferadresse *</label><input type="text" id="bAdresse"></div>
             </div>
-            <div class="form-grid">
+            <div class="btn-row" style="display:flex; gap:10px; margin-top:20px;">
                 <button class="btn btn-outline" onclick="zeige('view-dashboard')">Abbrechen</button>
-                <button class="btn btn-primary" onclick="bestellungAbschicken()">Auftrag anfragen</button>
+                <button class="btn btn-primary" onclick="bestellungAbschicken()">Auftrag absenden</button>
             </div>
         </div>
     </div>
@@ -195,47 +221,42 @@
     <div class="view" id="view-gast">
         <div class="card">
             <h2>Als Gast bestellen</h2>
+            <div class="alert alert-err" id="gastFehler"></div>
             <div class="form-grid">
                 <div class="field"><label>Dein Name *</label><input type="text" id="gName"></div>
-                <div class="field"><label>E-Mail-Adresse *</label><input type="email" id="gEmail"></div>
+                <div class="field"><label>E-Mail *</label><input type="email" id="gEmail"></div>
                 <div class="field"><label>Projektname *</label><input type="text" id="gProjekt"></div>
                 <div class="field"><label>Material</label><select id="gMaterial"><option>PLA</option><option>PETG</option></select></div>
-                <div class="field" style="grid-column: 1 / -1;"><label>Beschreibung</label><textarea id="gBeschreibung"></textarea></div>
-                <div class="field" style="grid-column: 1 / -1;"><label>Lieferadresse *</label><input type="text" id="gAdresse" placeholder="Straße, Hausnummer, PLZ, Ort"></div>
+                <div class="field col-full"><label>Beschreibung</label><textarea id="gBeschreibung"></textarea></div>
+                <div class="field col-full"><label>Adresse *</label><input type="text" id="gAdresse" placeholder="Straße, PLZ, Ort"></div>
             </div>
-            <button class="btn btn-primary" onclick="gastBestellung()">Jetzt kostenfrei anfragen</button>
-            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Zurück</button>
+            <button class="btn btn-primary" onclick="gastBestellung()">Anfrage jetzt senden</button>
+            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Abbrechen</button>
         </div>
     </div>
 
     <div class="view" id="view-bestaetigung">
         <div class="card" style="text-align:center; padding:40px;">
-            <div style="font-size:50px; margin-bottom:20px;">✅</div>
+            <div style="font-size:50px;">✅</div>
             <h2>Anfrage erfolgreich gesendet!</h2>
-            <p>Deine Bestellnummer zur Nachverfolgung:</p>
-            <div id="confirmId" style="font-size:1.8em; font-weight:700; color:var(--primary); margin:20px 0; background:#f0f7ff; padding:15px; border-radius:10px; border:2px dashed var(--primary);"></div>
-            <p style="font-size:0.85em; color:var(--text-l);">Bitte notiere dir diese Nummer gut.</p>
-            <button class="btn btn-primary" style="margin-top:30px;" onclick="zeige('view-start')">Zurück zur Startseite</button>
+            <p>Deine Bestellnummer:</p>
+            <div id="confirmId" style="font-size:1.8em; font-weight:700; color:var(--primary); margin:15px 0;"></div>
+            <button class="btn btn-primary" onclick="zeige('view-start')">Zurück zur Startseite</button>
         </div>
     </div>
 </main>
 
 <script>
-/* ================================================
-   SUPABASE KONFIGURATION
-================================================ */
 const supabaseUrl = 'https://zasufuyaiturzgohqkky.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inphc3VmdXlhaXR1cnpnb2hxa2t5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjU0MDQsImV4cCI6MjA5MDQ0MTQwNH0.jOtN5Ls_-8JnQJQyPKP2URgWQdKa5GPLhpUs55LB0is';
 const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
 let aktKunde = null;
 
-/* HILFSFUNKTIONEN */
 function laden(on) { document.getElementById('ladeOverlay').style.display = on ? 'flex' : 'none'; }
 function zeige(id) { 
     document.querySelectorAll('.view').forEach(v => v.classList.remove('aktiv'));
-    const target = document.getElementById(id);
-    if(target) target.classList.add('aktiv');
+    document.getElementById(id).classList.add('aktiv');
     window.scrollTo(0,0);
 }
 async function sha256(str) {
@@ -248,70 +269,40 @@ function getBadge(s) {
     return `<span class="badge ${m[s] || 'b-blau'}">${s}</span>`;
 }
 
-/* ================================================
-   AUTHENTIFIZIERUNG
-================================================ */
+/* AUTHENTIFIZIERUNG */
 async function anmelden() {
     const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPW').value;
     if(!e || !p) return;
     laden(true);
     try {
         const hash = await sha256(p);
-        const { data, error } = await sb.from('kunden').select('*').eq('email', e).eq('passwort_hash', hash).single();
-        if(data) {
-            aktKunde = data; 
-            headerAktualisieren(); 
-            await ladeDashboard(); 
-            zeige('view-dashboard');
-        } else {
-            document.getElementById('loginFehler').innerText = "❌ E-Mail oder Passwort falsch.";
-            document.getElementById('loginFehler').style.display = 'block';
-        }
-    } catch(e) { console.error(e); }
-    finally { laden(false); }
+        const { data } = await sb.from('kunden').select('*').eq('email', e).eq('passwort_hash', hash).single();
+        if(data) { aktKunde = data; headerAktualisieren(); await ladeDashboard(); zeige('view-dashboard'); }
+        else { alert('loginFehler', '❌ Login-Daten falsch.'); }
+    } catch(e) { console.error(e); } finally { laden(false); }
 }
 
 async function registrieren() {
     const n = document.getElementById('regName').value, e = document.getElementById('regEmail').value, p = document.getElementById('regPW').value;
-    if(!n || !e || p.length < 8) {
-        document.getElementById('regFehler').innerText = "❌ Bitte alle Felder ausfüllen (PW min. 8 Zeichen).";
-        document.getElementById('regFehler').style.display = 'block';
-        return;
-    }
+    if(!n || !e || p.length < 8) return alert('Bitte alle Felder korrekt ausfüllen.');
     laden(true);
     try {
         const hash = await sha256(p);
         const { error } = await sb.from('kunden').insert([{ id: 'k_'+Date.now(), name: n, email: e, passwort_hash: hash }]);
-        if(!error) { 
-            alert("Konto erstellt! Du kannst dich jetzt einloggen.");
-            zeige('view-login'); 
-        } else {
-            document.getElementById('regFehler').innerText = "❌ Fehler: E-Mail evtl. schon vergeben.";
-            document.getElementById('regFehler').style.display = 'block';
-        }
-    } catch(e) { console.error(e); }
-    finally { laden(false); }
+        if(!error) { alert('Erfolgreich registriert!'); zeige('view-login'); }
+    } catch(e) { console.error(e); } finally { laden(false); }
 }
 
-/* ================================================
-   BESTELL-FUNKTIONEN
-================================================ */
+/* BESTELLUNGEN */
 async function bestellungAbschicken() {
-    const p = document.getElementById('bProjekt').value, adr = document.getElementById('bAdresse').value, desc = document.getElementById('bBeschreibung').value;
-    const mat = document.getElementById('bMaterial').value;
-    if(!p || !adr) return alert("Bitte Projektname und Adresse eingeben!");
+    const p = document.getElementById('bProjekt').value, adr = document.getElementById('bAdresse').value, desc = document.getElementById('bBeschreibung').value, mat = document.getElementById('bMaterial').value;
+    if(!p || !adr) return alert("Projektname und Adresse sind Pflicht!");
     laden(true);
     const id = genId();
     try {
-        const { error } = await sb.from('bestellanfragen').insert([{ 
-            id, kunden_id: aktKunde.id, projekt: p, adresse: adr, beschreibung: desc, material_wunsch: mat, status: 'Anfrage eingegangen', datum: new Date().toLocaleDateString('de-DE') 
-        }]);
-        if(!error) {
-            document.getElementById('confirmId').innerText = id;
-            zeige('view-bestaetigung');
-        }
-    } catch(e) { console.error(e); }
-    finally { laden(false); }
+        await sb.from('bestellAnfragen').insert([{ id, kunden_id: aktKunde.id, projekt: p, adresse: adr, beschreibung: desc, material_wunsch: mat, datum: new Date().toLocaleDateString('de-DE') }]);
+        document.getElementById('confirmId').innerText = id; zeige('view-bestaetigung');
+    } catch(e) { console.error(e); } finally { laden(false); }
 }
 
 async function gastBestellung() {
@@ -320,129 +311,72 @@ async function gastBestellung() {
     laden(true);
     const id = genId();
     try {
-        const { error } = await sb.from('bestellanfragen').insert([{ 
-            id, gastname: n, gast_email: e, projekt: p, adresse: adr, beschreibung: desc, material_wunsch: mat, status: 'Anfrage eingegangen', datum: new Date().toLocaleDateString('de-DE') 
-        }]);
-        if(!error) {
-            document.getElementById('confirmId').innerText = id;
-            zeige('view-bestaetigung');
-        }
-    } catch(e) { console.error(e); }
-    finally { laden(false); }
+        await sb.from('bestellAnfragen').insert([{ id, gastname: n, gast_email: e, projekt: p, adresse: adr, beschreibung: desc, material_wunsch: mat, datum: new Date().toLocaleDateString('de-DE') }]);
+        document.getElementById('confirmId').innerText = id; zeige('view-bestaetigung');
+    } catch(e) { console.error(e); } finally { laden(false); }
 }
 
-/* ================================================
-   CHAT & STORNO
-================================================ */
+/* KOMMUNIKATION & STORNO */
 async function nachrichtSenden(id) {
     const input = document.getElementById('input-'+id), msg = input.value.trim();
     if(!msg) return;
     laden(true);
     try {
-        const { data } = await sb.from('bestellanfragen').select('beschreibung').eq('id', id).single();
+        const { data } = await sb.from('bestellAnfragen').select('beschreibung').eq('id', id).single();
         const newDesc = (data.beschreibung || "") + "\n\n[Kunde " + new Date().toLocaleTimeString() + "]: " + msg;
-        await sb.from('bestellanfragen').update({ beschreibung: newDesc }).eq('id', id);
-        input.value = ""; 
-        await ladeDashboard();
-        alert("Nachricht gesendet!");
-    } catch(e) { console.error(e); }
-    finally { laden(false); }
+        await sb.from('bestellAnfragen').update({ beschreibung: newDesc }).eq('id', id);
+        input.value = ""; await ladeDashboard(); alert("Nachricht gesendet!");
+    } catch(e) { console.error(e); } finally { laden(false); }
 }
 
 async function kundeStorno(id) {
-    if(!confirm("Möchtest du diesen Auftrag wirklich stornieren? Dies kann nicht rückgängig gemacht werden.")) return;
+    if(!confirm("Auftrag wirklich stornieren?")) return;
     laden(true);
     try {
-        await sb.from('bestellanfragen').update({ status: 'Storniert' }).eq('id', id);
-        await ladeDashboard();
-    } catch(e) { console.error(e); }
-    finally { laden(false); }
+        await sb.from('bestellAnfragen').update({ status: 'Storniert' }).eq('id', id);
+        if(aktKunde) await ladeDashboard(); else gastStatusPruefen();
+    } catch(e) { console.error(e); } finally { laden(false); }
 }
 
-/* ================================================
-   GÄSTE STATUS CHECK
-================================================ */
 async function gastStatusPruefen() {
     const nr = document.getElementById('sucheBestellNr').value.trim(), erg = document.getElementById('sucheErgebnis');
     if(!nr) return;
     laden(true);
     try {
-        const { data, error } = await sb.from('bestellanfragen').select('*').eq('id', nr).single();
+        const { data } = await sb.from('bestellAnfragen').select('*').eq('id', nr).single();
         erg.style.display = 'block';
         if(data) {
             const msgHtml = data.admin_notiz ? `<div class="msg-box"><b>Nachricht vom Studio:</b><br>${data.admin_notiz}</div>` : '';
-            const stornoBtn = data.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger" onclick="kundeStorno('${data.id}').then(()=>gastStatusPruefen())">Diesen Auftrag stornieren</button>` : '';
-            
-            erg.innerHTML = `
-                <div class="card" style="border:1px solid #a5d8ff; box-shadow:none;">
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>Status: ${getBadge(data.status)}</b>
-                        <small>${data.datum}</small>
-                    </div>
-                    <div style="margin-top:10px;">Projekt: <b>${data.projekt}</b></div>
-                    ${msgHtml}
-                    ${stornoBtn}
-                </div>`;
-        } else { erg.innerHTML = "<div class='msg-box' style='background:#fee; border-color:#fcc; color:#922;'>❌ Bestellnummer nicht gefunden.</div>"; }
-    } catch(e) { console.error(e); }
-    finally { laden(false); }
+            const stornoBtn = data.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger" onclick="kundeStorno('${data.id}')">Auftrag stornieren</button>` : '';
+            erg.innerHTML = `<div class="card" style="border:1px solid #a5d8ff;"><b>Status: ${getBadge(data.status)}</b><br>Projekt: <b>${data.projekt}</b>${msgHtml}${stornoBtn}</div>`;
+        } else { erg.innerHTML = "<div class='msg-box'>❌ Nicht gefunden.</div>"; }
+    } catch(e) { console.error(e); } finally { laden(false); }
 }
 
-/* ================================================
-   DASHBOARD LADEN
-================================================ */
 async function ladeDashboard() {
     if(!aktKunde) return;
-    document.getElementById('profilBox').innerHTML = `<h3>Willkommen, ${aktKunde.name}</h3><p style="font-size:0.85em; color:var(--text-l);">${aktKunde.email}</p>`;
-    
+    document.getElementById('profilBox').innerHTML = `<h3>Willkommen, ${aktKunde.name}</h3><small>${aktKunde.email}</small>`;
     try {
-        const { data, error } = await sb.from('bestellanfragen').select('*').eq('kunden_id', aktKunde.id).order('id', {ascending:false});
+        const { data } = await sb.from('bestellAnfragen').select('*').eq('kunden_id', aktKunde.id).order('id', {ascending:false});
         const liste = document.getElementById('auftragsListe');
-        
-        if(!data || data.length === 0) {
-            liste.innerHTML = "<div style='text-align:center; padding:30px; color:#aaa;'>Noch keine Aufträge vorhanden.</div>";
-        } else {
-            liste.innerHTML = `
-                <div style="overflow-x:auto;">
-                    <table style="width:100%; min-width:600px;">
-                        <thead><tr><th>Auftrag & Kommunikation</th><th>Status</th><th>Preis</th></tr></thead>
-                        <tbody>
-                            ${data.map(a => `
-                                <tr>
-                                    <td style="padding:20px 10px;">
-                                        <b style="font-size:1.1em;">${a.projekt}</b> <small style="color:#aaa;">(${a.datum})</small>
-                                        ${a.admin_notiz ? `<div class="msg-box"><b>Studio-Nachricht:</b><br>${a.admin_notiz}</div>` : ''}
-                                        
-                                        <div class="chat-input-row">
-                                            <input type="text" id="input-${a.id}" placeholder="Frage oder Nachricht zum Auftrag...">
-                                            <button class="btn btn-primary btn-sm" onclick="nachrichtSenden('${a.id}')">Senden</button>
-                                        </div>
-
-                                        ${a.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger" onclick="kundeStorno('${a.id}')">Stornieren</button>` : ''}
-                                    </td>
-                                    <td>${getBadge(a.status)}</td>
-                                    <td style="font-weight:700;">${a.kosten ? a.kosten.toFixed(2)+'€' : '<span style="color:#aaa;">ausst.</span>'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>`;
+        if(!data || data.length === 0) { liste.innerHTML = "<p>Keine Aufträge vorhanden.</p>"; }
+        else {
+            liste.innerHTML = `<div style="overflow-x:auto;"><table class="order-table"><thead><tr><th>Auftrag & Kommunikation</th><th>Status</th><th>Preis</th></tr></thead><tbody>
+                ${data.map(a => `<tr><td><b>${a.projekt}</b> (${a.datum})
+                    ${a.admin_notiz ? `<div class="msg-box"><b>Studio-Nachricht:</b><br>${a.admin_notiz}</div>` : ''}
+                    <div class="chat-input-row"><input type="text" id="input-${a.id}" placeholder="Nachricht an Admin..."><button class="btn btn-primary btn-sm" onclick="nachrichtSenden('${a.id}')">Senden</button></div>
+                    ${a.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger" onclick="kundeStorno('${a.id}')">Stornieren</button>` : ''}
+                </td><td>${getBadge(a.status)}</td><td>${a.kosten ? a.kosten.toFixed(2)+'€' : 'ausst.'}</td></tr>`).join('')}
+            </tbody></table></div>`;
         }
     } catch(e) { console.error(e); }
 }
 
 function headerAktualisieren() {
     const nav = document.getElementById('headerNav');
-    nav.innerHTML = aktKunde 
-        ? `<span style="font-size:0.85em; color:#ddd; margin-right:10px;">👤 ${aktKunde.name.split(' ')[0]}</span><button class="nav-btn" onclick="abmelden()">Abmelden</button>` 
-        : `<button class="nav-btn" onclick="zeige('view-login')">Anmelden</button>`;
+    nav.innerHTML = aktKunde ? `<button class="nav-btn" onclick="abmelden()">Logout</button>` : `<button class="nav-btn" onclick="zeige('view-login')">Login</button>`;
 }
-
-function abmelden() { 
-    if(confirm("Möchtest du dich wirklich abmelden?")) {
-        aktKunde = null; headerAktualisieren(); zeige('view-start'); 
-    }
-}
+function abmelden() { aktKunde = null; headerAktualisieren(); zeige('view-start'); }
 
 window.addEventListener('DOMContentLoaded', headerAktualisieren);
 </script>
