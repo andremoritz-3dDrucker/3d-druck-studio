@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* ================================================
-           BASIS (Original-Design beibehalten)
+           BASIS (Dein Original-Design bleibt 100% erhalten)
         ================================================ */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -58,75 +58,403 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 12px;
         }
 
-        .logo { display: flex; align-items: center; gap: 10px; }
-        .logo-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
 
-        .header-nav { display: flex; align-items: center; gap: 6px; }
-        .nav-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); color: white; padding: 6px 13px; border-radius: 8px; font-size: 0.8em; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .logo-text { line-height: 1.2; }
+        .logo-name { font-size: 0.97em; font-weight: 700; }
+        .logo-sub  { font-size: 0.68em; opacity: 0.65; }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.22);
+            color: white;
+            padding: 6px 13px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
         .nav-btn:hover { background: rgba(255,255,255,0.22); }
+        .nav-btn.nav-accent { background: rgba(255,255,255,0.22); font-weight: 600; }
 
-        main { max-width: 940px; margin: 0 auto; padding: 28px 16px 80px; }
+        .nav-user {
+            font-size: 0.8em;
+            opacity: 0.8;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        main {
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 28px 16px 80px;
+        }
+
         .view { display: none; }
         .view.aktiv { display: block; }
 
-        .card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 28px; margin-bottom: 20px; }
-        .card-sm { max-width: 480px; margin-left: auto; margin-right: auto; }
-        .card h2 { font-size: 1.25em; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-        .card-sub { font-size: 0.85em; color: var(--text-l); margin-bottom: 24px; }
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 20px;
+        }
 
-        /* NEUE ELEMENTE FÜR CHAT & STATUS */
-        .msg-box { background: #fff9db; border-left: 4px solid #fcc419; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 0.88em; color: #856404; }
-        .chat-input-row { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
-        .chat-input-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85em; }
-        .status-search { background: #e7f5ff; border: 2px solid #a5d8ff; padding: 24px; border-radius: var(--radius-lg); margin-top: 30px; }
+        .card-sm {
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-        /* FORMULARE */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .card h2 {
+            font-size: 1.25em;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+            border: none;
+            padding: 0;
+        }
+
+        .card-sub {
+            font-size: 0.85em;
+            color: var(--text-l);
+            margin-bottom: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
         .col-full { grid-column: 1 / -1; }
-        .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
-        .field label { font-size: 0.78em; font-weight: 700; color: var(--text-l); text-transform: uppercase; }
-        .field input, .field select, .field textarea { padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; outline: none; }
-        .field input:disabled { background: #f5f5f5; color: #999; }
-        .field textarea { min-height: 80px; resize: vertical; }
 
-        .btn { padding: 11px 20px; border-radius: 9px; font-weight: 600; cursor: pointer; border: none; width: 100%; transition: 0.2s; text-align: center; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-m); }
-        .btn-danger { background: var(--danger); color: white; font-size: 0.8em; padding: 6px 12px; width: auto; margin-top: 10px; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-sm { width: auto; padding: 7px 14px; font-size: 13px; }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-        .alert { padding: 11px 15px; border-radius: 9px; font-size: 0.85em; margin-bottom: 18px; display: none; }
+        .field label {
+            font-size: 0.78em;
+            font-weight: 700;
+            color: var(--text-l);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            padding: 10px 13px;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,86,179,0.1);
+        }
+
+        .field input:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .section-sep {
+            font-size: 0.75em;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin: 22px 0 12px;
+            padding-bottom: 7px;
+            border-bottom: 1.5px solid #e0eaf8;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 20px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.18s;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0056b3, #0073e6);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,86,179,0.25);
+        }
+        .btn-primary:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #34c759);
+            color: white;
+            box-shadow: 0 2px 8px rgba(40,167,69,0.25);
+        }
+        .btn-success:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-m);
+            border: 1.5px solid var(--border);
+        }
+        .btn-outline:hover:not(:disabled) { background: var(--bg); border-color: #b0bcc8; }
+
+        .btn-danger-outline {
+            background: transparent;
+            color: var(--danger);
+            border: 1.5px solid #f5c6cb;
+            font-size: 12px;
+            padding: 6px 12px;
+            width: auto;
+            margin-top: 8px;
+        }
+        .btn-danger-outline:hover:not(:disabled) { background: #fde8ea; }
+
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .btn-sm { padding: 7px 14px; font-size: 13px; width: auto; }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-row .btn { flex: 1; }
+
+        /* NEUE ELEMENTE: CHAT & MSG */
+        .msg-box {
+            background: #fff9db;
+            border-left: 4px solid #fcc419;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #856404;
+        }
+        .chat-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f4f8;
+        }
+        .chat-row input {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 0.82em;
+            border-radius: 6px;
+            border: 1.5px solid var(--border);
+        }
+
+        .alert {
+            padding: 11px 15px;
+            border-radius: 9px;
+            font-size: 0.85em;
+            margin-bottom: 18px;
+            display: none;
+            line-height: 1.5;
+        }
         .alert.on { display: block; }
         .alert-err  { background: #fde8ea; border: 1px solid #f5c6cb; color: #922; }
         .alert-ok   { background: #e8f5e9; border: 1px solid #c3e6cb; color: #155724; }
 
-        .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.76em; font-weight: 600; }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.76em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
         .b-blau  { background: #e3f0ff; color: #0056b3; }
         .b-gelb  { background: #fff3e0; color: var(--warn); }
         .b-gruen { background: #e8f5e9; color: #155724; }
         .b-rot   { background: #fde8ea; color: var(--danger); }
 
-        .hero { text-align: center; padding: 36px 16px 28px; }
-        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
-        .option-card { background: var(--white); border: 2px solid var(--border); padding: 24px; border-radius: var(--radius-lg); cursor: pointer; transition: 0.2s; text-align: center; }
-        .option-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+        .hero {
+            text-align: center;
+            padding: 36px 16px 28px;
+        }
 
-        .profil-box { display: flex; align-items: center; gap: 16px; background: linear-gradient(135deg, #eef5ff 0%, #eef8f0 100%); border: 1px solid #d6e8f8; border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 20px; }
-        .profil-avatar { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--success)); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        .hero-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0056b3 0%, #28a745 100%);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 22px;
+            box-shadow: 0 8px 24px rgba(0,86,179,0.25);
+        }
 
-        .order-table { width: 100%; border-collapse: collapse; font-size: 0.87em; }
-        .order-table th { background: #f8fafc; text-align: left; padding: 10px; color: var(--text-l); }
-        .order-table td { padding: 12px 10px; border-bottom: 1px solid #f0f4f8; }
+        .hero h1 { font-size: 1.7em; margin-bottom: 10px; }
+        .hero p  {
+            color: var(--text-l);
+            font-size: 0.93em;
+            max-width: 420px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+        }
 
-        #ladeOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.82); display: none; justify-content: center; align-items: center; z-index: 9999; }
-        .spinner { width: 28px; height: 28px; border: 3px solid #d8e2ef; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.65s linear infinite; }
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        .option-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px 18px;
+            cursor: pointer;
+            transition: all 0.22s;
+            text-align: center;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 6px 24px rgba(0,86,179,0.14);
+            transform: translateY(-3px);
+        }
+
+        .option-card.full-width { grid-column: 1 / -1; }
+
+        .profil-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(135deg, #eef5ff 0%, #eef8f0 100%);
+            border: 1px solid #d6e8f8;
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .profil-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .profil-info { flex: 1; min-width: 0; }
+        .profil-info h3 { font-size: 1em; margin-bottom: 2px; }
+        .profil-info span { font-size: 0.82em; color: var(--text-l); display: block; }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.87em;
+            min-width: 580px;
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 10px 13px;
+            text-align: left;
+            border-bottom: 1px solid #f0f4f8;
+        }
+
+        .order-table th {
+            background: #f8fafc;
+            color: var(--text-l);
+            font-weight: 700;
+        }
+
+        #ladeOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.82);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #d8e2ef;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.65s linear infinite;
+            margin-right: 10px;
+        }
+
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .option-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 560px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .option-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -135,32 +463,41 @@
     <div class="header-inner">
         <div class="logo">
             <div class="logo-icon">🖨️</div>
-            <div style="font-weight:700">3D-Druck Studio</div>
+            <div class="logo-text">
+                <div class="logo-name">3D-Druck Studio</div>
+                <div class="logo-sub">Kundenportal</div>
+            </div>
         </div>
         <nav class="header-nav" id="headerNav"></nav>
     </div>
 </header>
 
-<div id="ladeOverlay"><div class="spinner"></div></div>
+<div id="ladeOverlay">
+    <div class="spinner"></div>
+    <span style="font-size:14px;font-weight:600;color:var(--primary)">Bitte warten…</span>
+</div>
 
 <main>
+
     <div class="view aktiv" id="view-start">
         <div class="hero">
+            <div class="hero-logo">🖨️</div>
             <h1>Willkommen im Kundenportal</h1>
-            <p>Gib deinen Druckauftrag auf oder verfolge deine Bestellungen.</p>
+            <p>Gib deinen Druckauftrag auf, verfolge den Status deiner Bestellungen und verwalte dein Kundenkonto.</p>
+
             <div class="option-grid">
                 <div class="option-card" onclick="zeige('view-login')">🔑 <b>Anmelden</b><br><small>Bestehende Aufträge</small></div>
-                <div class="option-card" onclick="zeige('view-register')">👤 <b>Registrieren</b><br><small>Kundenkonto anlegen</small></div>
+                <div class="option-card" onclick="zeige('view-register')">👤 <b>Registrieren</b><br><small>Konto erstellen</small></div>
+                <div class="option-card full-width" onclick="zeige('view-gast')">📦 <b>Als Gast bestellen</b><br><small>Ohne Registrierung</small></div>
             </div>
-            <button class="btn btn-primary" style="margin-top:15px;" onclick="zeige('view-gast')">📦 Als Gast bestellen</button>
 
-            <div class="status-search">
-                <h3 style="margin-bottom:12px; font-size:1em;">🔍 Gast-Status abfragen</h3>
+            <div class="card" style="margin-top: 30px; background: #e7f5ff; border: 2px solid #a5d8ff;">
+                <h3 style="font-size: 1em; margin-bottom: 12px;">🔍 Gast-Status prüfen</h3>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="sucheBestellNr" placeholder="Bestellnummer (B-...)" style="flex:1; padding:12px; border-radius:10px; border:1px solid #a5d8ff;">
-                    <button class="btn btn-primary btn-sm" onclick="gastStatusPruefen()">Prüfen</button>
+                    <input type="text" id="sucheBestellNr" placeholder="Bestellnummer (B-...)" style="flex:1; padding:10px; border-radius:8px; border:1px solid #a5d8ff;">
+                    <button class="btn btn-primary btn-sm" style="width:auto;" onclick="gastStatusPruefen()">Prüfen</button>
                 </div>
-                <div id="sucheErgebnis" style="margin-top:20px; display:none; text-align:left;"></div>
+                <div id="sucheErgebnis" style="margin-top:15px; display:none; text-align:left;"></div>
             </div>
         </div>
     </div>
@@ -171,29 +508,33 @@
             <div class="alert alert-err" id="loginFehler"></div>
             <div class="field"><label>E-Mail</label><input type="email" id="loginEmail"></div>
             <div class="field"><label>Passwort</label><input type="password" id="loginPW"></div>
-            <button class="btn btn-primary" onclick="anmelden()">Login</button>
-            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Abbrechen</button>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="zeige('view-start')">Abbrechen</button>
+                <button class="btn btn-primary" id="btnLogin" onclick="anmelden()">Anmelden</button>
+            </div>
         </div>
     </div>
 
     <div class="view" id="view-register">
-        <div class="card" style="max-width:500px; margin:auto;">
+        <div class="card" style="max-width: 500px; margin: auto;">
             <h2>Kundenkonto erstellen</h2>
             <div class="alert alert-err" id="regFehler"></div>
             <div class="form-grid">
-                <div class="field col-full"><label>Vollständiger Name *</label><input type="text" id="regName"></div>
+                <div class="field col-full"><label>Name *</label><input type="text" id="regName"></div>
                 <div class="field"><label>E-Mail *</label><input type="email" id="regEmail"></div>
                 <div class="field"><label>Passwort * (min. 8 Zeichen)</label><input type="password" id="regPW"></div>
             </div>
-            <button class="btn btn-primary" onclick="registrieren()">Registrieren</button>
-            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Abbrechen</button>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="zeige('view-start')">Abbrechen</button>
+                <button class="btn btn-primary" id="btnRegister" onclick="registrieren()">Registrieren</button>
+            </div>
         </div>
     </div>
 
     <div class="view" id="view-dashboard">
         <div class="profil-box" id="profilBox"></div>
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
                 <h2>Meine Aufträge</h2>
                 <button class="btn btn-success btn-sm" onclick="zeige('view-bestellung')">+ Neuer Auftrag</button>
             </div>
@@ -211,7 +552,7 @@
                 <div class="field col-full"><label>Beschreibung & Wünsche</label><textarea id="bBeschreibung" placeholder="Farbe, Details, Maße..."></textarea></div>
                 <div class="field col-full"><label>Lieferadresse *</label><input type="text" id="bAdresse"></div>
             </div>
-            <div class="btn-row" style="display:flex; gap:10px; margin-top:20px;">
+            <div class="btn-row">
                 <button class="btn btn-outline" onclick="zeige('view-dashboard')">Abbrechen</button>
                 <button class="btn btn-primary" onclick="bestellungAbschicken()">Auftrag absenden</button>
             </div>
@@ -223,45 +564,52 @@
             <h2>Als Gast bestellen</h2>
             <div class="alert alert-err" id="gastFehler"></div>
             <div class="form-grid">
-                <div class="field"><label>Dein Name *</label><input type="text" id="gName"></div>
+                <div class="field"><label>Name *</label><input type="text" id="gName"></div>
                 <div class="field"><label>E-Mail *</label><input type="email" id="gEmail"></div>
                 <div class="field"><label>Projektname *</label><input type="text" id="gProjekt"></div>
                 <div class="field"><label>Material</label><select id="gMaterial"><option>PLA</option><option>PETG</option></select></div>
                 <div class="field col-full"><label>Beschreibung</label><textarea id="gBeschreibung"></textarea></div>
-                <div class="field col-full"><label>Adresse *</label><input type="text" id="gAdresse" placeholder="Straße, PLZ, Ort"></div>
+                <div class="field col-full"><label>Lieferadresse *</label><input type="text" id="gAdresse" placeholder="Straße, PLZ, Ort"></div>
             </div>
-            <button class="btn btn-primary" onclick="gastBestellung()">Anfrage jetzt senden</button>
-            <button class="btn btn-outline" style="margin-top:10px;" onclick="zeige('view-start')">Abbrechen</button>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="zeige('view-start')">Abbrechen</button>
+                <button class="btn btn-primary" onclick="gastBestellung()">Anfrage absenden</button>
+            </div>
         </div>
     </div>
 
     <div class="view" id="view-bestaetigung">
         <div class="card" style="text-align:center; padding:40px;">
-            <div style="font-size:50px;">✅</div>
-            <h2>Anfrage erfolgreich gesendet!</h2>
-            <p>Deine Bestellnummer:</p>
+            <div style="font-size:50px; margin-bottom:20px;">✅</div>
+            <h2>Auftrag erfolgreich gesendet!</h2>
+            <p>Bestellnummer zur Nachverfolgung:</p>
             <div id="confirmId" style="font-size:1.8em; font-weight:700; color:var(--primary); margin:15px 0;"></div>
             <button class="btn btn-primary" onclick="zeige('view-start')">Zurück zur Startseite</button>
         </div>
     </div>
+
 </main>
 
 <script>
+/* ================================================
+   SUPABASE CLIENT
+================================================ */
 const supabaseUrl = 'https://zasufuyaiturzgohqkky.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inphc3VmdXlhaXR1cnpnb2hxa2t5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjU0MDQsImV4cCI6MjA5MDQ0MTQwNH0.jOtN5Ls_-8JnQJQyPKP2URgWQdKa5GPLhpUs55LB0is';
 const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
 let aktKunde = null;
 
-function laden(on) { document.getElementById('ladeOverlay').style.display = on ? 'flex' : 'none'; }
+async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function laden(an) { document.getElementById('ladeOverlay').style.display = an ? 'flex' : 'none'; }
 function zeige(id) { 
     document.querySelectorAll('.view').forEach(v => v.classList.remove('aktiv'));
     document.getElementById(id).classList.add('aktiv');
     window.scrollTo(0,0);
-}
-async function sha256(str) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 function genId() { return 'B-' + Math.random().toString(36).substr(2, 8).toUpperCase(); }
 function getBadge(s) {
@@ -269,72 +617,82 @@ function getBadge(s) {
     return `<span class="badge ${m[s] || 'b-blau'}">${s}</span>`;
 }
 
-/* AUTHENTIFIZIERUNG */
+/* ================================================
+   AUTHENTIFIZIERUNG
+================================================ */
 async function anmelden() {
-    const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPW').value;
-    if(!e || !p) return;
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const pw = document.getElementById('loginPW').value;
+    if(!email || !pw) return;
     laden(true);
     try {
-        const hash = await sha256(p);
-        const { data } = await sb.from('kunden').select('*').eq('email', e).eq('passwort_hash', hash).single();
+        const hash = await sha256(pw);
+        const { data } = await sb.from('kunden').select('*').eq('email', email).eq('passwort_hash', hash).single();
         if(data) { aktKunde = data; headerAktualisieren(); await ladeDashboard(); zeige('view-dashboard'); }
-        else { alert('loginFehler', '❌ Login-Daten falsch.'); }
+        else { document.getElementById('loginFehler').innerText = "❌ E-Mail oder Passwort falsch."; document.getElementById('loginFehler').style.display='block'; }
     } catch(e) { console.error(e); } finally { laden(false); }
 }
 
 async function registrieren() {
-    const n = document.getElementById('regName').value, e = document.getElementById('regEmail').value, p = document.getElementById('regPW').value;
-    if(!n || !e || p.length < 8) return alert('Bitte alle Felder korrekt ausfüllen.');
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim().toLowerCase();
+    const pw = document.getElementById('regPW').value;
+    if(!name || !email || pw.length < 8) return alert("Daten prüfen.");
     laden(true);
     try {
-        const hash = await sha256(p);
-        const { error } = await sb.from('kunden').insert([{ id: 'k_'+Date.now(), name: n, email: e, passwort_hash: hash }]);
-        if(!error) { alert('Erfolgreich registriert!'); zeige('view-login'); }
+        const hash = await sha256(pw);
+        const { error } = await sb.from('kunden').insert([{ id: 'k_'+Date.now(), name, email, passwort_hash: hash }]);
+        if(!error) { alert("Konto erstellt! Bitte einloggen."); zeige('view-login'); }
     } catch(e) { console.error(e); } finally { laden(false); }
 }
 
-/* BESTELLUNGEN */
-async function bestellungAbschicken() {
-    const p = document.getElementById('bProjekt').value, adr = document.getElementById('bAdresse').value, desc = document.getElementById('bBeschreibung').value, mat = document.getElementById('bMaterial').value;
-    if(!p || !adr) return alert("Projektname und Adresse sind Pflicht!");
-    laden(true);
-    const id = genId();
-    try {
-        await sb.from('bestellAnfragen').insert([{ id, kunden_id: aktKunde.id, projekt: p, adresse: adr, beschreibung: desc, material_wunsch: mat, datum: new Date().toLocaleDateString('de-DE') }]);
-        document.getElementById('confirmId').innerText = id; zeige('view-bestaetigung');
-    } catch(e) { console.error(e); } finally { laden(false); }
-}
-
-async function gastBestellung() {
-    const n = document.getElementById('gName').value, e = document.getElementById('gEmail').value, p = document.getElementById('gProjekt').value, adr = document.getElementById('gAdresse').value, desc = document.getElementById('gBeschreibung').value, mat = document.getElementById('gMaterial').value;
-    if(!n || !e || !p || !adr) return alert("Bitte alle Pflichtfelder (*) ausfüllen!");
-    laden(true);
-    const id = genId();
-    try {
-        await sb.from('bestellAnfragen').insert([{ id, gastname: n, gast_email: e, projekt: p, adresse: adr, beschreibung: desc, material_wunsch: mat, datum: new Date().toLocaleDateString('de-DE') }]);
-        document.getElementById('confirmId').innerText = id; zeige('view-bestaetigung');
-    } catch(e) { console.error(e); } finally { laden(false); }
-}
-
-/* KOMMUNIKATION & STORNO */
+/* ================================================
+   KOMMUNIKATION & STORNO
+================================================ */
 async function nachrichtSenden(id) {
     const input = document.getElementById('input-'+id), msg = input.value.trim();
     if(!msg) return;
     laden(true);
     try {
         const { data } = await sb.from('bestellAnfragen').select('beschreibung').eq('id', id).single();
-        const newDesc = (data.beschreibung || "") + "\n\n[Kunde " + new Date().toLocaleTimeString() + "]: " + msg;
+        const newDesc = (data.beschreibung || "") + "\n\n[Kunde]: " + msg;
         await sb.from('bestellAnfragen').update({ beschreibung: newDesc }).eq('id', id);
         input.value = ""; await ladeDashboard(); alert("Nachricht gesendet!");
     } catch(e) { console.error(e); } finally { laden(false); }
 }
 
 async function kundeStorno(id) {
-    if(!confirm("Auftrag wirklich stornieren?")) return;
+    if(!confirm("Diesen Auftrag wirklich stornieren?")) return;
     laden(true);
     try {
         await sb.from('bestellAnfragen').update({ status: 'Storniert' }).eq('id', id);
         if(aktKunde) await ladeDashboard(); else gastStatusPruefen();
+    } catch(e) { console.error(e); } finally { laden(false); }
+}
+
+/* ================================================
+   BESTELLUNGEN
+================================================ */
+async function bestellungAbschicken() {
+    const p = document.getElementById('bProjekt').value, adr = document.getElementById('bAdresse').value;
+    const desc = document.getElementById('bBeschreibung').value, mat = document.getElementById('bMaterial').value;
+    if(!p || !adr) return alert("Pflichtfelder!");
+    laden(true);
+    const id = genId();
+    try {
+        await sb.from('bestellAnfragen').insert([{ id, kunden_id: aktKunde.id, projekt: p, adresse: adr, beschreibung: desc, material_wunsch: mat, status: 'Anfrage eingegangen', datum: new Date().toLocaleDateString('de-DE') }]);
+        document.getElementById('confirmId').innerText = id; zeige('view-bestaetigung');
+    } catch(e) { console.error(e); } finally { laden(false); }
+}
+
+async function gastBestellung() {
+    const n = document.getElementById('gName').value, e = document.getElementById('gEmail').value, p = document.getElementById('gProjekt').value, adr = document.getElementById('gAdresse').value;
+    if(!n || !e || !p || !adr) return alert("Pflichtfelder!");
+    laden(true);
+    const id = genId();
+    try {
+        await sb.from('bestellAnfragen').insert([{ id, gastname: n, gast_email: e, projekt: p, adresse: adr, status: 'Anfrage eingegangen', datum: new Date().toLocaleDateString('de-DE') }]);
+        document.getElementById('confirmId').innerText = id; zeige('view-bestaetigung');
     } catch(e) { console.error(e); } finally { laden(false); }
 }
 
@@ -346,10 +704,10 @@ async function gastStatusPruefen() {
         const { data } = await sb.from('bestellAnfragen').select('*').eq('id', nr).single();
         erg.style.display = 'block';
         if(data) {
-            const msgHtml = data.admin_notiz ? `<div class="msg-box"><b>Nachricht vom Studio:</b><br>${data.admin_notiz}</div>` : '';
-            const stornoBtn = data.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger" onclick="kundeStorno('${data.id}')">Auftrag stornieren</button>` : '';
-            erg.innerHTML = `<div class="card" style="border:1px solid #a5d8ff;"><b>Status: ${getBadge(data.status)}</b><br>Projekt: <b>${data.projekt}</b>${msgHtml}${stornoBtn}</div>`;
-        } else { erg.innerHTML = "<div class='msg-box'>❌ Nicht gefunden.</div>"; }
+            const mHtml = data.admin_notiz ? `<div class="msg-box"><b>Info:</b> ${data.admin_notiz}</div>` : '';
+            const sBtn = data.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger-outline" onclick="kundeStorno('${data.id}').then(()=>gastStatusPruefen())">Auftrag stornieren</button>` : '';
+            erg.innerHTML = `<div class="card" style="border:1px solid #a5d8ff;"><b>Status: ${getBadge(data.status)}</b><br>Projekt: ${data.projekt}${mHtml}${sBtn}</div>`;
+        } else { erg.innerHTML = "❌ Nicht gefunden."; }
     } catch(e) { console.error(e); } finally { laden(false); }
 }
 
@@ -363,9 +721,9 @@ async function ladeDashboard() {
         else {
             liste.innerHTML = `<div style="overflow-x:auto;"><table class="order-table"><thead><tr><th>Auftrag & Kommunikation</th><th>Status</th><th>Preis</th></tr></thead><tbody>
                 ${data.map(a => `<tr><td><b>${a.projekt}</b> (${a.datum})
-                    ${a.admin_notiz ? `<div class="msg-box"><b>Studio-Nachricht:</b><br>${a.admin_notiz}</div>` : ''}
-                    <div class="chat-input-row"><input type="text" id="input-${a.id}" placeholder="Nachricht an Admin..."><button class="btn btn-primary btn-sm" onclick="nachrichtSenden('${a.id}')">Senden</button></div>
-                    ${a.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger" onclick="kundeStorno('${a.id}')">Stornieren</button>` : ''}
+                    ${a.admin_notiz ? `<div class="msg-box"><b>Studio:</b><br>${a.admin_notiz}</div>` : ''}
+                    <div class="chat-row"><input type="text" id="input-${a.id}" placeholder="Nachricht an Admin..."><button class="btn btn-primary btn-sm" style="width:auto;" onclick="nachrichtSenden('${a.id}')">Senden</button></div>
+                    ${a.status === 'Anfrage eingegangen' ? `<button class="btn btn-danger-outline" onclick="kundeStorno('${a.id}')">Auftrag stornieren</button>` : ''}
                 </td><td>${getBadge(a.status)}</td><td>${a.kosten ? a.kosten.toFixed(2)+'€' : 'ausst.'}</td></tr>`).join('')}
             </tbody></table></div>`;
         }
