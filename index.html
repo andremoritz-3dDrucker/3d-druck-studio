@@ -1,4 +1,4 @@
-
+TML
 Kopieren
 
 <!DOCTYPE html>
@@ -1219,8 +1219,9 @@ async function anmelden() {
         zeige('view-dashboard');
  
     } catch (e) {
-        alert$('loginFehler', '❌ Verbindungsfehler. Bitte erneut versuchen.');
-        console.error(e);
+        const msg = e?.message || e?.error_description || JSON.stringify(e);
+        alert$('loginFehler', '❌ Fehler: ' + msg);
+        console.error('Login Fehler:', e);
     } finally {
         btn('btnLogin', false);
         laden(false);
@@ -1299,8 +1300,9 @@ async function registrieren() {
         zeige('view-dashboard');
  
     } catch (e) {
-        alert$('regFehler', '❌ Fehler beim Registrieren. Bitte erneut versuchen.');
-        console.error(e);
+        const msg = e?.message || e?.error_description || JSON.stringify(e);
+        alert$('regFehler', '❌ Fehler: ' + msg);
+        console.error('Registrieren Fehler:', e);
     } finally {
         btn('btnRegister', false);
         laden(false);
@@ -1506,8 +1508,9 @@ async function gastBestellung() {
         zeige('view-bestaetigung');
  
     } catch (e) {
-        alert$('gastFehler', '❌ Fehler beim Absenden. Bitte erneut versuchen.');
-        console.error(e);
+        const msg = e?.message || e?.error_description || JSON.stringify(e);
+        alert$('gastFehler', '❌ Fehler: ' + msg);
+        console.error('Gast-Bestellung Fehler:', e);
     } finally {
         btn('btnGast', false);
         laden(false);
@@ -1584,8 +1587,9 @@ async function bestellungAbschicken() {
         zeige('view-bestaetigung');
  
     } catch (e) {
-        alert$('bestellFehler', '❌ Fehler beim Absenden. Bitte erneut versuchen.');
-        console.error(e);
+        const msg = e?.message || e?.error_description || JSON.stringify(e);
+        alert$('bestellFehler', '❌ Fehler: ' + msg);
+        console.error('Bestellung Fehler:', e);
     } finally {
         btn('btnBestellung', false);
         laden(false);
