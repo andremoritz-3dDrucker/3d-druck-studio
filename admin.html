@@ -1,960 +1,1037 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3D-Druck Admin</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-/* ── RESET & VARIABLEN ─────────────────────────────── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bl:#0056b3;--bl2:#004494;--gn:#28a745;--gn2:#1e7e34;
-  --rd:#dc3545;--rd2:#b02a37;--or:#e65100;--li:#6a1b9a;
-  --yw:#f39c12;--bg:#f0f4f8;--wh:#fff;--br:#dde4ee;
-  --t1:#1e2a3a;--t2:#4a5568;--t3:#718096;
-  --sh:0 4px 16px rgba(0,0,0,.09);
-}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:14px;min-height:100vh}
-
-/* ── LOGIN ─────────────────────────────────────────── */
-#loginWrap{position:fixed;inset:0;background:linear-gradient(135deg,#0d1b2e 0%,#0056b3 100%);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
-#loginWrap.fade{opacity:0;pointer-events:none}
-.lbox{background:var(--wh);border-radius:18px;padding:42px 46px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.35);text-align:center}
-.llogo{width:64px;height:64px;background:linear-gradient(135deg,#0056b3,#28a745);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 22px}
-.lbox h1{font-size:1.45em;margin-bottom:4px;color:var(--t1)}
-.lsub{font-size:.84em;color:var(--t3);margin-bottom:28px}
-.linp-wrap{position:relative;margin-bottom:16px}
-.linp-wrap input{width:100%;padding:12px 44px 12px 14px;border:1.5px solid var(--br);border-radius:9px;font-size:15px;outline:none;transition:border-color .2s}
-.linp-wrap input:focus{border-color:var(--bl)}
-.linp-wrap input.shake{border-color:var(--rd);animation:shake .35s}
-.teye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:#aaa;width:auto;padding:4px}
-.teye:hover{color:var(--bl)}
-.lerr{background:#fde8ea;border:1px solid #f5c6cb;color:var(--rd);border-radius:8px;padding:10px 14px;font-size:.83em;margin-bottom:14px;display:none}
-.lerr.on{display:block}
-.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--bl),#0073e6);color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s}
-.lbtn:hover{opacity:.9}
-.lbtn:active{transform:scale(.98)}
-.lhint{margin-top:16px;font-size:.77em;color:#bbb}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-
-/* ── TOPBAR ────────────────────────────────────────── */
-#topbar{background:linear-gradient(90deg,#0d1b2e 0%,#0056b3 100%);color:#fff;height:58px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 14px rgba(0,0,0,.2)}
-.tbl{display:flex;align-items:center;gap:12px}
-.tlogo{width:34px;height:34px;background:rgba(255,255,255,.14);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.ttitle{font-size:1em;font-weight:700;letter-spacing:.02em}
-.tbadge{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:2px 11px;font-size:.71em;font-weight:600;letter-spacing:.06em}
-.tonline{background:#e8f5e9;color:var(--gn);font-size:.75em;padding:3px 10px;border-radius:12px;font-weight:600}
-.tlogout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 16px;border-radius:8px;font-size:.82em;cursor:pointer;transition:background .2s;width:auto}
-.tlogout:hover{background:rgba(255,255,255,.2)}
-
-/* ── NAV TABS ──────────────────────────────────────── */
-#nav{background:var(--wh);border-bottom:2px solid var(--br);display:flex;gap:0;padding:0 20px;position:sticky;top:58px;z-index:190;box-shadow:0 2px 8px rgba(0,0,0,.05);overflow-x:auto}
-.ntab{padding:14px 18px;font-size:.87em;font-weight:600;color:var(--t3);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;width:auto;transition:color .2s,border-color .2s}
-.ntab:hover{color:var(--bl)}
-.ntab.on{color:var(--bl);border-bottom-color:var(--bl)}
-.nbadge{display:inline-flex;align-items:center;justify-content:center;background:var(--rd);color:#fff;width:18px;height:18px;border-radius:50%;font-size:.7em;font-weight:700;margin-left:5px}
-
-/* ── PANELS ────────────────────────────────────────── */
-#wrap{padding:22px}
-.panel{display:none}.panel.on{display:block}
-
-/* ── CARD ──────────────────────────────────────────── */
-.card{background:var(--wh);padding:22px 24px;border-radius:14px;box-shadow:var(--sh);margin-bottom:20px}
-.card-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.chead{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--bl);padding-bottom:10px;margin-bottom:18px}
-.chead h2{font-size:1.1em;color:var(--t1);margin:0}
-
-/* ── STATS ─────────────────────────────────────────── */
-.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-bottom:22px}
-.scard{background:var(--wh);border-radius:11px;padding:15px 17px;box-shadow:var(--sh);border-left:4px solid var(--bl)}
-.scard.or{border-left-color:var(--or)}.scard.gn{border-left-color:var(--gn)}.scard.li{border-left-color:var(--li)}.scard.rd{border-left-color:var(--rd)}
-.slabel{font-size:.72em;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.04em}
-.sval{font-size:1.7em;font-weight:700;color:var(--t1);margin-top:4px}
-
-/* ── FORMS ─────────────────────────────────────────── */
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fcol{grid-column:1/-1}
-.field{display:flex;flex-direction:column;gap:5px}
-.field label{font-size:.77em;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em}
-.field input,.field select,.field textarea{padding:10px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:14px;font-family:inherit;color:var(--t1);outline:none;transition:border-color .2s,box-shadow .2s;background:#fff}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(0,86,179,.1)}
-.field input[readonly]{background:#f7f8fa;color:#999;cursor:not-allowed}
-.field textarea{resize:vertical;min-height:75px}
-
-/* ── BUTTONS ───────────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;width:100%}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.btn:active:not(:disabled){transform:scale(.98)}
-.b-bl{background:linear-gradient(135deg,var(--bl),#0073e6);color:#fff;box-shadow:0 2px 8px rgba(0,86,179,.22)}
-.b-bl:hover:not(:disabled){opacity:.88}
-.b-gn{background:linear-gradient(135deg,var(--gn),#34c759);color:#fff;box-shadow:0 2px 8px rgba(40,167,69,.22)}
-.b-gn:hover:not(:disabled){opacity:.88}
-.b-rd{background:var(--rd);color:#fff}
-.b-rd:hover:not(:disabled){background:var(--rd2)}
-.b-or{background:var(--or);color:#fff}
-.b-or:hover:not(:disabled){background:#c45000}
-.b-out{background:transparent;color:var(--t2);border:1.5px solid var(--br)}
-.b-out:hover:not(:disabled){background:var(--bg);border-color:#b0bcc8}
-.bsm{padding:6px 13px;font-size:12px;width:auto}
-.brow{display:flex;gap:10px;margin-top:18px}
-.brow .btn{flex:1}
-
-/* ── TABLE ─────────────────────────────────────────── */
-.twrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:.87em}
-th,td{padding:10px 11px;text-align:left;border-bottom:1px solid #f0f4f8}
-th{background:#f8fafc;font-size:.78em;text-transform:uppercase;letter-spacing:.04em;color:var(--t3);font-weight:700}
-tr:hover td{background:#fafcff}
-.emp{text-align:center;color:#bbb;font-style:italic;padding:28px}
-
-/* ── BADGES ────────────────────────────────────────── */
-.bdg{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.75em;font-weight:700;white-space:nowrap}
-.bbl{background:#e3f0ff;color:var(--bl)}
-.byw{background:#fff8e1;color:#c07a00}
-.bli{background:#f3e5f5;color:var(--li)}
-.bgn{background:#e8f5e9;color:#1a6b30}
-.brd{background:#fde8ea;color:var(--rd)}
-.bgr{background:#f0f0f0;color:#666}
-
-/* ── FILTER BAR ────────────────────────────────────── */
-.fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.fbar select{width:auto;font-family:inherit;font-size:13px;padding:7px 10px;border:1.5px solid var(--br);border-radius:8px;outline:none}
-.fbar input{flex:1;min-width:180px;font-family:inherit;font-size:13px;padding:7px 10px;border:1.5px solid var(--br);border-radius:8px;outline:none}
-.fbar select:focus,.fbar input:focus{border-color:var(--bl)}
-
-/* ── KALKULATIONSBOX ───────────────────────────────── */
-.kbox{background:#f0f7ff;border:1px solid #c8dff8;border-left:4px solid var(--bl);border-radius:10px;padding:14px 18px;margin:14px 0;line-height:1.9;font-size:.92em}
-.kbox .ktotal{font-size:1.2em;font-weight:700;color:var(--rd)}
-
-/* ── MODAL ─────────────────────────────────────────── */
-#modWrap{position:fixed;inset:0;background:rgba(0,0,0,.48);display:none;align-items:center;justify-content:center;z-index:5000;padding:14px;backdrop-filter:blur(4px)}
-#modWrap.on{display:flex}
-.mbox{background:var(--wh);border-radius:16px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.28)}
-.mhead{padding:18px 22px 14px;border-bottom:1px solid var(--br);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;background:var(--wh);z-index:1}
-.mhead h3{font-size:1.05em;color:var(--t1);margin:0}
-.mclose{background:var(--bg);border:none;color:var(--t1);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
-.mclose:hover{background:#dde}
-.mbody{padding:18px 22px}
-.mfoot{padding:14px 22px;border-top:1px solid var(--br);display:flex;gap:10px}
-.mfoot .btn{flex:1;margin:0}
-.msec{font-size:.73em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.07em;margin:18px 0 9px;padding-bottom:5px;border-bottom:1.5px solid #dbeeff}
-.msec:first-child{margin-top:0}
-.igrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.iitem{background:#f8fafc;border-radius:8px;padding:9px 13px}
-.iitem.full{grid-column:1/-1}
-.ilbl{font-size:.7em;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:3px;letter-spacing:.04em}
-.ival{font-size:.88em;color:var(--t1);line-height:1.55;word-break:break-word}
-
-/* ── NACHRICHTEN ───────────────────────────────────── */
-.msg-list{max-height:200px;overflow-y:auto;border:1.5px solid var(--br);border-radius:9px;padding:10px 13px;background:#fafcff;margin-bottom:10px}
-.msg-item{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #eef2f8}
-.msg-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
-.msg-meta{font-size:.72em;color:var(--t3);margin-bottom:3px}
-.msg-text{font-size:.88em;color:var(--t1);line-height:1.55;white-space:pre-wrap}
-.msg-empty{font-size:.84em;color:#bbb;font-style:italic;text-align:center;padding:12px}
-
-/* ── LADE-OVERLAY ──────────────────────────────────── */
-#ladeWrap{position:fixed;inset:0;background:rgba(255,255,255,.84);display:none;align-items:center;justify-content:center;z-index:9000;backdrop-filter:blur(2px)}
-.lspin{width:28px;height:28px;border:3px solid #d8e2ef;border-top-color:var(--bl);border-radius:50%;animation:spin .65s linear infinite;margin-right:10px}
-.ltxt{font-size:14px;font-weight:600;color:var(--bl)}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── WARN ──────────────────────────────────────────── */
-.warn{color:var(--rd);font-size:.8em;font-weight:600;display:none;margin-top:4px}
-.chk{width:20px;height:20px;cursor:pointer;accent-color:var(--gn)}
-
-/* ── RESPONSIVE ────────────────────────────────────── */
-@media(max-width:640px){
-  .card-row,.fgrid,.igrid{grid-template-columns:1fr}
-  .fcol{grid-column:1}.iitem.full{grid-column:1}
-  #wrap{padding:14px}
-  .ntab{padding:12px 12px;font-size:.8em}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D-Druck Studio – Kundenportal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}:root{--primary:#0056b3;--primary-d:#004494;--success:#28a745;--danger:#dc3545;--warn:#e65100;--bg:#f0f4f8;--white:#ffffff;--border:#dde4ee;--text:#1e2a3a;--text-m:#4a5568;--text-l:#718096;--shadow-sm:0 2px 8px rgba(0,0,0,0.07);--shadow:0 4px 20px rgba(0,0,0,0.09);--shadow-lg:0 8px 40px rgba(0,0,0,0.12);--radius:12px;--radius-lg:16px;}body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;}a{color:var(--primary);text-decoration:none;font-weight:600;}a:hover{text-decoration:underline;}header{background:linear-gradient(135deg,#112244 0%,#0056b3 100%);color:white;position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(0,0,0,0.25);}.header-inner{max-width:940px;margin:0 auto;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;}.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}.logo-icon{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}.logo-text{line-height:1.2;}.logo-name{font-size:0.97em;font-weight:700;}.logo-sub{font-size:0.68em;opacity:0.65;}.header-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;}.nav-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);color:white;padding:6px 13px;border-radius:8px;font-size:0.8em;cursor:pointer;transition:background 0.2s;white-space:nowrap;}.nav-btn:hover{background:rgba(255,255,255,0.22);}.nav-btn.nav-accent{background:rgba(255,255,255,0.22);font-weight:600;}.nav-user{font-size:0.8em;opacity:0.8;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}main{max-width:940px;margin:0 auto;padding:28px 16px 80px;}.view{display:none;}.view.aktiv{display:block;}.card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:28px;margin-bottom:20px;}.card-sm{max-width:480px;margin-left:auto;margin-right:auto;}.card h2{font-size:1.25em;font-weight:700;color:var(--text);margin-bottom:4px;border:none;padding:0;}.card-sub{font-size:0.85em;color:var(--text-l);margin-bottom:24px;}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}.col-full{grid-column:1 / -1;}.field{display:flex;flex-direction:column;gap:5px;}.field label{font-size:0.78em;font-weight:700;color:var(--text-l);text-transform:uppercase;letter-spacing:0.05em;}.field input,.field select,.field textarea{padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;color:var(--text);background:white;transition:border-color 0.2s,box-shadow 0.2s;outline:none;}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,86,179,0.1);}.field input:disabled{background:#f5f5f5;color:#999;cursor:not-allowed;}.field textarea{resize:vertical;min-height:80px;}.section-sep{font-size:0.75em;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.07em;margin:22px 0 12px;padding-bottom:7px;border-bottom:1.5px solid #e0eaf8;display:flex;align-items:center;gap:7px;}.btn{display:inline-block;padding:11px 20px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.18s;text-align:center;width:100%;}.btn-primary{background:linear-gradient(135deg,#0056b3,#0073e6);color:white;box-shadow:0 2px 8px rgba(0,86,179,0.25);}.btn-primary:hover:not(:disabled){opacity:0.88;transform:translateY(-1px);}.btn-success{background:linear-gradient(135deg,#28a745,#34c759);color:white;box-shadow:0 2px 8px rgba(40,167,69,0.25);}.btn-success:hover:not(:disabled){opacity:0.88;transform:translateY(-1px);}.btn-outline{background:transparent;color:var(--text-m);border:1.5px solid var(--border);}.btn-outline:hover:not(:disabled){background:var(--bg);border-color:#b0bcc8;}.btn-danger-outline{background:transparent;color:var(--danger);border:1.5px solid #f5c6cb;}.btn-danger-outline:hover:not(:disabled){background:#fde8ea;}.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none !important;}.btn-sm{padding:7px 14px;font-size:13px;width:auto;}.btn-row{display:flex;gap:10px;margin-top:20px;}.btn-row .btn{flex:1;}.alert{padding:11px 15px;border-radius:9px;font-size:0.85em;margin-bottom:18px;display:none;line-height:1.5;}.alert.on{display:block;}.alert-err{background:#fde8ea;border:1px solid #f5c6cb;color:#922;}.alert-ok{background:#e8f5e9;border:1px solid #c3e6cb;color:#155724;}.alert-info{background:#e3f0ff;border:1px solid #b8d4f0;color:#0056b3;}.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.76em;font-weight:600;white-space:nowrap;}.b-blau{background:#e3f0ff;color:#0056b3;}.b-gelb{background:#fff3e0;color:var(--warn);}.b-lila{background:#f3e5f5;color:#6a1b9a;}.b-gruen{background:#e8f5e9;color:#155724;}.b-rot{background:#fde8ea;color:var(--danger);}.b-grau{background:#f0f0f0;color:#666;}.hero{text-align:center;padding:36px 16px 28px;}.hero-logo{width:80px;height:80px;background:linear-gradient(135deg,#0056b3 0%,#28a745 100%);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 22px;box-shadow:0 8px 24px rgba(0,86,179,0.25);}.hero h1{font-size:1.7em;margin-bottom:10px;}.hero p{color:var(--text-l);font-size:0.93em;max-width:420px;margin:0 auto 32px;line-height:1.7;}.option-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:580px;margin:0 auto;}.option-card{background:var(--white);border:2px solid var(--border);border-radius:var(--radius-lg);padding:24px 18px;cursor:pointer;transition:all 0.22s;text-align:center;}.option-card:hover{border-color:var(--primary);box-shadow:0 6px 24px rgba(0,86,179,0.14);transform:translateY(-3px);}.option-card.full-width{grid-column:1 / -1;}.oc-icon{font-size:34px;margin-bottom:11px;}.oc-title{font-size:0.97em;font-weight:700;margin-bottom:6px;}.oc-desc{font-size:0.78em;color:var(--text-l);line-height:1.55;}.profil-box{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#eef5ff 0%,#eef8f0 100%);border:1px solid #d6e8f8;border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;}.profil-avatar{width:50px;height:50px;background:linear-gradient(135deg,var(--primary),var(--success));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.1em;color:white;font-weight:700;flex-shrink:0;}.profil-info{flex:1;min-width:0;}.profil-info h3{font-size:1em;margin-bottom:2px;}.profil-info span{font-size:0.82em;color:var(--text-l);display:block;}.profil-actions{display:flex;gap:8px;flex-shrink:0;}.order-wrap{overflow-x:auto;margin-top:4px;}.order-table{width:100%;border-collapse:collapse;font-size:0.87em;min-width:580px;}.order-table th,.order-table td{padding:10px 13px;text-align:left;border-bottom:1px solid #f0f4f8;}.order-table th{background:#f8fafc;font-size:0.78em;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-l);font-weight:700;}.order-table tr:last-child td{border-bottom:none;}.order-table tr:hover td{background:#fafcff;}.order-detail{font-size:0.8em;color:var(--text-l);margin-top:2px;}.btn-storno{display:inline-block;padding:5px 11px;background:transparent;border:1.5px solid #f5c6cb;color:var(--danger);border-radius:7px;font-size:0.76em;font-weight:600;cursor:pointer;transition:all 0.18s;white-space:nowrap;width:auto;}.btn-storno:hover{background:#fde8ea;border-color:var(--danger);}.btn-storno:disabled{opacity:0.35;cursor:not-allowed;border-color:#ddd;color:#bbb;}.nachrichten-box{background:#eef5ff;border:1px solid #c3d9f8;border-left:3px solid var(--primary);border-radius:8px;padding:9px 13px;margin-top:5px;font-size:0.81em;}.nachrichten-box .msg-label{font-size:0.73em;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;}.nachrichten-box .msg-entry{padding:4px 0;border-bottom:1px dashed #c3d9f8;color:var(--text);line-height:1.55;}.nachrichten-box .msg-entry:last-child{border-bottom:none;}.nachrichten-box .msg-ts{font-size:0.78em;color:var(--text-l);}.confirm-wrap{text-align:center;padding:32px 20px;}.confirm-icon{width:76px;height:76px;background:#e8f5e9;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 20px;box-shadow:0 4px 16px rgba(40,167,69,0.15);}.confirm-id{background:#f8fafc;border:1.5px dashed #c0c8d4;border-radius:10px;padding:12px 22px;font-family:'Courier New',monospace;font-size:1.15em;letter-spacing:0.07em;display:inline-block;margin:10px 0 22px;color:var(--text);}.empty{text-align:center;padding:44px 20px;color:var(--text-l);}.empty .empty-icon{font-size:44px;margin-bottom:14px;}.empty p{font-size:0.9em;margin-bottom:18px;}#ladeOverlay{position:fixed;inset:0;background:rgba(255,255,255,0.82);display:none;justify-content:center;align-items:center;z-index:9999;backdrop-filter:blur(2px);}.spinner{width:28px;height:28px;border:3px solid #d8e2ef;border-top-color:var(--primary);border-radius:50%;animation:spin 0.65s linear infinite;margin-right:10px;}@keyframes spin{to{transform:rotate(360deg);}}@media (max-width:560px){.form-grid{grid-template-columns:1fr;}.option-grid{grid-template-columns:1fr;}.option-card.full-width{grid-column:1;}.card{padding:20px 16px;}.profil-box{flex-wrap:wrap;}.profil-actions{width:100%;}.profil-actions .btn{flex:1;}}</style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════
-     LOGIN
-════════════════════════════════════════════════════════ -->
-<div id="loginWrap">
-  <div class="lbox">
-    <div class="llogo">🖨️</div>
-    <h1>3D-Druck Admin</h1>
-    <p class="lsub">Nur für Administratoren</p>
-    <label for="pw" style="text-align:left;display:block;font-size:.82em;font-weight:600;color:var(--t2);margin-bottom:6px">Passwort</label>
-    <div class="linp-wrap">
-      <input type="password" id="pw" placeholder="Passwort eingeben…" autocomplete="current-password"
-             onkeydown="if(event.key==='Enter')login()">
-      <button class="teye" onclick="togglePw()">👁</button>
+<header>
+    <div class="header-inner">
+        <div class="logo">
+            <div class="logo-icon">🖨️</div>
+            <div class="logo-text">
+                <div class="logo-name">3D-Druck Studio</div>
+                <div class="logo-sub">Kundenportal</div>
+            </div>
+        </div>
+        <nav class="header-nav" id="headerNav">
+
+        </nav>
     </div>
-    <div class="lerr" id="lerr">❌ Falsches Passwort – bitte erneut versuchen.</div>
-    <button class="lbtn" onclick="login()">Anmelden</button>
-    <p class="lhint">Sitzung gilt nur für diese Browser-Session.</p>
-  </div>
+</header>
+
+<div id="ladeOverlay">
+    <div class="spinner"></div>
+    <span style="font-size:14px;font-weight:600;color:var(--primary)">Bitte warten…</span>
 </div>
 
-<!-- LADE -->
-<div id="ladeWrap">
-  <div class="lspin"></div><span class="ltxt">Bitte warten…</span>
-</div>
+<main>
 
-<!-- ══════════════════════════════════════════════════════
-     MODAL – ANFRAGE BEARBEITEN
-════════════════════════════════════════════════════════ -->
-<div id="modWrap">
-  <div class="mbox">
-    <div class="mhead">
-      <h3 id="modTitle">Anfrage bearbeiten</h3>
-      <button class="mclose" onclick="modClose()">✕</button>
-    </div>
-    <div class="mbody" id="modBody"></div>
-    <div class="mfoot">
-      <button class="btn b-out" style="font-size:13px" onclick="modClose()">Schließen</button>
-      <button class="btn b-gn" style="font-size:13px" onclick="modSave()">✓ Speichern</button>
-    </div>
-  </div>
-</div>
 
-<!-- ══════════════════════════════════════════════════════
-     TOPBAR
-════════════════════════════════════════════════════════ -->
-<div id="topbar" style="display:none">
-  <div class="tbl">
-    <div class="tlogo">🖨️</div>
-    <span class="ttitle">3D-Druck Dashboard</span>
-    <span class="tbadge">ADMIN</span>
-    <span class="tonline" id="onlineStatus">🟢 Online</span>
-  </div>
-  <button class="tlogout" onclick="logout()">⬡ Abmelden</button>
-</div>
+    <div class="view aktiv" id="view-start">
+        <div class="hero">
+            <div class="hero-logo">🖨️</div>
+            <h1>Willkommen im Kundenportal</h1>
+            <p>
+                Gib deinen Druckauftrag auf, verfolge den Status deiner Bestellungen
+                und verwalte dein persönliches Kundenkonto.
+            </p>
 
-<!-- ══════════════════════════════════════════════════════
-     NAV TABS
-════════════════════════════════════════════════════════ -->
-<div id="nav" style="display:none">
-  <button class="ntab on" onclick="tab('p-anfragen',this)">
-    📥 Kundenanfragen <span class="nbadge" id="nbAnfragen" style="display:none">0</span>
-  </button>
-  <button class="ntab" onclick="tab('p-lager',this)">🧵 Filamentlager</button>
-  <button class="ntab" onclick="tab('p-historie',this)">📋 Auftragshistorie</button>
-  <button class="ntab" onclick="tab('p-auftrag',this)">➕ Neuer Auftrag</button>
-</div>
-
-<!-- ══════════════════════════════════════════════════════
-     HAUPTINHALT
-════════════════════════════════════════════════════════ -->
-<div id="wrap" style="display:none">
-
-  <!-- ─── TAB 1: KUNDENANFRAGEN ─────────────────────── -->
-  <div class="panel on" id="p-anfragen">
-
-    <!-- Stats -->
-    <div class="sgrid">
-      <div class="scard"><div class="slabel">Alle Anfragen</div><div class="sval" id="sAlle">—</div></div>
-      <div class="scard or"><div class="slabel">Neu / Offen</div><div class="sval" id="sNeu">—</div></div>
-      <div class="scard li"><div class="slabel">Im Druck</div><div class="sval" id="sDruck">—</div></div>
-      <div class="scard gn"><div class="slabel">Abgeschlossen</div><div class="sval" id="sAbge">—</div></div>
-      <div class="scard rd"><div class="slabel">Umsatz gesamt</div><div class="sval" id="sUmsatz">—</div></div>
+            <div class="option-grid">
+                <div class="option-card" onclick="zeige('view-login')">
+                    <div class="oc-icon">🔑</div>
+                    <div class="oc-title">Anmelden</div>
+                    <div class="oc-desc">Mit deinem Kundenkonto einloggen und alle Aufträge verwalten.</div>
+                </div>
+                <div class="option-card" onclick="zeige('view-register')">
+                    <div class="oc-icon">👤</div>
+                    <div class="oc-title">Registrieren</div>
+                    <div class="oc-desc">Neu hier? Kostenloses Kundenkonto mit gespeicherter Adresse anlegen.</div>
+                </div>
+                <div class="option-card full-width" onclick="zeige('view-gast')">
+                    <div class="oc-icon">📦</div>
+                    <div class="oc-title">Als Gast bestellen</div>
+                    <div class="oc-desc">Schnell & ohne Registrierung – einfach Auftrag aufgeben, kein Konto nötig.</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-      <div class="chead">
-        <h2>📥 Alle Kundenanfragen</h2>
-        <button class="btn b-bl bsm" onclick="ladeAnfragen()">↻ Aktualisieren</button>
-      </div>
 
-      <!-- Filter -->
-      <div class="fbar">
-        <select id="fStatus" onchange="filterAnfragen()">
-          <option value="">— Alle Status —</option>
-          <option>Anfrage eingegangen</option>
-          <option>In Bearbeitung</option>
-          <option>Im Druck</option>
-          <option>Qualitätsprüfung</option>
-          <option>Versandbereit</option>
-          <option>Abgeschlossen</option>
-          <option>Storniert</option>
-        </select>
-        <input type="text" id="fSuche" placeholder="🔍 Name, Projekt, E-Mail, Bestellnr. …" oninput="filterAnfragen()">
-      </div>
+    <div class="view" id="view-login">
+        <div class="card card-sm">
+            <h2>Anmelden</h2>
+            <p class="card-sub">Mit deinem Kundenkonto einloggen</p>
 
-      <div class="twrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Datum</th><th>Bestellnr.</th><th>Kunde / Kontakt</th>
-              <th>Projekt</th><th>Material</th><th>Lieferadresse</th>
-              <th>Status</th><th>Preis</th><th>Aktionen</th>
-            </tr>
-          </thead>
-          <tbody id="tAnfragen"><tr><td colspan="9" class="emp">Lade…</td></tr></tbody>
-        </table>
-      </div>
+            <div class="alert alert-err" id="loginFehler"></div>
+
+            <div class="form-grid" style="grid-template-columns:1fr">
+                <div class="field">
+                    <label>E-Mail-Adresse</label>
+                    <input type="email" id="loginEmail" placeholder="deine@email.de" autocomplete="email">
+                </div>
+                <div class="field">
+                    <label>Passwort</label>
+                    <input type="password" id="loginPW" placeholder="••••••••"
+                           autocomplete="current-password"
+                           onkeydown="if(event.key==='Enter') anmelden()">
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="zeige('view-start')">← Zurück</button>
+                <button class="btn btn-primary" id="btnLogin" onclick="anmelden()">Anmelden</button>
+            </div>
+
+            <p style="text-align:center;margin-top:16px;font-size:0.82em;color:var(--text-l)">
+                Noch kein Konto?
+                <a href="#" onclick="zeige('view-register');return false;">Jetzt registrieren</a>
+            </p>
+        </div>
     </div>
-  </div>
 
-  <!-- ─── TAB 2: FILAMENTLAGER ──────────────────────── -->
-  <div class="panel" id="p-lager">
-    <div class="card-row">
-      <div class="card">
-        <div class="chead"><h2>🧵 Neue Spule hinzufügen</h2></div>
-        <div class="fgrid">
-          <div class="field">
-            <label>Hersteller</label>
-            <input type="text" id="lHer" placeholder="z.B. Anycubic">
-          </div>
-          <div class="field">
-            <label>Farbe / Bezeichnung</label>
-            <input type="text" id="lFarbe" placeholder="z.B. Schwarz">
-          </div>
-          <div class="field">
-            <label>Material-Typ</label>
-            <select id="lMat">
-              <optgroup label="── PLA Varianten ──">
-                <option>PLA</option>
-                <option>PLA+</option>
-                <option>PLA Silk</option>
-                <option>PLA Matt</option>
-                <option>PLA High Speed</option>
-                <option>XPLA</option>
-                <option>PLA-CF (Carbon)</option>
-                <option>PLA Wood Fill</option>
-                <option>PLA Metal Fill</option>
-                <option>PLA Marble</option>
-              </optgroup>
-              <optgroup label="── PETG Varianten ──">
-                <option>PETG</option>
-                <option>PETG-CF (Carbon)</option>
-                <option>PETG-GF (Glasfaser)</option>
-              </optgroup>
-              <optgroup label="── Nylon / PA ──">
-                <option>Nylon PA6</option>
-                <option>Nylon PA12</option>
-                <option>Nylon PA-CF (Carbon)</option>
-                <option>Nylon PA-GF (Glasfaser)</option>
-              </optgroup>
-              <optgroup label="── Technische Filamente ──">
-                <option>ABS</option>
-                <option>ABS-CF (Carbon)</option>
-                <option>ASA</option>
-                <option>ASA-CF (Carbon)</option>
-                <option>PC (Polycarbonat)</option>
-                <option>PC-CF (Carbon)</option>
-                <option>PP (Polypropylen)</option>
-                <option>HIPS</option>
-                <option>POM (Delrin)</option>
-              </optgroup>
-              <optgroup label="── Glasfaser (GF) ──">
-                <option>GF-PLA (Glasfaser)</option>
-                <option>GF-PETG (Glasfaser)</option>
-                <option>GF-PA12 (Glasfaser)</option>
-                <option>GF30-PA (30% Glasfaser)</option>
-              </optgroup>
-              <optgroup label="── Flexibel ──">
-                <option>TPU 95A</option>
-                <option>TPU 87A (weich)</option>
-                <option>TPE</option>
-                <option>TPC</option>
-              </optgroup>
-              <optgroup label="── Spezialmaterialien ──">
-                <option>Resin (Standard)</option>
-                <option>Resin (ABS-Like)</option>
-                <option>Resin (Water Washable)</option>
-              </optgroup>
-            </select>
-          </div>
-          <div class="field">
-            <label>Startgewicht (g)</label>
-            <input type="number" id="lGew" value="1000" min="1">
-          </div>
-          <div class="field fcol">
-            <label>Einkaufspreis (€)</label>
-            <input type="number" id="lPre" step="0.01" placeholder="z.B. 16.99">
-          </div>
-        </div>
-        <div class="brow">
-          <button class="btn b-bl" onclick="filamentAdd()">+ Spule hinzufügen</button>
-        </div>
-      </div>
 
-      <div class="card">
-        <div class="chead"><h2>📦 Aktueller Bestand</h2></div>
-        <div class="twrap">
-          <table>
-            <thead><tr><th>Material</th><th>Hersteller</th><th>Rest (g)</th><th>Preis €</th><th></th></tr></thead>
-            <tbody id="tLager"><tr><td colspan="5" class="emp">Lade…</td></tr></tbody>
-          </table>
+    <div class="view" id="view-register">
+        <div class="card">
+            <h2>Konto erstellen</h2>
+            <p class="card-sub">Einmalig registrieren – dann Aufträge schnell & einfach aufgeben</p>
+
+            <div class="alert alert-err" id="regFehler"></div>
+
+            <div class="section-sep">👤 Persönliche Daten</div>
+            <div class="form-grid">
+                <div class="field col-full">
+                    <label>Vollständiger Name *</label>
+                    <input type="text" id="regName" placeholder="Max Mustermann" autocomplete="name">
+                </div>
+                <div class="field">
+                    <label>E-Mail-Adresse *</label>
+                    <input type="email" id="regEmail" placeholder="deine@email.de" autocomplete="email">
+                </div>
+                <div class="field">
+                    <label>Telefon (optional)</label>
+                    <input type="tel" id="regTelefon" placeholder="+49 170 1234567" autocomplete="tel">
+                </div>
+                <div class="field">
+                    <label>Passwort * (min. 8 Zeichen)</label>
+                    <input type="password" id="regPW" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <div class="field">
+                    <label>Passwort wiederholen *</label>
+                    <input type="password" id="regPW2" placeholder="••••••••" autocomplete="new-password">
+                </div>
+            </div>
+
+            <div class="section-sep">📍 Standard-Lieferadresse (optional)</div>
+            <div class="form-grid">
+                <div class="field col-full">
+                    <label>Straße &amp; Hausnummer</label>
+                    <input type="text" id="regAdresse" placeholder="Musterstraße 12" autocomplete="street-address">
+                </div>
+                <div class="field">
+                    <label>PLZ</label>
+                    <input type="text" id="regPlz" placeholder="12345" autocomplete="postal-code">
+                </div>
+                <div class="field">
+                    <label>Ort / Stadt</label>
+                    <input type="text" id="regOrt" placeholder="Musterstadt" autocomplete="address-level2">
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="zeige('view-start')">← Zurück</button>
+                <button class="btn btn-primary" id="btnRegister" onclick="registrieren()">Konto erstellen</button>
+            </div>
+
+            <p style="text-align:center;margin-top:16px;font-size:0.82em;color:var(--text-l)">
+                Bereits registriert?
+                <a href="#" onclick="zeige('view-login');return false;">Anmelden</a>
+            </p>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- ─── TAB 3: AUFTRAGSHISTORIE ───────────────────── -->
-  <div class="panel" id="p-historie">
-    <div class="card">
-      <div class="chead">
-        <h2>🗂️ Auftragshistorie</h2>
-        <button class="btn b-bl bsm" onclick="ladeDaten()">↻ Aktualisieren</button>
-      </div>
-      <div class="twrap">
-        <table>
-          <thead>
-            <tr><th>Datum</th><th>Projekt</th><th>Kunde</th><th>Material</th><th>Gramm</th><th>Preis</th><th>Aktionen</th></tr>
-          </thead>
-          <tbody id="tHistorie"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
-        </table>
-      </div>
+
+    <div class="view" id="view-dashboard">
+
+
+        <div class="profil-box" id="profilBox">
+
+        </div>
+
+
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+                <div>
+                    <h2 style="margin-bottom:3px">Meine Aufträge</h2>
+                    <p style="font-size:0.83em;color:var(--text-l)">Alle deine Bestellungen auf einen Blick</p>
+                </div>
+                <button class="btn btn-success btn-sm" onclick="zeige('view-bestellung')">
+                    + Neuer Auftrag
+                </button>
+            </div>
+
+            <div id="auftragsListe">
+                <div class="empty">
+                    <div class="empty-icon">📋</div>
+                    <p>Noch keine Aufträge vorhanden.</p>
+                    <button class="btn btn-primary btn-sm" onclick="zeige('view-bestellung')">
+                        Ersten Auftrag aufgeben
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
-  </div>
 
-  <!-- ─── TAB 4: NEUER AUFTRAG ──────────────────────── -->
-  <div class="panel" id="p-auftrag">
-    <div class="card-row">
-      <div class="card">
-        <div class="chead"><h2>➕ Manuellen Auftrag erfassen</h2></div>
-        <div class="fgrid">
-          <div class="field fcol">
-            <label>Projektname / Bezeichnung</label>
-            <input type="text" id="jPro" placeholder="z.B. Gehäuse für Raspberry Pi">
-          </div>
-          <div class="field fcol">
-            <label>Auftraggeber (Name)</label>
-            <input type="text" id="jKun" placeholder="Max Mustermann">
-          </div>
-          <div class="field fcol">
-            <label>Verwendetes Filament</label>
-            <select id="jSpu" onchange="berechne()"><option value="">— Spule wählen —</option></select>
-          </div>
-          <div class="field">
-            <label>Verbrauch (g)</label>
-            <input type="number" id="jGra" placeholder="z.B. 125" step="any" oninput="berechne()">
-            <span class="warn" id="warnGew">⚠ Mehr als Restgewicht!</span>
-          </div>
-          <div class="field">
-            <label>Rabatt (%)</label>
-            <input type="number" id="jDis" value="0" min="0" max="100" oninput="berechne()">
-          </div>
-          <div class="field">
-            <label>Verschleiß / Strom (€ fest)</label>
-            <input type="number" id="jFix" value="4.50" step="0.01" oninput="berechne()">
-          </div>
-        </div>
 
-        <div class="kbox">
-          Material: <span id="kMat">0,00</span> €<br>
-          Verschleiß/Strom: <span id="kFix">4,50</span> €<br>
-          Zwischensumme: <span id="kZwi">4,50</span> €<br>
-          Rabatt: <span id="kRab" style="color:var(--gn)">- 0,00</span> €<br>
-          <span class="ktotal">Endpreis: <span id="kEnd">4,50</span> €</span>
-        </div>
-        <div class="brow">
-          <button class="btn b-gn" id="btnBuchen" onclick="auftragBuchen()">✓ Auftrag buchen &amp; speichern</button>
-        </div>
-      </div>
+    <div class="view" id="view-bestellung">
+        <div class="card">
+            <h2>Neuer Druckauftrag</h2>
+            <p class="card-sub">Deine gespeicherte Adresse ist bereits vorausgefüllt</p>
 
-      <div class="card">
-        <div class="chead"><h2>💡 Preisinfo</h2></div>
-        <div style="font-size:.88em;color:var(--t2);line-height:1.8">
-          <p><strong>Formel:</strong></p>
-          <p>Materialkosten = (€ / Startgewicht) × Verbrauch (g)</p>
-          <p>+ Pauschale für Strom &amp; Verschleiß</p>
-          <p>− Rabatt auf die Gesamtsumme</p>
-          <br>
-          <p style="color:var(--t3);font-size:.9em">Der Endpreis wird in der Auftragshistorie gespeichert und kann dort nachträglich geändert werden.</p>
+            <div class="alert alert-err" id="bestellFehler"></div>
+
+            <div class="section-sep">🖨️ Auftrag</div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Projektname / Bezeichnung *</label>
+                    <input type="text" id="bProjekt" placeholder="z.B. Halterung für Monitor">
+                </div>
+                <div class="field">
+                    <label>Material-Wunsch</label>
+                    <select id="bMaterial" onchange="previewBerechne('b')">
+                        <option value="Keine Präferenz">Keine Präferenz – Admin wählt für mich</option>
+                        <optgroup label="── PLA Varianten ──">
+                            <option value="PLA">PLA – Standard (günstig, dekorativ)</option>
+                            <option value="PLA+">PLA+ – Verstärkt (stabiler)</option>
+                            <option value="PLA Silk">PLA Silk – Glänzend / Seidenoptik</option>
+                            <option value="PLA Matt">PLA Matt – Matte Oberfläche</option>
+                            <option value="PLA High Speed">PLA High Speed – Schnelldruck</option>
+                            <option value="PLA-CF">PLA-CF – Carbonfaser (sehr steif)</option>
+                            <option value="PLA Wood Fill">PLA Wood Fill – Holzoptik</option>
+                            <option value="PLA Marble">PLA Marble – Marmoroptik</option>
+                        </optgroup>
+                        <optgroup label="── PETG ──">
+                            <option value="PETG">PETG – Robust &amp; wasserbeständig</option>
+                            <option value="PETG-CF">PETG-CF – Carbonfaser (steif)</option>
+                            <option value="PETG-GF">PETG-GF – Glasfaser (verstärkt)</option>
+                        </optgroup>
+                        <optgroup label="── Nylon / PA ──">
+                            <option value="Nylon PA6">Nylon PA6 – Zäh &amp; abriebfest</option>
+                            <option value="Nylon PA12">Nylon PA12 – Flexibler Nylon</option>
+                            <option value="Nylon PA-CF">Nylon PA-CF – Carbonfaser (leicht+fest)</option>
+                            <option value="Nylon PA-GF">Nylon PA-GF – Glasfaser (steif)</option>
+                        </optgroup>
+                        <optgroup label="── Technische Materialien ──">
+                            <option value="ABS">ABS – Hitzebeständig (bis 100°C)</option>
+                            <option value="ASA">ASA – Outdoor &amp; UV-beständig</option>
+                            <option value="PC">PC – Polycarbonat (sehr fest)</option>
+                            <option value="PP">PP – Polypropylen (chemikalienbeständig)</option>
+                        </optgroup>
+                        <optgroup label="── Glasfaser (GF) ──">
+                            <option value="GF-PLA">GF-PLA – Glasfaser in PLA</option>
+                            <option value="GF-PETG">GF-PETG – Glasfaser in PETG</option>
+                            <option value="GF30-PA">GF30-PA – 30% Glasfaser in Nylon</option>
+                        </optgroup>
+                        <optgroup label="── Flexibel (TPU/TPE) ──">
+                            <option value="TPU 95A">TPU 95A – Leicht flexibel</option>
+                            <option value="TPU 87A">TPU 87A – Weich &amp; elastisch</option>
+                            <option value="TPE">TPE – Sehr weich (Gummiähnlich)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Ca. Gramm (geschätzter Verbrauch)</label>
+                    <input type="number" id="bGramm" min="1" step="1"
+                        placeholder="z.B. 120 g"
+                        oninput="previewBerechne('b')">
+                </div>
+                <div class="field col-full" id="bPreviewWrap" style="display:none">
+                    <div style="background:#f0f7ff;border:1px solid #c3d9f8;border-left:3px solid var(--primary);border-radius:9px;padding:11px 15px;font-size:.88em;line-height:1.8">
+                        <div style="font-size:.74em;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">💡 Geschätzte Kosten (unverbindlich)</div>
+                        <span id="bPreviewText">—</span>
+                        <div style="font-size:.76em;color:var(--text-l);margin-top:4px">⚠ Der endgültige Preis wird vom Studio bestätigt.</div>
+                    </div>
+                </div>
+                <div class="field col-full">
+                    <label>Beschreibung &amp; Anforderungen</label>
+                    <textarea id="bBeschreibung"
+                        placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz. Besonderheiten: ..."></textarea>
+                </div>
+            </div>
+
+            <div class="section-sep">📍 Lieferadresse</div>
+            <div class="form-grid">
+                <div class="field col-full">
+                    <label>Straße &amp; Hausnummer *</label>
+                    <input type="text" id="bAdresse" placeholder="Musterstraße 12" autocomplete="street-address">
+                </div>
+                <div class="field">
+                    <label>PLZ *</label>
+                    <input type="text" id="bPlz" placeholder="12345" autocomplete="postal-code">
+                </div>
+                <div class="field">
+                    <label>Ort / Stadt *</label>
+                    <input type="text" id="bOrt" placeholder="Musterstadt" autocomplete="address-level2">
+                </div>
+                <div class="field col-full">
+                    <label>Lieferhinweis (optional)</label>
+                    <input type="text" id="bHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung bevorzugt, …">
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="zeige('view-dashboard')">← Zurück</button>
+                <button class="btn btn-primary" id="btnBestellung" onclick="bestellungAbschicken()">
+                    Auftrag absenden ✓
+                </button>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-
-</div><!-- /#wrap -->
 
 
-<script>
-/* ═══════════════════════════════════════════════════════════
-   PASSWORT (Base64)  →  Kx9m-Druck#2025
-═══════════════════════════════════════════════════════════ */
-const _P = atob('S3g5bS1EcnVjayMyMDI1');
+    <div class="view" id="view-gast">
+        <div class="card">
+            <h2>Als Gast bestellen</h2>
+            <p class="card-sub">Kein Konto nötig – einfach ausfüllen und absenden</p>
 
-function login(){
-  const v=document.getElementById('pw').value, e=document.getElementById('lerr'), i=document.getElementById('pw');
-  if(v===_P){
-    sessionStorage.setItem('adm','1');
-    document.getElementById('loginWrap').classList.add('fade');
-    setTimeout(()=>{document.getElementById('loginWrap').style.display='none';startAdmin();},400);
-  } else {
-    e.classList.add('on'); i.classList.add('shake'); i.value='';
-    setTimeout(()=>i.classList.remove('shake'),400); i.focus();
-  }
+            <div class="alert alert-err" id="gastFehler"></div>
+
+            <div class="section-sep">👤 Deine Kontaktdaten</div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Vollständiger Name *</label>
+                    <input type="text" id="gName" placeholder="Max Mustermann" autocomplete="name">
+                </div>
+                <div class="field">
+                    <label>E-Mail-Adresse *</label>
+                    <input type="email" id="gEmail" placeholder="deine@email.de" autocomplete="email">
+                </div>
+                <div class="field col-full">
+                    <label>Telefon (optional)</label>
+                    <input type="tel" id="gTelefon" placeholder="+49 170 1234567" autocomplete="tel">
+                </div>
+            </div>
+
+            <div class="section-sep">🖨️ Auftrag</div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Projektname *</label>
+                    <input type="text" id="gProjekt" placeholder="z.B. Halterung für Monitor">
+                </div>
+                <div class="field">
+                    <label>Material-Wunsch</label>
+                    <select id="gMaterial" onchange="previewBerechne('g')">
+                        <option value="Keine Präferenz">Keine Präferenz – Admin wählt für mich</option>
+                        <optgroup label="── PLA Varianten ──">
+                            <option value="PLA">PLA – Standard (günstig, dekorativ)</option>
+                            <option value="PLA+">PLA+ – Verstärkt (stabiler)</option>
+                            <option value="PLA Silk">PLA Silk – Glänzend / Seidenoptik</option>
+                            <option value="PLA Matt">PLA Matt – Matte Oberfläche</option>
+                            <option value="PLA High Speed">PLA High Speed – Schnelldruck</option>
+                            <option value="PLA-CF">PLA-CF – Carbonfaser (sehr steif)</option>
+                            <option value="PLA Wood Fill">PLA Wood Fill – Holzoptik</option>
+                            <option value="PLA Marble">PLA Marble – Marmoroptik</option>
+                        </optgroup>
+                        <optgroup label="── PETG ──">
+                            <option value="PETG">PETG – Robust &amp; wasserbeständig</option>
+                            <option value="PETG-CF">PETG-CF – Carbonfaser (steif)</option>
+                            <option value="PETG-GF">PETG-GF – Glasfaser (verstärkt)</option>
+                        </optgroup>
+                        <optgroup label="── Nylon / PA ──">
+                            <option value="Nylon PA6">Nylon PA6 – Zäh &amp; abriebfest</option>
+                            <option value="Nylon PA12">Nylon PA12 – Flexibler Nylon</option>
+                            <option value="Nylon PA-CF">Nylon PA-CF – Carbonfaser (leicht+fest)</option>
+                            <option value="Nylon PA-GF">Nylon PA-GF – Glasfaser (steif)</option>
+                        </optgroup>
+                        <optgroup label="── Technische Materialien ──">
+                            <option value="ABS">ABS – Hitzebeständig (bis 100°C)</option>
+                            <option value="ASA">ASA – Outdoor &amp; UV-beständig</option>
+                            <option value="PC">PC – Polycarbonat (sehr fest)</option>
+                            <option value="PP">PP – Polypropylen (chemikalienbeständig)</option>
+                        </optgroup>
+                        <optgroup label="── Glasfaser (GF) ──">
+                            <option value="GF-PLA">GF-PLA – Glasfaser in PLA</option>
+                            <option value="GF-PETG">GF-PETG – Glasfaser in PETG</option>
+                            <option value="GF30-PA">GF30-PA – 30% Glasfaser in Nylon</option>
+                        </optgroup>
+                        <optgroup label="── Flexibel (TPU/TPE) ──">
+                            <option value="TPU 95A">TPU 95A – Leicht flexibel</option>
+                            <option value="TPU 87A">TPU 87A – Weich &amp; elastisch</option>
+                            <option value="TPE">TPE – Sehr weich (Gummiähnlich)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Ca. Gramm (geschätzter Verbrauch)</label>
+                    <input type="number" id="gGramm" min="1" step="1"
+                        placeholder="z.B. 120 g"
+                        oninput="previewBerechne('g')">
+                </div>
+                <div class="field col-full" id="gPreviewWrap" style="display:none">
+                    <div style="background:#f0f7ff;border:1px solid #c3d9f8;border-left:3px solid var(--primary);border-radius:9px;padding:11px 15px;font-size:.88em;line-height:1.8">
+                        <div style="font-size:.74em;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">💡 Geschätzte Kosten (unverbindlich)</div>
+                        <span id="gPreviewText">—</span>
+                        <div style="font-size:.76em;color:var(--text-l);margin-top:4px">⚠ Der endgültige Preis wird vom Studio bestätigt.</div>
+                    </div>
+                </div>
+                <div class="field col-full">
+                    <label>Beschreibung &amp; Anforderungen</label>
+                    <textarea id="gBeschreibung"
+                        placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz."></textarea>
+                </div>
+            </div>
+
+            <div class="section-sep">📍 Lieferadresse</div>
+            <div class="form-grid">
+                <div class="field col-full">
+                    <label>Straße &amp; Hausnummer *</label>
+                    <input type="text" id="gAdresse" placeholder="Musterstraße 12" autocomplete="street-address">
+                </div>
+                <div class="field">
+                    <label>PLZ *</label>
+                    <input type="text" id="gPlz" placeholder="12345" autocomplete="postal-code">
+                </div>
+                <div class="field">
+                    <label>Ort / Stadt *</label>
+                    <input type="text" id="gOrt" placeholder="Musterstadt" autocomplete="address-level2">
+                </div>
+                <div class="field col-full">
+                    <label>Lieferhinweis (optional)</label>
+                    <input type="text" id="gHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung, …">
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="zeige('view-start')">← Zurück</button>
+                <button class="btn btn-primary" id="btnGast" onclick="gastBestellung()">
+                    Auftrag absenden ✓
+                </button>
+            </div>
+
+            <p style="text-align:center;margin-top:16px;font-size:0.82em;color:var(--text-l)">
+                Möchtest du deine Bestellungen später verfolgen?
+                <a href="#" onclick="zeige('view-register');return false;">Jetzt Konto erstellen</a>
+            </p>
+        </div>
+    </div>
+
+
+    <div class="view" id="view-bestaetigung">
+        <div class="card">
+            <div class="confirm-wrap">
+                <div class="confirm-icon">✅</div>
+                <h2>Auftrag erfolgreich eingegangen!</h2>
+                <p style="color:var(--text-l);margin:10px 0 5px;font-size:0.88em">Deine Bestellnummer:</p>
+                <div class="confirm-id" id="confirmId">—</div>
+                <p style="color:var(--text-l);font-size:0.85em;max-width:400px;margin:0 auto 26px;line-height:1.65">
+                    Wir haben deine Anfrage erhalten und melden uns zeitnah mit einer Bestätigung sowie dem Preis bei dir. Bitte notiere deine Bestellnummer.
+                </p>
+                <div id="confirmButtons">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="view" id="view-profil">
+        <div class="card">
+            <h2>Profil bearbeiten</h2>
+            <p class="card-sub">Deine gespeicherten Daten aktualisieren</p>
+
+            <div class="alert alert-err" id="profilFehler"></div>
+            <div class="alert alert-ok"  id="profilErfolg"></div>
+
+            <div class="section-sep">👤 Persönliche Daten</div>
+            <div class="form-grid">
+                <div class="field col-full">
+                    <label>Vollständiger Name *</label>
+                    <input type="text" id="editName" placeholder="Max Mustermann">
+                </div>
+                <div class="field">
+                    <label>E-Mail (nicht änderbar)</label>
+                    <input type="email" id="editEmail" disabled>
+                </div>
+                <div class="field">
+                    <label>Telefon</label>
+                    <input type="tel" id="editTelefon" placeholder="+49 170 1234567">
+                </div>
+            </div>
+
+            <div class="section-sep">📍 Lieferadresse</div>
+            <div class="form-grid">
+                <div class="field col-full">
+                    <label>Straße &amp; Hausnummer</label>
+                    <input type="text" id="editAdresse" placeholder="Musterstraße 12">
+                </div>
+                <div class="field">
+                    <label>PLZ</label>
+                    <input type="text" id="editPlz" placeholder="12345">
+                </div>
+                <div class="field">
+                    <label>Ort / Stadt</label>
+                    <input type="text" id="editOrt" placeholder="Musterstadt">
+                </div>
+            </div>
+
+            <div class="section-sep">🔒 Passwort ändern (optional)</div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Neues Passwort (leer = unverändert)</label>
+                    <input type="password" id="editPW" placeholder="Mindestens 8 Zeichen">
+                </div>
+                <div class="field">
+                    <label>Neues Passwort wiederholen</label>
+                    <input type="password" id="editPW2" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="zeige('view-dashboard')">← Zurück</button>
+                <button class="btn btn-primary" id="btnProfil" onclick="profilSpeichern()">
+                    Änderungen speichern
+                </button>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>const supabaseUrl = 'https://zasufuyaiturzgohqkky.supabase.co';
+const supabaseKey = 'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj';
+const sb = supabase.createClient(supabaseUrl, supabaseKey);
+let aktKunde = null;
+async function sha256(str) {
+const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
-function togglePw(){ const e=document.getElementById('pw'); e.type=e.type==='password'?'text':'password'; }
-function logout(){ if(confirm('Wirklich abmelden?')){ sessionStorage.removeItem('adm'); location.reload(); } }
-
-/* ═══════════════════════════════════════════════════════════
-   SUPABASE
-═══════════════════════════════════════════════════════════ */
-const SB = supabase.createClient(
-  'https://zasufuyaiturzgohqkky.supabase.co',
-  'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj'
-);
-
-/* ═══════════════════════════════════════════════════════════
-   START
-═══════════════════════════════════════════════════════════ */
-function startAdmin(){
-  ['topbar','nav','wrap'].forEach(id=>document.getElementById(id).style.display=id==='topbar'?'flex':id==='nav'?'flex':'block');
-  ladeDaten(); ladeAnfragen();
+function laden(an) {
+document.getElementById('ladeOverlay').style.display = an ? 'flex' : 'none';
 }
-window.addEventListener('DOMContentLoaded',()=>{
-  if(sessionStorage.getItem('adm')==='1'){
-    document.getElementById('loginWrap').style.display='none';
-    startAdmin();
-  } else document.getElementById('pw').focus();
+function btn(id, disabled) {
+const el = document.getElementById(id);
+if (el) el.disabled = disabled;
+}
+function alert$(id, text, show = true) {
+const el = document.getElementById(id);
+if (!el) return;
+el.textContent = text;
+el.classList.toggle('on', show);
+}
+function alertsReset(...ids) {
+ids.forEach(id => alert$(id, '', false));
+}
+function validEmail(e) {
+return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+function genId() {
+return 'B-' + Date.now().toString().slice(-8).toUpperCase();
+}
+function initialen(name) {
+return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+function badge(status) {
+const klassen = {
+'Anfrage eingegangen': 'b-blau',
+'In Bearbeitung':      'b-gelb',
+'Im Druck':            'b-lila',
+'Qualitätsprüfung':    'b-gelb',
+'Versandbereit':       'b-gruen',
+'Abgeschlossen':       'b-gruen',
+'Storniert':           'b-rot'
+};
+return `<span class="badge ${klassen[status] || 'b-grau'}">${status}</span>`;
+}
+function sessionSpeichern(k) { localStorage.setItem('k_session', JSON.stringify(k)); }
+function sessionLaden()      { const r = localStorage.getItem('k_session'); return r ? JSON.parse(r) : null; }
+function sessionLoeschen()   { localStorage.removeItem('k_session'); }
+function zeige(viewId) {
+document.querySelectorAll('.view').forEach(v => v.classList.remove('aktiv'));
+document.getElementById(viewId).classList.add('aktiv');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+if (viewId === 'view-bestellung' && aktKunde) {
+document.getElementById('bAdresse').value = aktKunde.adresse || '';
+document.getElementById('bPlz').value     = aktKunde.plz     || '';
+document.getElementById('bOrt').value     = aktKunde.ort     || '';
+document.getElementById('bHinweis').value = '';
+alertsReset('bestellFehler');
+}
+if (viewId === 'view-profil' && aktKunde) {
+document.getElementById('editName').value    = aktKunde.name    || '';
+document.getElementById('editEmail').value   = aktKunde.email   || '';
+document.getElementById('editTelefon').value = aktKunde.telefon || '';
+document.getElementById('editAdresse').value = aktKunde.adresse || '';
+document.getElementById('editPlz').value     = aktKunde.plz     || '';
+document.getElementById('editOrt').value     = aktKunde.ort     || '';
+document.getElementById('editPW').value      = '';
+document.getElementById('editPW2').value     = '';
+alertsReset('profilFehler', 'profilErfolg');
+}
+}
+function headerAktualisieren() {
+const nav = document.getElementById('headerNav');
+if (aktKunde) {
+nav.innerHTML = `
+<span class="nav-user">👤 ${aktKunde.name.split(' ')[0]}</span>
+<button class="nav-btn" onclick="zeige('view-dashboard')">Meine Aufträge</button>
+<button class="nav-btn" onclick="zeige('view-profil')">Profil</button>
+<button class="nav-btn" onclick="abmelden()">Abmelden</button>
+`;
+} else {
+nav.innerHTML = `
+<button class="nav-btn" onclick="zeige('view-login')">Anmelden</button>
+<button class="nav-btn nav-accent" onclick="zeige('view-gast')">Jetzt bestellen</button>
+`;
+}
+}
+async function anmelden() {
+alertsReset('loginFehler');
+const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+const pw    = document.getElementById('loginPW').value;
+if (!email || !pw) {
+alert$('loginFehler', '❌ Bitte E-Mail und Passwort eingeben.');
+return;
+}
+btn('btnLogin', true);
+laden(true);
+try {
+const hash = await sha256(pw);
+const { data: rows } = await sb
+.from('kunden')
+.select('*')
+.eq('email', email)
+.eq('passwort_hash', hash)
+.limit(1);
+if (!rows || rows.length === 0) {
+alert$('loginFehler', '❌ E-Mail oder Passwort ist falsch.');
+return;
+}
+aktKunde = rows[0];
+sessionSpeichern(aktKunde);
+headerAktualisieren();
+document.getElementById('loginEmail').value = '';
+document.getElementById('loginPW').value    = '';
+await ladeDashboard();
+zeige('view-dashboard');
+} catch (e) {
+const msg = e?.message || e?.error_description || JSON.stringify(e);
+alert$('loginFehler', '❌ Fehler: ' + msg);
+console.error('Login Fehler:', e);
+} finally {
+btn('btnLogin', false);
+laden(false);
+}
+}
+async function registrieren() {
+alertsReset('regFehler');
+const name    = document.getElementById('regName').value.trim();
+const email   = document.getElementById('regEmail').value.trim().toLowerCase();
+const tel     = document.getElementById('regTelefon').value.trim();
+const pw      = document.getElementById('regPW').value;
+const pw2     = document.getElementById('regPW2').value;
+const adresse = document.getElementById('regAdresse').value.trim();
+const plz     = document.getElementById('regPlz').value.trim();
+const ort     = document.getElementById('regOrt').value.trim();
+if (!name || !email || !pw) {
+alert$('regFehler', '❌ Bitte alle Pflichtfelder (*) ausfüllen.');
+return;
+}
+if (!validEmail(email)) {
+alert$('regFehler', '❌ Bitte eine gültige E-Mail-Adresse eingeben.');
+return;
+}
+if (pw.length < 8) {
+alert$('regFehler', '❌ Das Passwort muss mindestens 8 Zeichen lang sein.');
+return;
+}
+if (pw !== pw2) {
+alert$('regFehler', '❌ Die Passwörter stimmen nicht überein.');
+return;
+}
+btn('btnRegister', true);
+laden(true);
+try {
+const { data: check } = await sb
+.from('kunden')
+.select('id')
+.eq('email', email)
+.limit(1);
+if (check && check.length > 0) {
+alert$('regFehler', '❌ Diese E-Mail-Adresse ist bereits registriert.');
+return;
+}
+const hash       = await sha256(pw);
+const neuerKunde = {
+id:            'k_' + Date.now(),
+name,
+email,
+passwort_hash: hash,
+telefon:       tel,
+adresse,
+plz,
+ort,
+erstellt:      new Date().toLocaleDateString('de-DE')
+};
+const { error } = await sb.from('kunden').insert([neuerKunde]);
+if (error) throw error;
+aktKunde = neuerKunde;
+sessionSpeichern(aktKunde);
+headerAktualisieren();
+await ladeDashboard();
+zeige('view-dashboard');
+} catch (e) {
+const msg = e?.message || e?.error_description || JSON.stringify(e);
+alert$('regFehler', '❌ Fehler: ' + msg);
+console.error('Registrieren Fehler:', e);
+} finally {
+btn('btnRegister', false);
+laden(false);
+}
+}
+function abmelden() {
+if (confirm('Wirklich abmelden?')) {
+aktKunde = null;
+sessionLoeschen();
+headerAktualisieren();
+zeige('view-start');
+}
+}
+async function ladeDashboard() {
+if (!aktKunde) return;
+const ini = initialen(aktKunde.name);
+const adressZeile = aktKunde.adresse
+? `<span>📍 ${aktKunde.adresse}, ${aktKunde.plz} ${aktKunde.ort}</span>`
+: `<span style="color:#b0bcc8">Noch keine Adresse hinterlegt</span>`;
+document.getElementById('profilBox').innerHTML = `
+<div class="profil-avatar">${ini}</div>
+<div class="profil-info">
+<h3>${aktKunde.name}</h3>
+<span>${aktKunde.email}${aktKunde.telefon ? ' · ' + aktKunde.telefon : ''}</span>
+${adressZeile}
+</div>
+<div class="profil-actions">
+<button class="btn btn-outline btn-sm" onclick="zeige('view-profil')">✏ Profil</button>
+</div>
+`;
+laden(true);
+try {
+const { data, error } = await sb
+.from('bestellAnfragen')
+.select('*')
+.eq('kunden_id', aktKunde.id)
+.order('id', { ascending: false });
+const liste = document.getElementById('auftragsListe');
+if (!data || data.length === 0) {
+liste.innerHTML = `
+<div class="empty">
+<div class="empty-icon">📋</div>
+<p>Noch keine Aufträge vorhanden.</p>
+<button class="btn btn-primary btn-sm" onclick="zeige('view-bestellung')">
+Ersten Auftrag aufgeben
+</button>
+</div>`;
+return;
+}
+const zeilen = data.map(a => {
+let msgs = [];
+try {
+if (a.admin_notiz) {
+const parsed = JSON.parse(a.admin_notiz);
+msgs = Array.isArray(parsed) ? parsed : [{ text: a.admin_notiz, ts: '' }];
+}
+} catch(e) {
+if (a.admin_notiz) msgs = [{ text: a.admin_notiz, ts: '' }];
+}
+const nachrichtenHtml = msgs.length > 0
+? `<div class="nachrichten-box">
+<div class="msg-label">💬 Nachricht vom Studio</div>
+${msgs.map(m => `<div class="msg-entry"><div class="msg-ts">${escHtml(m.ts)}</div>${escHtml(m.text)}</div>`).join('')}
+</div>`
+: '';
+const kannStornieren = a.status === 'Anfrage eingegangen';
+const stornoBtn = kannStornieren
+? `<button class="btn-storno" onclick="auftragStornieren('${a.id}', '${escHtml(a.projekt)}')">✕ Stornieren</button>`
+: `<button class="btn-storno" disabled title="Storno nicht mehr möglich – Auftrag wird bereits bearbeitet">✕ Stornieren</button>`;
+return `<tr>
+<td style="white-space:nowrap;color:var(--text-l);font-size:0.83em">${a.datum}</td>
+<td>
+<strong>${escHtml(a.projekt)}</strong>
+${a.beschreibung ? `<div class="order-detail">${escHtml(a.beschreibung.slice(0,60))}${a.beschreibung.length>60?'…':''}</div>` : ''}
+${nachrichtenHtml}
+</td>
+<td style="font-size:0.83em">${escHtml(a.material_wunsch)}</td>
+<td style="font-size:0.82em">
+${a.adresse ? `${escHtml(a.adresse)}<br>${escHtml(a.plz)} ${escHtml(a.ort)}` : '—'}
+</td>
+<td>${badge(a.status)}</td>
+<td style="white-space:nowrap">
+${a.kosten != null
+? `<strong>${parseFloat(a.kosten).toFixed(2)} €</strong>`
+: `<span style="color:#b0bcc8;font-size:0.83em">Ausstehend</span>`}
+</td>
+<td>${stornoBtn}</td>
+</tr>`;
+}).join('');
+liste.innerHTML = `
+<div class="order-wrap">
+<table class="order-table">
+<thead>
+<tr>
+<th>Datum</th>
+<th>Projekt &amp; Nachrichten</th>
+<th>Material</th>
+<th>Lieferadresse</th>
+<th>Status</th>
+<th>Kosten</th>
+<th>Aktion</th>
+</tr>
+</thead>
+<tbody>${zeilen}</tbody>
+</table>
+</div>`;
+} catch (e) {
+console.error('Dashboard laden:', e);
+} finally {
+laden(false);
+}
+}
+async function gastBestellung() {
+alertsReset('gastFehler');
+const name    = document.getElementById('gName').value.trim();
+const email   = document.getElementById('gEmail').value.trim();
+const tel     = document.getElementById('gTelefon').value.trim();
+const projekt = document.getElementById('gProjekt').value.trim();
+const mat     = document.getElementById('gMaterial').value;
+const desc    = document.getElementById('gBeschreibung').value.trim();
+const adresse = document.getElementById('gAdresse').value.trim();
+const plz     = document.getElementById('gPlz').value.trim();
+const ort     = document.getElementById('gOrt').value.trim();
+const hinweis = document.getElementById('gHinweis').value.trim();
+if (!name || !email || !projekt || !adresse || !plz || !ort) {
+alert$('gastFehler', '❌ Bitte alle Pflichtfelder (*) ausfüllen.');
+return;
+}
+if (!validEmail(email)) {
+alert$('gastFehler', '❌ Bitte eine gültige E-Mail-Adresse eingeben.');
+return;
+}
+btn('btnGast', true);
+laden(true);
+const orderId = genId();
+try {
+const gGrammVal = parseFloat(document.getElementById('gGramm')?.value) || null;
+const { error } = await sb.from('bestellAnfragen').insert([{
+id:              orderId,
+kunden_id:       null,
+gastname:        name,
+gast_email:      email,
+telefon:         tel,
+projekt,
+beschreibung:    desc,
+material_wunsch: mat,
+ca_gramm:        gGrammVal,
+adresse,
+plz,
+ort,
+liefer_hinweis:  hinweis,
+status:          'Anfrage eingegangen',
+datum:           new Date().toLocaleDateString('de-DE'),
+kosten:          null
+}]);
+if (error) throw error;
+['gName','gEmail','gTelefon','gProjekt','gBeschreibung','gAdresse','gPlz','gOrt','gHinweis','gGramm']
+.forEach(id => { document.getElementById(id).value = ''; });
+document.getElementById('gMaterial').value = 'Keine Präferenz';
+const gpw = document.getElementById('gPreviewWrap'); if(gpw) gpw.style.display='none';
+document.getElementById('confirmId').textContent = orderId;
+document.getElementById('confirmButtons').innerHTML = `
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+<button class="btn btn-outline btn-sm" onclick="zeige('view-start')">Zur Startseite</button>
+<button class="btn btn-primary btn-sm" onclick="zeige('view-register')">Konto erstellen für spätere Übersicht →</button>
+</div>`;
+zeige('view-bestaetigung');
+} catch (e) {
+const msg = e?.message || e?.error_description || JSON.stringify(e);
+alert$('gastFehler', '❌ Fehler: ' + msg);
+console.error('Gast-Bestellung Fehler:', e);
+} finally {
+btn('btnGast', false);
+laden(false);
+}
+}
+async function bestellungAbschicken() {
+if (!aktKunde) { zeige('view-login'); return; }
+alertsReset('bestellFehler');
+const projekt = document.getElementById('bProjekt').value.trim();
+const mat     = document.getElementById('bMaterial').value;
+const desc    = document.getElementById('bBeschreibung').value.trim();
+const adresse = document.getElementById('bAdresse').value.trim();
+const plz     = document.getElementById('bPlz').value.trim();
+const ort     = document.getElementById('bOrt').value.trim();
+const hinweis = document.getElementById('bHinweis').value.trim();
+if (!projekt || !adresse || !plz || !ort) {
+alert$('bestellFehler', '❌ Bitte alle Pflichtfelder (*) ausfüllen.');
+return;
+}
+btn('btnBestellung', true);
+laden(true);
+const orderId = genId();
+try {
+const bGrammVal = parseFloat(document.getElementById('bGramm')?.value) || null;
+const { error } = await sb.from('bestellAnfragen').insert([{
+id:              orderId,
+kunden_id:       aktKunde.id,
+gastname:        null,
+gast_email:      null,
+telefon:         aktKunde.telefon || '',
+projekt,
+beschreibung:    desc,
+material_wunsch: mat,
+ca_gramm:        bGrammVal,
+adresse,
+plz,
+ort,
+liefer_hinweis:  hinweis,
+status:          'Anfrage eingegangen',
+datum:           new Date().toLocaleDateString('de-DE'),
+kosten:          null
+}]);
+if (error) throw error;
+if (adresse !== aktKunde.adresse || plz !== aktKunde.plz || ort !== aktKunde.ort) {
+await sb.from('kunden').update({ adresse, plz, ort }).eq('id', aktKunde.id);
+aktKunde = { ...aktKunde, adresse, plz, ort };
+sessionSpeichern(aktKunde);
+}
+['bProjekt','bBeschreibung','bHinweis','bGramm'].forEach(id => {
+document.getElementById(id).value = '';
 });
-
-/* ═══════════════════════════════════════════════════════════
-   TABS
-═══════════════════════════════════════════════════════════ */
-function tab(id,btn){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-  btn.classList.add('on');
+document.getElementById('bMaterial').value = 'Keine Präferenz';
+const bpw = document.getElementById('bPreviewWrap'); if(bpw) bpw.style.display='none';
+document.getElementById('confirmId').textContent = orderId;
+document.getElementById('confirmButtons').innerHTML = `
+<button class="btn btn-primary btn-sm"
+onclick="ladeDashboard().then(() => zeige('view-dashboard'))">
+Meine Aufträge ansehen →
+</button>`;
+zeige('view-bestaetigung');
+} catch (e) {
+const msg = e?.message || e?.error_description || JSON.stringify(e);
+alert$('bestellFehler', '❌ Fehler: ' + msg);
+console.error('Bestellung Fehler:', e);
+} finally {
+btn('btnBestellung', false);
+laden(false);
+}
+}
+async function profilSpeichern() {
+if (!aktKunde) return;
+alertsReset('profilFehler', 'profilErfolg');
+const name    = document.getElementById('editName').value.trim();
+const tel     = document.getElementById('editTelefon').value.trim();
+const adresse = document.getElementById('editAdresse').value.trim();
+const plz     = document.getElementById('editPlz').value.trim();
+const ort     = document.getElementById('editOrt').value.trim();
+const pw      = document.getElementById('editPW').value;
+const pw2     = document.getElementById('editPW2').value;
+if (!name) {
+alert$('profilFehler', '❌ Bitte einen Namen eingeben.');
+return;
+}
+if (pw && pw.length < 8) {
+alert$('profilFehler', '❌ Das neue Passwort muss mindestens 8 Zeichen haben.');
+return;
+}
+if (pw && pw !== pw2) {
+alert$('profilFehler', '❌ Die neuen Passwörter stimmen nicht überein.');
+return;
+}
+btn('btnProfil', true);
+laden(true);
+try {
+const updates = { name, telefon: tel, adresse, plz, ort };
+if (pw) updates.passwort_hash = await sha256(pw);
+const { error } = await sb.from('kunden').update(updates).eq('id', aktKunde.id);
+if (error) throw error;
+aktKunde = { ...aktKunde, ...updates };
+sessionSpeichern(aktKunde);
+headerAktualisieren();
+alert$('profilErfolg', '✓ Profil erfolgreich gespeichert!');
+document.getElementById('editPW').value  = '';
+document.getElementById('editPW2').value = '';
+} catch (e) {
+alert$('profilFehler', '❌ Fehler beim Speichern. Bitte erneut versuchen.');
+console.error(e);
+} finally {
+btn('btnProfil', false);
+laden(false);
+}
+}
+async function auftragStornieren(id, projektName) {
+if (!confirm(`Auftrag "${projektName}" wirklich stornieren?\n\nEin Storno ist nur möglich, solange der Auftrag noch nicht bearbeitet wurde.`)) return;
+laden(true);
+try {
+const { error } = await sb
+.from('bestellAnfragen')
+.update({ status: 'Storniert' })
+.eq('id', id)
+.eq('status', 'Anfrage eingegangen');
+if (error) throw error;
+await ladeDashboard();
+} catch (e) {
+alert('❌ Storno fehlgeschlagen. Bitte versuche es erneut oder kontaktiere uns direkt.');
+console.error(e);
+} finally {
+laden(false);
+}
+}
+const MATERIAL_PREIS = {
+'PLA':0.040,'PLA+':0.045,'PLA Silk':0.050,'PLA Matt':0.042,'PLA High Speed':0.040,
+'PLA-CF':0.090,'PLA Wood Fill':0.055,'PLA Marble':0.050,
+'PETG':0.055,'PETG-CF':0.100,'PETG-GF':0.095,
+'Nylon PA6':0.110,'Nylon PA12':0.120,'Nylon PA-CF':0.180,'Nylon PA-GF':0.160,
+'ABS':0.060,'ASA':0.075,'PC':0.130,'PP':0.085,
+'GF-PLA':0.090,'GF-PETG':0.100,'GF30-PA':0.170,
+'TPU 95A':0.090,'TPU 87A':0.095,'TPE':0.100,
+};
+const PAUSCHALE = 4.50;
+function previewBerechne(prefix) {
+const mat   = document.getElementById(prefix+'Material')?.value||'';
+const gramm = parseFloat(document.getElementById(prefix+'Gramm')?.value)||0;
+const wrap  = document.getElementById(prefix+'PreviewWrap');
+const text  = document.getElementById(prefix+'PreviewText');
+if(!wrap||!text) return;
+if(!gramm||mat==='Keine Präferenz'){wrap.style.display='none';return;}
+const pg  = MATERIAL_PREIS[mat]||0.050;
+const mat_k = gramm*pg;
+const ges   = mat_k+PAUSCHALE;
+const min_p = (ges*0.85).toFixed(2);
+const max_p = (ges*1.15).toFixed(2);
+text.innerHTML =
+`Material (${gramm} g × ${(pg*1000).toFixed(0)} ct/g): <strong>${mat_k.toFixed(2)} €</strong><br>`+
+`Strom &amp; Verschleiß (Pauschale): <strong>${PAUSCHALE.toFixed(2)} €</strong><br>`+
+`<span style="font-size:1.05em">Geschätzter Preis: <strong style="color:var(--primary)">${min_p} – ${max_p} €</strong></span>`;
+wrap.style.display='block';
 }
 
-/* ═══════════════════════════════════════════════════════════
-   DATEN (Filament + Historie)
-═══════════════════════════════════════════════════════════ */
-// Filamentlager wird direkt aus Supabase geladen
-
-let lager=[], historie=[], anfragen=[];
-let aktKosten=0, modId=null;
-
-async function ladeDaten(){
-  laden(true);
-  try{
-    let {data:ld}=await SB.from('FilamentLager').select('*').order('Material',{ascending:true});
-    lager=ld||[];
-
-    let {data:hd}=await SB.from('auftragsHistorie').select('*');
-    historie=(hd||[]).sort((a,b)=>b.id.localeCompare(a.id));
-
-    renderLager(); renderHistorie(); renderFilamentDropdown();
-    document.getElementById('onlineStatus').textContent='🟢 Online';
-  }catch(e){
-    document.getElementById('onlineStatus').textContent='🔴 Fehler';
-    console.error('ladeDaten Fehler:', e);
-    alert('❌ Datenbankfehler: ' + (e.message||e) + '\n\nMöglicherweise muss das RLS-Fix-Script in Supabase ausgeführt werden.');
-  }
-  finally{ laden(false); }
+function escHtml(str) {
+if (!str) return '';
+return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
-/* ─── LAGER ──────────────────────────────────────── */
-function renderLager(){
-  const tb=document.getElementById('tLager');
-  if(!lager.length){ tb.innerHTML=`<tr><td colspan="5" class="emp">📭 Noch kein Filament in Supabase – bitte oben eine Spule hinzufügen.</td></tr>`; return; }
-  tb.innerHTML=lager.map(f=>{
-    const r=parseFloat(f.restGewicht), s=r<100?'color:var(--rd);font-weight:700':'';
-    return `<tr>
-      <td>${x(f.Material)}</td>
-      <td style="font-size:.82em;color:var(--t3)">${x(f.Hertseller)}</td>
-      <td style="${s}">${r.toFixed(0)} g</td>
-      <td>${parseFloat(f.Preis||0).toFixed(2)} €</td>
-      <td><button class="btn b-rd bsm" onclick="filamentDel('${f.id}')">✕</button></td>
-    </tr>`;
-  }).join('');
+window.addEventListener('DOMContentLoaded', () => {
+const session = sessionLaden();
+if (session) {
+aktKunde = session;
+headerAktualisieren();
+ladeDashboard();
+zeige('view-dashboard');
+} else {
+headerAktualisieren();
 }
-
-async function filamentAdd(){
-  const her=document.getElementById('lHer').value.trim();
-  const farbe=document.getElementById('lFarbe').value.trim();
-  const mat=document.getElementById('lMat').value;
-  const gew=parseFloat(document.getElementById('lGew').value)||0;
-  const pre=parseFloat(document.getElementById('lPre').value)||0;
-  if(!her||!farbe){ alert('Bitte Hersteller und Farbe angeben!'); return; }
-  if(!gew){ alert('Bitte ein gültiges Gewicht eingeben!'); return; }
-  laden(true);
-  try {
-    const { error } = await SB.from('FilamentLager').insert([{
-      id:'s_'+Date.now(), Hertseller:her,
-      Material:`${mat} (${farbe})`,
-      startGewicht:gew.toString(), restGewicht:gew.toString(), Preis:pre.toString()
-    }]);
-    if(error) throw error;
-    document.getElementById('lHer').value='';
-    document.getElementById('lFarbe').value='';
-    document.getElementById('lGew').value=1000;
-    document.getElementById('lPre').value='';
-    await ladeDaten();
-  } catch(e) {
-    console.error('Filament speichern fehlgeschlagen:', e);
-    alert('❌ Fehler beim Speichern: ' + (e.message || e) + '\n\nBitte das SQL-Fix-Script in Supabase ausführen!');
-    laden(false);
-  }
-}
-
-async function filamentDel(id){
-  if(confirm('Spule wirklich löschen?')){ laden(true); await SB.from('FilamentLager').delete().eq('id',id); await ladeDaten(); }
-}
-
-function renderFilamentDropdown(){
-  const dd=document.getElementById('jSpu');
-  dd.innerHTML='<option value="">— Spule wählen —</option>';
-  lager.forEach(f=>{
-    const r=parseFloat(f.restGewicht);
-    dd.innerHTML+=`<option value="${f.id}">${x(f.Material)} | ${x(f.Hertseller)} (${r.toFixed(0)} g)</option>`;
-  });
-}
-
-/* ─── AUFTRAGSHISTORIE ────────────────────────────── */
-function renderHistorie(){
-  const tb=document.getElementById('tHistorie');
-  if(!historie.length){ tb.innerHTML=`<tr><td colspan="7" class="emp">Noch keine Aufträge.</td></tr>`; return; }
-  tb.innerHTML=historie.map(h=>
-    `<tr>
-      <td style="font-size:.83em;white-space:nowrap">${x(h.datum)}</td>
-      <td><strong>${x(h.projekt)}</strong></td>
-      <td>${x(h.kunde)}</td>
-      <td style="font-size:.83em">${x(h.material)}</td>
-      <td>${h.verbrauchG} g</td>
-      <td><strong style="color:var(--gn)">${parseFloat(h.kosten||0).toFixed(2)} €</strong></td>
-      <td style="display:flex;gap:5px">
-        <button class="btn b-or bsm" onclick="historiePreisAendern('${h.id}','${h.kosten}')">✏ Preis</button>
-        <button class="btn b-rd bsm" onclick="historieDel('${h.id}',${h.verbrauchG},'${h.spuled||''}')">✕</button>
-      </td>
-    </tr>`
-  ).join('');
-}
-
-async function historiePreisAendern(id, alt){
-  const n=prompt('Neuer Preis (€):', alt);
-  if(n===null) return;
-  laden(true);
-  await SB.from('auftragsHistorie').update({kosten:parseFloat(n)||0}).eq('id',id);
-  await ladeDaten();
-}
-
-async function historieDel(id, g, spuId){
-  if(!confirm(`Auftrag löschen?\n${g}g Filament wird zurückgebucht.`)) return;
-  laden(true);
-  if(spuId){ const s=lager.find(f=>f.id===spuId); if(s){ const nr=parseFloat(s.restGewicht)+g; await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',spuId); } }
-  await SB.from('auftragsHistorie').delete().eq('id',id);
-  await ladeDaten();
-}
-
-/* ═══════════════════════════════════════════════════════════
-   KUNDENANFRAGEN
-═══════════════════════════════════════════════════════════ */
-async function ladeAnfragen(){
-  try{
-    const {data}=await SB.from('bestellAnfragen').select('*').order('erstellt_am',{ascending:false});
-    anfragen=data||[];
-    filterAnfragen(); statsUpdate();
-  }catch(e){ console.error('Anfragen:',e); }
-}
-
-function statsUpdate(){
-  const neu   =anfragen.filter(a=>a.status==='Anfrage eingegangen'||a.status==='In Bearbeitung').length;
-  const druck =anfragen.filter(a=>a.status==='Im Druck'||a.status==='Qualitätsprüfung').length;
-  const abge  =anfragen.filter(a=>a.status==='Abgeschlossen').length;
-  const umsatz=anfragen.reduce((s,a)=>s+parseFloat(a.kosten||0),0);
-  document.getElementById('sAlle').textContent  =anfragen.length;
-  document.getElementById('sNeu').textContent   =neu;
-  document.getElementById('sDruck').textContent =druck;
-  document.getElementById('sAbge').textContent  =abge;
-  document.getElementById('sUmsatz').textContent=umsatz.toFixed(2)+' €';
-  const nb=document.getElementById('nbAnfragen');
-  nb.textContent=neu; nb.style.display=neu>0?'inline-flex':'none';
-}
-
-function filterAnfragen(){
-  const sf=document.getElementById('fStatus').value;
-  const su=document.getElementById('fSuche').value.toLowerCase();
-  const list=anfragen.filter(a=>{
-    const ms=!sf||a.status===sf;
-    const mx=!su||`${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
-    return ms&&mx;
-  });
-  const tb=document.getElementById('tAnfragen');
-  if(!list.length){ tb.innerHTML=`<tr><td colspan="9" class="emp">Keine Einträge gefunden.</td></tr>`; return; }
-  tb.innerHTML=list.map(a=>{
-    const name=a.gastname
-      ?`${x(a.gastname)}<br><span style="font-size:.78em;color:var(--t3)">(Gast) ${a.gast_email?`<a href="mailto:${x(a.gast_email)}">${x(a.gast_email)}</a>`:''}</span>`
-      :`<span style="color:var(--bl);font-weight:600">🔑 Kundenkonto</span>`;
-    const adr=a.adresse?`<span style="font-size:.82em">${x(a.adresse)}<br>${x(a.plz)} ${x(a.ort)}</span>`:`<span style="color:#ccc">—</span>`;
-    const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
-    const hasMsg=a.admin_notiz&&a.admin_notiz.trim().length>0;
-    return `<tr>
-      <td style="font-size:.81em;color:var(--t3);white-space:nowrap">${x(a.datum)}</td>
-      <td style="font-family:monospace;font-size:.79em">${x(a.id)}</td>
-      <td>${name}</td>
-      <td><strong>${x(a.projekt)}</strong>${a.beschreibung?`<div style="font-size:.78em;color:#999;margin-top:2px">${x(a.beschreibung.slice(0,50))}${a.beschreibung.length>50?'…':''}</div>`:''}</td>
-      <td style="font-size:.83em">${x(a.material_wunsch)}</td>
-      <td>${adr}</td>
-      <td>${badge(a.status)}</td>
-      <td>${pr}</td>
-      <td>
-        <button class="btn b-bl bsm" style="margin-bottom:4px" onclick="modOpen('${a.id}')">✏ Bearbeiten</button>
-        ${a.status!=='Abgeschlossen'&&a.status!=='Storniert'?`<button class="btn b-gn bsm" onclick="auftragAbschliessen('${a.id}')">✓ Fertig</button>`:''}
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-/* ─── AUFTRAG ABSCHLIESSEN ────────────────────────── */
-async function auftragAbschliessen(id){
-  const a=anfragen.find(x=>x.id===id);
-  if(!a) return;
-  if(a.kosten==null){ alert('Bitte zuerst einen Preis festlegen (✏ Bearbeiten)!'); return; }
-  if(!confirm(`Auftrag "${a.projekt}" als abgeschlossen markieren?\nWird in die Auftragshistorie verschoben.`)) return;
-  laden(true);
-  try{
-    // In Historie übernehmen
-    await SB.from('auftragsHistorie').insert([{
-      id:'job_'+Date.now(),
-      spuled:null,
-      erledigt:true,
-      datum:a.datum||new Date().toLocaleDateString('de-DE'),
-      projekt:a.projekt,
-      kunde:a.gastname||'(Kundenkonto)',
-      material:a.material_wunsch||'Unbekannt',
-      verbrauchG:0,
-      kosten:parseFloat(a.kosten)||0
-    }]);
-    // Status auf Abgeschlossen
-    await SB.from('bestellAnfragen').update({status:'Abgeschlossen'}).eq('id',id);
-    await ladeDaten(); await ladeAnfragen();
-  }catch(e){ alert('Fehler!'); console.error(e); }
-  finally{ laden(false); }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   MODAL – ANFRAGE BEARBEITEN (Status + Preis + Nachricht)
-═══════════════════════════════════════════════════════════ */
-function modOpen(id){
-  const a=anfragen.find(e=>e.id===id);
-  if(!a) return;
-  modId=id;
-  document.getElementById('modTitle').textContent=`Anfrage: ${a.id}`;
-
-  // Bestehende Nachrichten parsen (JSON-Array in admin_notiz)
-  let msgs=[];
-  try{ if(a.admin_notiz) msgs=JSON.parse(a.admin_notiz); if(!Array.isArray(msgs)) msgs=[{text:a.admin_notiz,ts:''}]; }
-  catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
-
-  const msgsHtml=msgs.length
-    ? msgs.map(m=>`<div class="msg-item"><div class="msg-meta">📅 ${m.ts||'—'}</div><div class="msg-text">${x(m.text)}</div></div>`).join('')
-    : `<div class="msg-empty">Noch keine Nachrichten gesendet.</div>`;
-
-  document.getElementById('modBody').innerHTML=`
-    <div class="msec">📋 Auftragsdetails</div>
-    <div class="igrid">
-      <div class="iitem"><div class="ilbl">Eingegangen</div><div class="ival">${x(a.datum)}</div></div>
-      <div class="iitem"><div class="ilbl">Bestellnummer</div><div class="ival" style="font-family:monospace;font-size:.82em">${x(a.id)}</div></div>
-      <div class="iitem"><div class="ilbl">Kunde / Gast</div><div class="ival">${x(a.gastname||'(Kundenkonto)')}</div></div>
-      <div class="iitem"><div class="ilbl">E-Mail</div><div class="ival">${a.gast_email?`<a href="mailto:${x(a.gast_email)}">${x(a.gast_email)}</a>`:'—'}</div></div>
-      <div class="iitem"><div class="ilbl">Telefon</div><div class="ival">${x(a.telefon||'—')}</div></div>
-      <div class="iitem"><div class="ilbl">Material-Wunsch</div><div class="ival">${x(a.material_wunsch)}</div></div>
-      <div class="iitem full"><div class="ilbl">Projekt / Beschreibung</div><div class="ival"><strong>${x(a.projekt)}</strong>${a.beschreibung?'<br>'+x(a.beschreibung):''}</div></div>
-    </div>
-
-    <div class="msec">📍 Lieferadresse</div>
-    <div class="igrid">
-      <div class="iitem full"><div class="ilbl">Adresse</div><div class="ival">
-        ${a.adresse?`${x(a.adresse)}, ${x(a.plz)} ${x(a.ort)}`:'Keine Adresse angegeben'}
-        ${a.liefer_hinweis?`<br><span style="color:var(--or);font-size:.85em">💬 ${x(a.liefer_hinweis)}</span>`:''}
-      </div></div>
-    </div>
-
-    <div class="msec">⚙️ Status &amp; Preis ändern</div>
-    <div class="fgrid">
-      <div class="field">
-        <label>Auftragsstatus</label>
-        <select id="mStatus">
-          <option ${a.status==='Anfrage eingegangen'?'selected':''}>Anfrage eingegangen</option>
-          <option ${a.status==='In Bearbeitung'?'selected':''}>In Bearbeitung</option>
-          <option ${a.status==='Im Druck'?'selected':''}>Im Druck</option>
-          <option ${a.status==='Qualitätsprüfung'?'selected':''}>Qualitätsprüfung</option>
-          <option ${a.status==='Versandbereit'?'selected':''}>Versandbereit</option>
-          <option ${a.status==='Abgeschlossen'?'selected':''}>Abgeschlossen</option>
-          <option ${a.status==='Storniert'?'selected':''}>Storniert</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Grundpreis (€) – vor Rabatt</label>
-        <input type="number" id="mGrund" step="0.01" min="0"
-          value="${a.grundpreis!=null?a.grundpreis:(a.kosten!=null?a.kosten:'')}"
-          placeholder="z.B. 24.50"
-          oninput="modBerechne()">
-      </div>
-      <div class="field">
-        <label>Rabatt (%)</label>
-        <input type="number" id="mRabatt" step="1" min="0" max="100"
-          value="${a.rabatt_pct!=null?a.rabatt_pct:0}"
-          oninput="modBerechne()">
-      </div>
-      <div class="field">
-        <label>ca. Gramm (vom Kunden angegeben)</label>
-        <input type="number" id="mGramm" step="1" min="0"
-          value="${a.ca_gramm!=null?a.ca_gramm:''}"
-          placeholder="—" readonly
-          style="background:#f7f8fa;color:#888">
-      </div>
-      <div class="field">
-        <label>Endpreis für Kunden (€)</label>
-        <input type="number" id="mKosten" step="0.01" min="0"
-          value="${a.kosten!=null?a.kosten:''}"
-          placeholder="Wird automatisch berechnet">
-      </div>
-    </div>
-    <div id="mRabattInfo" style="display:none;background:#e8f5e9;border:1px solid #c3e6cb;border-radius:8px;padding:9px 14px;font-size:.85em;color:#155724;margin-top:4px">
-      💰 Rabatt aktiv – Endpreis wird automatisch berechnet
-    </div>
-
-    <div class="msec">💬 Nachricht an Kunden senden</div>
-    <div class="msg-list">${msgsHtml}</div>
-    <div class="field" style="margin-bottom:0">
-      <label>Neue Nachricht / Notiz</label>
-      <textarea id="mNeueNachricht" placeholder="z.B. Ihr Auftrag ist im Druck. Voraussichtliche Fertigstellung: Freitag. Bitte STL-Datei senden…"></textarea>
-    </div>
-    <p style="font-size:.77em;color:var(--t3);margin-top:6px">💡 Diese Nachricht sieht der Kunde in seinem Portalbereich.</p>
-  `;
-  document.getElementById('modWrap').classList.add('on');
-}
-
-function modClose(){
-  document.getElementById('modWrap').classList.remove('on');
-  modId=null;
-}
-
-function modBerechne(){
-  const grund  = parseFloat(document.getElementById('mGrund')?.value) || 0;
-  const rabatt = parseFloat(document.getElementById('mRabatt')?.value) || 0;
-  const info   = document.getElementById('mRabattInfo');
-  if(!grund){ return; }
-  const rabattBetrag = grund * (rabatt / 100);
-  const endpreis     = grund - rabattBetrag;
-  document.getElementById('mKosten').value = endpreis.toFixed(2);
-  if(info){
-    if(rabatt > 0){
-      info.style.display = 'block';
-      info.textContent   = `💰 ${rabatt}% Rabatt = -${rabattBetrag.toFixed(2)} € → Endpreis: ${endpreis.toFixed(2)} €`;
-    } else {
-      info.style.display = 'none';
-    }
-  }
-}
-
-async function modSave(){
-  if(!modId) return;
-  const status =document.getElementById('mStatus').value;
-  const kv     =document.getElementById('mKosten').value;
-  const kosten =kv!==''?parseFloat(kv):null;
-  const neueMsg=document.getElementById('mNeueNachricht').value.trim();
-
-  // Nachrichten-Array aufbauen
-  const a=anfragen.find(e=>e.id===modId);
-  let msgs=[];
-  try{ if(a.admin_notiz) msgs=JSON.parse(a.admin_notiz); if(!Array.isArray(msgs)) msgs=[{text:a.admin_notiz,ts:''}]; }
-  catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
-
-  if(neueMsg){
-    msgs.push({text:neueMsg, ts:new Date().toLocaleString('de-DE')});
-  }
-
-  const grundVal  = document.getElementById('mGrund').value;
-  const rabattVal = document.getElementById('mRabatt').value;
-  const grundpreis = grundVal !== '' ? parseFloat(grundVal) : null;
-  const rabatt_pct = rabattVal !== '' ? parseFloat(rabattVal) : 0;
-
-  laden(true);
-  try{
-    await SB.from('bestellAnfragen').update({
-      status, kosten, grundpreis, rabatt_pct,
-      admin_notiz: msgs.length?JSON.stringify(msgs):null
-    }).eq('id',modId);
-
-    const i=anfragen.findIndex(e=>e.id===modId);
-    if(i>-1) anfragen[i]={...anfragen[i],status,kosten,grundpreis,rabatt_pct,admin_notiz:msgs.length?JSON.stringify(msgs):null};
-    filterAnfragen(); statsUpdate(); modClose();
-  }catch(e){ alert('Fehler beim Speichern!'); console.error(e); }
-  finally{ laden(false); }
-}
-
-// Modal schließen beim Klick außerhalb
-document.getElementById('modWrap').addEventListener('click',function(e){ if(e.target===this) modClose(); });
-
-/* ═══════════════════════════════════════════════════════════
-   KALKULATION (Manueller Auftrag)
-═══════════════════════════════════════════════════════════ */
-function berechne(){
-  const sid=document.getElementById('jSpu').value;
-  const g=parseFloat(document.getElementById('jGra').value)||0;
-  const dis=parseFloat(document.getElementById('jDis').value)||0;
-  const fix=parseFloat(document.getElementById('jFix').value)||4.5;
-  const w=document.getElementById('warnGew');
-  let mat=0;
-  if(sid){
-    const s=lager.find(f=>f.id===sid);
-    if(s){
-      mat=(parseFloat(s.Preis)/parseFloat(s.startGewicht))*g;
-      w.style.display=g>parseFloat(s.restGewicht)?'block':'none';
-    }
-  } else w.style.display='none';
-  const zwi=mat+fix, rab=zwi*(dis/100);
-  aktKosten=zwi-rab;
-  document.getElementById('kMat').textContent=mat.toFixed(2).replace('.',',');
-  document.getElementById('kFix').textContent=fix.toFixed(2).replace('.',',');
-  document.getElementById('kZwi').textContent=zwi.toFixed(2).replace('.',',');
-  document.getElementById('kRab').textContent='- '+(rab.toFixed(2).replace('.',','));
-  document.getElementById('kEnd').textContent=aktKosten.toFixed(2).replace('.',',');
-}
-
-/* ═══════════════════════════════════════════════════════════
-   MANUELLEN AUFTRAG BUCHEN
-═══════════════════════════════════════════════════════════ */
-async function auftragBuchen(){
-  const sid=document.getElementById('jSpu').value;
-  const g=parseFloat(document.getElementById('jGra').value)||0;
-  const pro=document.getElementById('jPro').value.trim();
-  const kun=document.getElementById('jKun').value.trim();
-  if(!sid||!g||!pro||!kun){ alert('Bitte Projekt, Kunde, Filament und Gramm angeben!'); return; }
-  const s=lager.find(f=>f.id===sid); if(!s) return;
-  document.getElementById('btnBuchen').disabled=true;
-  laden(true);
-  try{
-    await SB.from('auftragsHistorie').insert([{
-      id:'job_'+Date.now(), spuled:sid, erledigt:false,
-      datum:new Date().toLocaleDateString('de-DE'),
-      projekt:pro, kunde:kun, material:s.Material,
-      verbrauchG:g, kosten:aktKosten
-    }]);
-    const nr=parseFloat(s.restGewicht)-g;
-    await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',sid);
-    ['jPro','jKun','jGra'].forEach(i=>document.getElementById(i).value='');
-    document.getElementById('jDis').value='0';
-    if(nr<=0) alert('⚠ ACHTUNG: Diese Spule ist jetzt leer!');
-    await ladeDaten();
-  }catch(e){ alert('Fehler beim Buchen!'); console.error(e); }
-  finally{ document.getElementById('btnBuchen').disabled=false; laden(false); }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   HILFSFUNKTIONEN
-═══════════════════════════════════════════════════════════ */
-function laden(an){ document.getElementById('ladeWrap').style.display=an?'flex':'none'; }
-
-function x(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
-
-function badge(st){
-  const m={
-    'Anfrage eingegangen':'bbl','In Bearbeitung':'byw',
-    'Im Druck':'bli','Qualitätsprüfung':'byw',
-    'Versandbereit':'bgn','Abgeschlossen':'bgn','Storniert':'brd'
-  };
-  return `<span class="bdg ${m[st]||'bgr'}">${x(st)}</span>`;
-}
-</script>
+});</script>
 </body>
 </html>
