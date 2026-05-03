@@ -312,8 +312,57 @@ tr:hover td{background:#fafcff}
           <div class="field">
             <label>Material-Typ</label>
             <select id="lMat">
-              <optgroup label="PLA"><option>PLA</option><option>PLA+</option><option>PLA Silk</option><option>PLA Matt</option><option>XPLA</option></optgroup>
-              <optgroup label="Weitere"><option>PETG</option><option>ABS</option><option>ASA</option><option>TPU</option><option>Nylon</option><option>PC</option><option>CF</option></optgroup>
+              <optgroup label="── PLA Varianten ──">
+                <option>PLA</option>
+                <option>PLA+</option>
+                <option>PLA Silk</option>
+                <option>PLA Matt</option>
+                <option>PLA High Speed</option>
+                <option>XPLA</option>
+                <option>PLA-CF (Carbon)</option>
+                <option>PLA Wood Fill</option>
+                <option>PLA Metal Fill</option>
+                <option>PLA Marble</option>
+              </optgroup>
+              <optgroup label="── PETG Varianten ──">
+                <option>PETG</option>
+                <option>PETG-CF (Carbon)</option>
+                <option>PETG-GF (Glasfaser)</option>
+              </optgroup>
+              <optgroup label="── Nylon / PA ──">
+                <option>Nylon PA6</option>
+                <option>Nylon PA12</option>
+                <option>Nylon PA-CF (Carbon)</option>
+                <option>Nylon PA-GF (Glasfaser)</option>
+              </optgroup>
+              <optgroup label="── Technische Filamente ──">
+                <option>ABS</option>
+                <option>ABS-CF (Carbon)</option>
+                <option>ASA</option>
+                <option>ASA-CF (Carbon)</option>
+                <option>PC (Polycarbonat)</option>
+                <option>PC-CF (Carbon)</option>
+                <option>PP (Polypropylen)</option>
+                <option>HIPS</option>
+                <option>POM (Delrin)</option>
+              </optgroup>
+              <optgroup label="── Glasfaser (GF) ──">
+                <option>GF-PLA (Glasfaser)</option>
+                <option>GF-PETG (Glasfaser)</option>
+                <option>GF-PA12 (Glasfaser)</option>
+                <option>GF30-PA (30% Glasfaser)</option>
+              </optgroup>
+              <optgroup label="── Flexibel ──">
+                <option>TPU 95A</option>
+                <option>TPU 87A (weich)</option>
+                <option>TPE</option>
+                <option>TPC</option>
+              </optgroup>
+              <optgroup label="── Spezialmaterialien ──">
+                <option>Resin (Standard)</option>
+                <option>Resin (ABS-Like)</option>
+                <option>Resin (Water Washable)</option>
+              </optgroup>
             </select>
           </div>
           <div class="field">
@@ -733,9 +782,34 @@ function modOpen(id){
         </select>
       </div>
       <div class="field">
-        <label>Preis für Kunden (€)</label>
-        <input type="number" id="mKosten" step="0.01" min="0" value="${a.kosten!=null?a.kosten:''}" placeholder="Noch nicht festgelegt">
+        <label>Grundpreis (€) – vor Rabatt</label>
+        <input type="number" id="mGrund" step="0.01" min="0"
+          value="${a.grundpreis!=null?a.grundpreis:(a.kosten!=null?a.kosten:'')}"
+          placeholder="z.B. 24.50"
+          oninput="modBerechne()">
       </div>
+      <div class="field">
+        <label>Rabatt (%)</label>
+        <input type="number" id="mRabatt" step="1" min="0" max="100"
+          value="${a.rabatt_pct!=null?a.rabatt_pct:0}"
+          oninput="modBerechne()">
+      </div>
+      <div class="field">
+        <label>ca. Gramm (vom Kunden angegeben)</label>
+        <input type="number" id="mGramm" step="1" min="0"
+          value="${a.ca_gramm!=null?a.ca_gramm:''}"
+          placeholder="—" readonly
+          style="background:#f7f8fa;color:#888">
+      </div>
+      <div class="field">
+        <label>Endpreis für Kunden (€)</label>
+        <input type="number" id="mKosten" step="0.01" min="0"
+          value="${a.kosten!=null?a.kosten:''}"
+          placeholder="Wird automatisch berechnet">
+      </div>
+    </div>
+    <div id="mRabattInfo" style="display:none;background:#e8f5e9;border:1px solid #c3e6cb;border-radius:8px;padding:9px 14px;font-size:.85em;color:#155724;margin-top:4px">
+      💰 Rabatt aktiv – Endpreis wird automatisch berechnet
     </div>
 
     <div class="msec">💬 Nachricht an Kunden senden</div>
@@ -752,6 +826,24 @@ function modOpen(id){
 function modClose(){
   document.getElementById('modWrap').classList.remove('on');
   modId=null;
+}
+
+function modBerechne(){
+  const grund  = parseFloat(document.getElementById('mGrund')?.value) || 0;
+  const rabatt = parseFloat(document.getElementById('mRabatt')?.value) || 0;
+  const info   = document.getElementById('mRabattInfo');
+  if(!grund){ return; }
+  const rabattBetrag = grund * (rabatt / 100);
+  const endpreis     = grund - rabattBetrag;
+  document.getElementById('mKosten').value = endpreis.toFixed(2);
+  if(info){
+    if(rabatt > 0){
+      info.style.display = 'block';
+      info.textContent   = `💰 ${rabatt}% Rabatt = -${rabattBetrag.toFixed(2)} € → Endpreis: ${endpreis.toFixed(2)} €`;
+    } else {
+      info.style.display = 'none';
+    }
+  }
 }
 
 async function modSave(){
@@ -771,15 +863,20 @@ async function modSave(){
     msgs.push({text:neueMsg, ts:new Date().toLocaleString('de-DE')});
   }
 
+  const grundVal  = document.getElementById('mGrund').value;
+  const rabattVal = document.getElementById('mRabatt').value;
+  const grundpreis = grundVal !== '' ? parseFloat(grundVal) : null;
+  const rabatt_pct = rabattVal !== '' ? parseFloat(rabattVal) : 0;
+
   laden(true);
   try{
     await SB.from('bestellAnfragen').update({
-      status, kosten,
+      status, kosten, grundpreis, rabatt_pct,
       admin_notiz: msgs.length?JSON.stringify(msgs):null
     }).eq('id',modId);
 
     const i=anfragen.findIndex(e=>e.id===modId);
-    if(i>-1) anfragen[i]={...anfragen[i],status,kosten,admin_notiz:msgs.length?JSON.stringify(msgs):null};
+    if(i>-1) anfragen[i]={...anfragen[i],status,kosten,grundpreis,rabatt_pct,admin_notiz:msgs.length?JSON.stringify(msgs):null};
     filterAnfragen(); statsUpdate(); modClose();
   }catch(e){ alert('Fehler beim Speichern!'); console.error(e); }
   finally{ laden(false); }
