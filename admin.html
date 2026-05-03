@@ -16,7 +16,7 @@
   --sh:0 4px 16px rgba(0,0,0,.09);
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:14px;min-height:100vh}
- 
+
 /* ── LOGIN ─────────────────────────────────────────── */
 #loginWrap{position:fixed;inset:0;background:linear-gradient(135deg,#0d1b2e 0%,#0056b3 100%);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
 #loginWrap.fade{opacity:0;pointer-events:none}
@@ -37,7 +37,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .lbtn:active{transform:scale(.98)}
 .lhint{margin-top:16px;font-size:.77em;color:#bbb}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
- 
+
 /* ── TOPBAR ────────────────────────────────────────── */
 #topbar{background:linear-gradient(90deg,#0d1b2e 0%,#0056b3 100%);color:#fff;height:58px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 14px rgba(0,0,0,.2)}
 .tbl{display:flex;align-items:center;gap:12px}
@@ -47,31 +47,31 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .tonline{background:#e8f5e9;color:var(--gn);font-size:.75em;padding:3px 10px;border-radius:12px;font-weight:600}
 .tlogout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 16px;border-radius:8px;font-size:.82em;cursor:pointer;transition:background .2s;width:auto}
 .tlogout:hover{background:rgba(255,255,255,.2)}
- 
+
 /* ── NAV TABS ──────────────────────────────────────── */
 #nav{background:var(--wh);border-bottom:2px solid var(--br);display:flex;gap:0;padding:0 20px;position:sticky;top:58px;z-index:190;box-shadow:0 2px 8px rgba(0,0,0,.05);overflow-x:auto}
 .ntab{padding:14px 18px;font-size:.87em;font-weight:600;color:var(--t3);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;width:auto;transition:color .2s,border-color .2s}
 .ntab:hover{color:var(--bl)}
 .ntab.on{color:var(--bl);border-bottom-color:var(--bl)}
 .nbadge{display:inline-flex;align-items:center;justify-content:center;background:var(--rd);color:#fff;width:18px;height:18px;border-radius:50%;font-size:.7em;font-weight:700;margin-left:5px}
- 
+
 /* ── PANELS ────────────────────────────────────────── */
 #wrap{padding:22px}
 .panel{display:none}.panel.on{display:block}
- 
+
 /* ── CARD ──────────────────────────────────────────── */
 .card{background:var(--wh);padding:22px 24px;border-radius:14px;box-shadow:var(--sh);margin-bottom:20px}
 .card-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .chead{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--bl);padding-bottom:10px;margin-bottom:18px}
 .chead h2{font-size:1.1em;color:var(--t1);margin:0}
- 
+
 /* ── STATS ─────────────────────────────────────────── */
 .sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-bottom:22px}
 .scard{background:var(--wh);border-radius:11px;padding:15px 17px;box-shadow:var(--sh);border-left:4px solid var(--bl)}
 .scard.or{border-left-color:var(--or)}.scard.gn{border-left-color:var(--gn)}.scard.li{border-left-color:var(--li)}.scard.rd{border-left-color:var(--rd)}
 .slabel{font-size:.72em;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.04em}
 .sval{font-size:1.7em;font-weight:700;color:var(--t1);margin-top:4px}
- 
+
 /* ── FORMS ─────────────────────────────────────────── */
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fcol{grid-column:1/-1}
@@ -81,7 +81,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(0,86,179,.1)}
 .field input[readonly]{background:#f7f8fa;color:#999;cursor:not-allowed}
 .field textarea{resize:vertical;min-height:75px}
- 
+
 /* ── BUTTONS ───────────────────────────────────────── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;width:100%}
 .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -99,7 +99,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .bsm{padding:6px 13px;font-size:12px;width:auto}
 .brow{display:flex;gap:10px;margin-top:18px}
 .brow .btn{flex:1}
- 
+
 /* ── TABLE ─────────────────────────────────────────── */
 .twrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:.87em}
@@ -107,7 +107,7 @@ th,td{padding:10px 11px;text-align:left;border-bottom:1px solid #f0f4f8}
 th{background:#f8fafc;font-size:.78em;text-transform:uppercase;letter-spacing:.04em;color:var(--t3);font-weight:700}
 tr:hover td{background:#fafcff}
 .emp{text-align:center;color:#bbb;font-style:italic;padding:28px}
- 
+
 /* ── BADGES ────────────────────────────────────────── */
 .bdg{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.75em;font-weight:700;white-space:nowrap}
 .bbl{background:#e3f0ff;color:var(--bl)}
@@ -116,17 +116,17 @@ tr:hover td{background:#fafcff}
 .bgn{background:#e8f5e9;color:#1a6b30}
 .brd{background:#fde8ea;color:var(--rd)}
 .bgr{background:#f0f0f0;color:#666}
- 
+
 /* ── FILTER BAR ────────────────────────────────────── */
 .fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .fbar select{width:auto;font-family:inherit;font-size:13px;padding:7px 10px;border:1.5px solid var(--br);border-radius:8px;outline:none}
 .fbar input{flex:1;min-width:180px;font-family:inherit;font-size:13px;padding:7px 10px;border:1.5px solid var(--br);border-radius:8px;outline:none}
 .fbar select:focus,.fbar input:focus{border-color:var(--bl)}
- 
+
 /* ── KALKULATIONSBOX ───────────────────────────────── */
 .kbox{background:#f0f7ff;border:1px solid #c8dff8;border-left:4px solid var(--bl);border-radius:10px;padding:14px 18px;margin:14px 0;line-height:1.9;font-size:.92em}
 .kbox .ktotal{font-size:1.2em;font-weight:700;color:var(--rd)}
- 
+
 /* ── MODAL ─────────────────────────────────────────── */
 #modWrap{position:fixed;inset:0;background:rgba(0,0,0,.48);display:none;align-items:center;justify-content:center;z-index:5000;padding:14px;backdrop-filter:blur(4px)}
 #modWrap.on{display:flex}
@@ -145,7 +145,7 @@ tr:hover td{background:#fafcff}
 .iitem.full{grid-column:1/-1}
 .ilbl{font-size:.7em;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:3px;letter-spacing:.04em}
 .ival{font-size:.88em;color:var(--t1);line-height:1.55;word-break:break-word}
- 
+
 /* ── NACHRICHTEN ───────────────────────────────────── */
 .msg-list{max-height:200px;overflow-y:auto;border:1.5px solid var(--br);border-radius:9px;padding:10px 13px;background:#fafcff;margin-bottom:10px}
 .msg-item{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #eef2f8}
@@ -153,17 +153,17 @@ tr:hover td{background:#fafcff}
 .msg-meta{font-size:.72em;color:var(--t3);margin-bottom:3px}
 .msg-text{font-size:.88em;color:var(--t1);line-height:1.55;white-space:pre-wrap}
 .msg-empty{font-size:.84em;color:#bbb;font-style:italic;text-align:center;padding:12px}
- 
+
 /* ── LADE-OVERLAY ──────────────────────────────────── */
 #ladeWrap{position:fixed;inset:0;background:rgba(255,255,255,.84);display:none;align-items:center;justify-content:center;z-index:9000;backdrop-filter:blur(2px)}
 .lspin{width:28px;height:28px;border:3px solid #d8e2ef;border-top-color:var(--bl);border-radius:50%;animation:spin .65s linear infinite;margin-right:10px}
 .ltxt{font-size:14px;font-weight:600;color:var(--bl)}
 @keyframes spin{to{transform:rotate(360deg)}}
- 
+
 /* ── WARN ──────────────────────────────────────────── */
 .warn{color:var(--rd);font-size:.8em;font-weight:600;display:none;margin-top:4px}
 .chk{width:20px;height:20px;cursor:pointer;accent-color:var(--gn)}
- 
+
 /* ── RESPONSIVE ────────────────────────────────────── */
 @media(max-width:640px){
   .card-row,.fgrid,.igrid{grid-template-columns:1fr}
@@ -174,7 +174,7 @@ tr:hover td{background:#fafcff}
 </style>
 </head>
 <body>
- 
+
 <!-- ══════════════════════════════════════════════════════
      LOGIN
 ════════════════════════════════════════════════════════ -->
@@ -194,12 +194,12 @@ tr:hover td{background:#fafcff}
     <p class="lhint">Sitzung gilt nur für diese Browser-Session.</p>
   </div>
 </div>
- 
+
 <!-- LADE -->
 <div id="ladeWrap">
   <div class="lspin"></div><span class="ltxt">Bitte warten…</span>
 </div>
- 
+
 <!-- ══════════════════════════════════════════════════════
      MODAL – ANFRAGE BEARBEITEN
 ════════════════════════════════════════════════════════ -->
@@ -216,7 +216,7 @@ tr:hover td{background:#fafcff}
     </div>
   </div>
 </div>
- 
+
 <!-- ══════════════════════════════════════════════════════
      TOPBAR
 ════════════════════════════════════════════════════════ -->
@@ -229,7 +229,7 @@ tr:hover td{background:#fafcff}
   </div>
   <button class="tlogout" onclick="logout()">⬡ Abmelden</button>
 </div>
- 
+
 <!-- ══════════════════════════════════════════════════════
      NAV TABS
 ════════════════════════════════════════════════════════ -->
@@ -241,15 +241,15 @@ tr:hover td{background:#fafcff}
   <button class="ntab" onclick="tab('p-historie',this)">📋 Auftragshistorie</button>
   <button class="ntab" onclick="tab('p-auftrag',this)">➕ Neuer Auftrag</button>
 </div>
- 
+
 <!-- ══════════════════════════════════════════════════════
      HAUPTINHALT
 ════════════════════════════════════════════════════════ -->
 <div id="wrap" style="display:none">
- 
+
   <!-- ─── TAB 1: KUNDENANFRAGEN ─────────────────────── -->
   <div class="panel on" id="p-anfragen">
- 
+
     <!-- Stats -->
     <div class="sgrid">
       <div class="scard"><div class="slabel">Alle Anfragen</div><div class="sval" id="sAlle">—</div></div>
@@ -258,13 +258,13 @@ tr:hover td{background:#fafcff}
       <div class="scard gn"><div class="slabel">Abgeschlossen</div><div class="sval" id="sAbge">—</div></div>
       <div class="scard rd"><div class="slabel">Umsatz gesamt</div><div class="sval" id="sUmsatz">—</div></div>
     </div>
- 
+
     <div class="card">
       <div class="chead">
         <h2>📥 Alle Kundenanfragen</h2>
         <button class="btn b-bl bsm" onclick="ladeAnfragen()">↻ Aktualisieren</button>
       </div>
- 
+
       <!-- Filter -->
       <div class="fbar">
         <select id="fStatus" onchange="filterAnfragen()">
@@ -279,7 +279,7 @@ tr:hover td{background:#fafcff}
         </select>
         <input type="text" id="fSuche" placeholder="🔍 Name, Projekt, E-Mail, Bestellnr. …" oninput="filterAnfragen()">
       </div>
- 
+
       <div class="twrap">
         <table>
           <thead>
@@ -294,7 +294,7 @@ tr:hover td{background:#fafcff}
       </div>
     </div>
   </div>
- 
+
   <!-- ─── TAB 2: FILAMENTLAGER ──────────────────────── -->
   <div class="panel" id="p-lager">
     <div class="card-row">
@@ -329,7 +329,7 @@ tr:hover td{background:#fafcff}
           <button class="btn b-bl" onclick="filamentAdd()">+ Spule hinzufügen</button>
         </div>
       </div>
- 
+
       <div class="card">
         <div class="chead"><h2>📦 Aktueller Bestand</h2></div>
         <div class="twrap">
@@ -341,7 +341,7 @@ tr:hover td{background:#fafcff}
       </div>
     </div>
   </div>
- 
+
   <!-- ─── TAB 3: AUFTRAGSHISTORIE ───────────────────── -->
   <div class="panel" id="p-historie">
     <div class="card">
@@ -359,7 +359,7 @@ tr:hover td{background:#fafcff}
       </div>
     </div>
   </div>
- 
+
   <!-- ─── TAB 4: NEUER AUFTRAG ──────────────────────── -->
   <div class="panel" id="p-auftrag">
     <div class="card-row">
@@ -392,7 +392,7 @@ tr:hover td{background:#fafcff}
             <input type="number" id="jFix" value="4.50" step="0.01" oninput="berechne()">
           </div>
         </div>
- 
+
         <div class="kbox">
           Material: <span id="kMat">0,00</span> €<br>
           Verschleiß/Strom: <span id="kFix">4,50</span> €<br>
@@ -404,7 +404,7 @@ tr:hover td{background:#fafcff}
           <button class="btn b-gn" id="btnBuchen" onclick="auftragBuchen()">✓ Auftrag buchen &amp; speichern</button>
         </div>
       </div>
- 
+
       <div class="card">
         <div class="chead"><h2>💡 Preisinfo</h2></div>
         <div style="font-size:.88em;color:var(--t2);line-height:1.8">
@@ -418,16 +418,16 @@ tr:hover td{background:#fafcff}
       </div>
     </div>
   </div>
- 
+
 </div><!-- /#wrap -->
- 
- 
+
+
 <script>
 /* ═══════════════════════════════════════════════════════════
    PASSWORT (Base64)  →  Kx9m-Druck#2025
 ═══════════════════════════════════════════════════════════ */
 const _P = atob('S3g5bS1EcnVjayMyMDI1');
- 
+
 function login(){
   const v=document.getElementById('pw').value, e=document.getElementById('lerr'), i=document.getElementById('pw');
   if(v===_P){
@@ -441,7 +441,7 @@ function login(){
 }
 function togglePw(){ const e=document.getElementById('pw'); e.type=e.type==='password'?'text':'password'; }
 function logout(){ if(confirm('Wirklich abmelden?')){ sessionStorage.removeItem('adm'); location.reload(); } }
- 
+
 /* ═══════════════════════════════════════════════════════════
    SUPABASE
 ═══════════════════════════════════════════════════════════ */
@@ -449,7 +449,7 @@ const SB = supabase.createClient(
   'https://zasufuyaiturzgohqkky.supabase.co',
   'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj'
 );
- 
+
 /* ═══════════════════════════════════════════════════════════
    START
 ═══════════════════════════════════════════════════════════ */
@@ -463,7 +463,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     startAdmin();
   } else document.getElementById('pw').focus();
 });
- 
+
 /* ═══════════════════════════════════════════════════════════
    TABS
 ═══════════════════════════════════════════════════════════ */
@@ -473,24 +473,24 @@ function tab(id,btn){
   document.getElementById(id).classList.add('on');
   btn.classList.add('on');
 }
- 
+
 /* ═══════════════════════════════════════════════════════════
    DATEN (Filament + Historie)
 ═══════════════════════════════════════════════════════════ */
 // Filamentlager wird direkt aus Supabase geladen
- 
+
 let lager=[], historie=[], anfragen=[];
 let aktKosten=0, modId=null;
- 
+
 async function ladeDaten(){
   laden(true);
   try{
     let {data:ld}=await SB.from('FilamentLager').select('*').order('Material',{ascending:true});
     lager=ld||[];
- 
+
     let {data:hd}=await SB.from('auftragsHistorie').select('*');
     historie=(hd||[]).sort((a,b)=>b.id.localeCompare(a.id));
- 
+
     renderLager(); renderHistorie(); renderFilamentDropdown();
     document.getElementById('onlineStatus').textContent='🟢 Online';
   }catch(e){
@@ -500,7 +500,7 @@ async function ladeDaten(){
   }
   finally{ laden(false); }
 }
- 
+
 /* ─── LAGER ──────────────────────────────────────── */
 function renderLager(){
   const tb=document.getElementById('tLager');
@@ -516,7 +516,7 @@ function renderLager(){
     </tr>`;
   }).join('');
 }
- 
+
 async function filamentAdd(){
   const her=document.getElementById('lHer').value.trim();
   const farbe=document.getElementById('lFarbe').value.trim();
@@ -544,11 +544,11 @@ async function filamentAdd(){
     laden(false);
   }
 }
- 
+
 async function filamentDel(id){
   if(confirm('Spule wirklich löschen?')){ laden(true); await SB.from('FilamentLager').delete().eq('id',id); await ladeDaten(); }
 }
- 
+
 function renderFilamentDropdown(){
   const dd=document.getElementById('jSpu');
   dd.innerHTML='<option value="">— Spule wählen —</option>';
@@ -557,7 +557,7 @@ function renderFilamentDropdown(){
     dd.innerHTML+=`<option value="${f.id}">${x(f.Material)} | ${x(f.Hertseller)} (${r.toFixed(0)} g)</option>`;
   });
 }
- 
+
 /* ─── AUFTRAGSHISTORIE ────────────────────────────── */
 function renderHistorie(){
   const tb=document.getElementById('tHistorie');
@@ -577,7 +577,7 @@ function renderHistorie(){
     </tr>`
   ).join('');
 }
- 
+
 async function historiePreisAendern(id, alt){
   const n=prompt('Neuer Preis (€):', alt);
   if(n===null) return;
@@ -585,7 +585,7 @@ async function historiePreisAendern(id, alt){
   await SB.from('auftragsHistorie').update({kosten:parseFloat(n)||0}).eq('id',id);
   await ladeDaten();
 }
- 
+
 async function historieDel(id, g, spuId){
   if(!confirm(`Auftrag löschen?\n${g}g Filament wird zurückgebucht.`)) return;
   laden(true);
@@ -593,7 +593,7 @@ async function historieDel(id, g, spuId){
   await SB.from('auftragsHistorie').delete().eq('id',id);
   await ladeDaten();
 }
- 
+
 /* ═══════════════════════════════════════════════════════════
    KUNDENANFRAGEN
 ═══════════════════════════════════════════════════════════ */
@@ -604,7 +604,7 @@ async function ladeAnfragen(){
     filterAnfragen(); statsUpdate();
   }catch(e){ console.error('Anfragen:',e); }
 }
- 
+
 function statsUpdate(){
   const neu   =anfragen.filter(a=>a.status==='Anfrage eingegangen'||a.status==='In Bearbeitung').length;
   const druck =anfragen.filter(a=>a.status==='Im Druck'||a.status==='Qualitätsprüfung').length;
@@ -618,7 +618,7 @@ function statsUpdate(){
   const nb=document.getElementById('nbAnfragen');
   nb.textContent=neu; nb.style.display=neu>0?'inline-flex':'none';
 }
- 
+
 function filterAnfragen(){
   const sf=document.getElementById('fStatus').value;
   const su=document.getElementById('fSuche').value.toLowerCase();
@@ -652,7 +652,7 @@ function filterAnfragen(){
     </tr>`;
   }).join('');
 }
- 
+
 /* ─── AUFTRAG ABSCHLIESSEN ────────────────────────── */
 async function auftragAbschliessen(id){
   const a=anfragen.find(x=>x.id===id);
@@ -679,7 +679,7 @@ async function auftragAbschliessen(id){
   }catch(e){ alert('Fehler!'); console.error(e); }
   finally{ laden(false); }
 }
- 
+
 /* ═══════════════════════════════════════════════════════════
    MODAL – ANFRAGE BEARBEITEN (Status + Preis + Nachricht)
 ═══════════════════════════════════════════════════════════ */
@@ -688,16 +688,16 @@ function modOpen(id){
   if(!a) return;
   modId=id;
   document.getElementById('modTitle').textContent=`Anfrage: ${a.id}`;
- 
+
   // Bestehende Nachrichten parsen (JSON-Array in admin_notiz)
   let msgs=[];
   try{ if(a.admin_notiz) msgs=JSON.parse(a.admin_notiz); if(!Array.isArray(msgs)) msgs=[{text:a.admin_notiz,ts:''}]; }
   catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
- 
+
   const msgsHtml=msgs.length
     ? msgs.map(m=>`<div class="msg-item"><div class="msg-meta">📅 ${m.ts||'—'}</div><div class="msg-text">${x(m.text)}</div></div>`).join('')
     : `<div class="msg-empty">Noch keine Nachrichten gesendet.</div>`;
- 
+
   document.getElementById('modBody').innerHTML=`
     <div class="msec">📋 Auftragsdetails</div>
     <div class="igrid">
@@ -709,7 +709,7 @@ function modOpen(id){
       <div class="iitem"><div class="ilbl">Material-Wunsch</div><div class="ival">${x(a.material_wunsch)}</div></div>
       <div class="iitem full"><div class="ilbl">Projekt / Beschreibung</div><div class="ival"><strong>${x(a.projekt)}</strong>${a.beschreibung?'<br>'+x(a.beschreibung):''}</div></div>
     </div>
- 
+
     <div class="msec">📍 Lieferadresse</div>
     <div class="igrid">
       <div class="iitem full"><div class="ilbl">Adresse</div><div class="ival">
@@ -717,7 +717,7 @@ function modOpen(id){
         ${a.liefer_hinweis?`<br><span style="color:var(--or);font-size:.85em">💬 ${x(a.liefer_hinweis)}</span>`:''}
       </div></div>
     </div>
- 
+
     <div class="msec">⚙️ Status &amp; Preis ändern</div>
     <div class="fgrid">
       <div class="field">
@@ -737,7 +737,7 @@ function modOpen(id){
         <input type="number" id="mKosten" step="0.01" min="0" value="${a.kosten!=null?a.kosten:''}" placeholder="Noch nicht festgelegt">
       </div>
     </div>
- 
+
     <div class="msec">💬 Nachricht an Kunden senden</div>
     <div class="msg-list">${msgsHtml}</div>
     <div class="field" style="margin-bottom:0">
@@ -748,46 +748,46 @@ function modOpen(id){
   `;
   document.getElementById('modWrap').classList.add('on');
 }
- 
+
 function modClose(){
   document.getElementById('modWrap').classList.remove('on');
   modId=null;
 }
- 
+
 async function modSave(){
   if(!modId) return;
   const status =document.getElementById('mStatus').value;
   const kv     =document.getElementById('mKosten').value;
   const kosten =kv!==''?parseFloat(kv):null;
   const neueMsg=document.getElementById('mNeueNachricht').value.trim();
- 
+
   // Nachrichten-Array aufbauen
   const a=anfragen.find(e=>e.id===modId);
   let msgs=[];
   try{ if(a.admin_notiz) msgs=JSON.parse(a.admin_notiz); if(!Array.isArray(msgs)) msgs=[{text:a.admin_notiz,ts:''}]; }
   catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
- 
+
   if(neueMsg){
     msgs.push({text:neueMsg, ts:new Date().toLocaleString('de-DE')});
   }
- 
+
   laden(true);
   try{
     await SB.from('bestellAnfragen').update({
       status, kosten,
       admin_notiz: msgs.length?JSON.stringify(msgs):null
     }).eq('id',modId);
- 
+
     const i=anfragen.findIndex(e=>e.id===modId);
     if(i>-1) anfragen[i]={...anfragen[i],status,kosten,admin_notiz:msgs.length?JSON.stringify(msgs):null};
     filterAnfragen(); statsUpdate(); modClose();
   }catch(e){ alert('Fehler beim Speichern!'); console.error(e); }
   finally{ laden(false); }
 }
- 
+
 // Modal schließen beim Klick außerhalb
 document.getElementById('modWrap').addEventListener('click',function(e){ if(e.target===this) modClose(); });
- 
+
 /* ═══════════════════════════════════════════════════════════
    KALKULATION (Manueller Auftrag)
 ═══════════════════════════════════════════════════════════ */
@@ -813,7 +813,7 @@ function berechne(){
   document.getElementById('kRab').textContent='- '+(rab.toFixed(2).replace('.',','));
   document.getElementById('kEnd').textContent=aktKosten.toFixed(2).replace('.',',');
 }
- 
+
 /* ═══════════════════════════════════════════════════════════
    MANUELLEN AUFTRAG BUCHEN
 ═══════════════════════════════════════════════════════════ */
@@ -842,14 +842,14 @@ async function auftragBuchen(){
   }catch(e){ alert('Fehler beim Buchen!'); console.error(e); }
   finally{ document.getElementById('btnBuchen').disabled=false; laden(false); }
 }
- 
+
 /* ═══════════════════════════════════════════════════════════
    HILFSFUNKTIONEN
 ═══════════════════════════════════════════════════════════ */
 function laden(an){ document.getElementById('ladeWrap').style.display=an?'flex':'none'; }
- 
+
 function x(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
- 
+
 function badge(st){
   const m={
     'Anfrage eingegangen':'bbl','In Bearbeitung':'byw',
