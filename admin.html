@@ -383,7 +383,7 @@ tr:hover td{background:#fafcff}
         <div class="chead"><h2>📦 Aktueller Bestand</h2></div>
         <div class="twrap">
           <table>
-            <thead><tr><th>Material</th><th>Hersteller</th><th>Rest (g)</th><th>Preis €</th><th></th></tr></thead>
+            <thead><tr><th>Material</th><th>Hersteller</th><th>Rest (g)</th><th>Preis €</th><th>Status</th><th>Aktionen</th></tr></thead>
             <tbody id="tLager"><tr><td colspan="5" class="emp">Lade…</td></tr></tbody>
           </table>
         </div>
@@ -553,17 +553,46 @@ async function ladeDaten(){
 /* ─── LAGER ──────────────────────────────────────── */
 function renderLager(){
   const tb=document.getElementById('tLager');
-  if(!lager.length){ tb.innerHTML=`<tr><td colspan="5" class="emp">📭 Noch kein Filament in Supabase – bitte oben eine Spule hinzufügen.</td></tr>`; return; }
+  if(!lager.length){ tb.innerHTML=`<tr><td colspan="6" class="emp">📭 Noch kein Filament in Supabase – bitte oben eine Spule hinzufügen.</td></tr>`; return; }
   tb.innerHTML=lager.map(f=>{
-    const r=parseFloat(f.restGewicht), s=r<100?'color:var(--rd);font-weight:700':'';
-    return `<tr>
+    const r=parseFloat(f.restGewicht);
+    const gesperrt=f.gesperrt||false;
+    const rowStyle=gesperrt?'opacity:.5;background:#fff8f8;':'';
+    const restStyle=r<100&&!gesperrt?'color:var(--rd);font-weight:700':'';
+    const statusBdg=gesperrt
+      ?`<span class="bdg" style="background:#fde8ea;color:var(--rd)">🔒 Gesperrt</span>`
+      :(r<=0
+        ?`<span class="bdg" style="background:#fde8ea;color:var(--rd)">⚠ Leer</span>`
+        :(r<100
+          ?`<span class="bdg" style="background:#fff3e0;color:var(--or)">⚠ Gering</span>`
+          :`<span class="bdg" style="background:#e8f5e9;color:var(--gn)">✓ Verfügbar</span>`));
+    const sperrBtn=gesperrt
+      ?`<button class="btn b-gn bsm" onclick="filamentSperren('${f.id}',false)" title="Spule wieder freigeben">🔓 Freigeben</button>`
+      :`<button class="btn b-or bsm" onclick="filamentSperren('${f.id}',true)" title="Spule für Kunden sperren">🔒 Sperren</button>`;
+    return `<tr style="${rowStyle}">
       <td>${x(f.Material)}</td>
       <td style="font-size:.82em;color:var(--t3)">${x(f.Hertseller)}</td>
-      <td style="${s}">${r.toFixed(0)} g</td>
+      <td style="${restStyle}">${r.toFixed(0)} g</td>
       <td>${parseFloat(f.Preis||0).toFixed(2)} €</td>
-      <td><button class="btn b-rd bsm" onclick="filamentDel('${f.id}')">✕</button></td>
+      <td>${statusBdg}</td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap">
+        ${sperrBtn}
+        <button class="btn b-rd bsm" onclick="filamentDel('${f.id}')">✕</button>
+      </td>
     </tr>`;
   }).join('');
+}
+
+async function filamentSperren(id, sperren){
+  laden(true);
+  try{
+    const grund = sperren ? prompt('Grund für Sperrung (optional):', '') : null;
+    const { error } = await SB.from('FilamentLager')
+      .update({ gesperrt: sperren, sperr_grund: grund||'' })
+      .eq('id', id);
+    if(error) throw error;
+    await ladeDaten();
+  }catch(e){ alert('Fehler: '+(e.message||e)); laden(false); }
 }
 
 async function filamentAdd(){
@@ -603,7 +632,8 @@ function renderFilamentDropdown(){
   dd.innerHTML='<option value="">— Spule wählen —</option>';
   lager.forEach(f=>{
     const r=parseFloat(f.restGewicht);
-    dd.innerHTML+=`<option value="${f.id}">${x(f.Material)} | ${x(f.Hertseller)} (${r.toFixed(0)} g)</option>`;
+    const tag=f.gesperrt?' 🔒':r<=0?' ⚠ LEER':r<100?' ⚠ gering':'';
+    dd.innerHTML+=`<option value="${f.id}">${x(f.Material)} | ${x(f.Hertseller)} (${r.toFixed(0)} g)${tag}</option>`;
   });
 }
 
@@ -738,14 +768,34 @@ function modOpen(id){
   modId=id;
   document.getElementById('modTitle').textContent=`Anfrage: ${a.id}`;
 
-  // Bestehende Nachrichten parsen (JSON-Array in admin_notiz)
-  let msgs=[];
-  try{ if(a.admin_notiz) msgs=JSON.parse(a.admin_notiz); if(!Array.isArray(msgs)) msgs=[{text:a.admin_notiz,ts:''}]; }
-  catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
+  // Admin-Nachrichten laden
+  let adminMsgs=[];
+  try{ if(a.admin_notiz) adminMsgs=JSON.parse(a.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[{text:a.admin_notiz,ts:'',von:'admin'}]; }
+  catch(e){ if(a.admin_notiz) adminMsgs=[{text:a.admin_notiz,ts:'',von:'admin'}]; }
 
-  const msgsHtml=msgs.length
-    ? msgs.map(m=>`<div class="msg-item"><div class="msg-meta">📅 ${m.ts||'—'}</div><div class="msg-text">${x(m.text)}</div></div>`).join('')
-    : `<div class="msg-empty">Noch keine Nachrichten gesendet.</div>`;
+  // Kunden-Nachrichten laden
+  let kundenMsgs=[];
+  try{ if(a.kunden_nachrichten) kundenMsgs=JSON.parse(a.kunden_nachrichten); if(!Array.isArray(kundenMsgs)) kundenMsgs=[]; }
+  catch(e){ kundenMsgs=[]; }
+
+  // Alle zusammenführen & nach Zeitstempel sortieren
+  const alleNachrichten=[
+    ...adminMsgs.map(m=>({...m,von:'admin'})),
+    ...kundenMsgs.map(m=>({...m,von:'kunde'}))
+  ].sort((a,b)=>new Date(a.ts||0)-new Date(b.ts||0));
+
+  const chatHtml = alleNachrichten.length
+    ? alleNachrichten.map(m=>{
+        const istAdmin = m.von==='admin';
+        const bg    = istAdmin ? '#e3f0ff' : '#f3e5f5';
+        const col   = istAdmin ? '#0056b3' : '#6a1b9a';
+        const label = istAdmin ? '👤 Du (Admin)' : `🙋 Kunde${m.name?' – '+x(m.name):''}`;
+        return `<div style="margin-bottom:10px;padding:8px 11px;background:${bg};border-radius:8px;border-left:3px solid ${col}">
+          <div style="font-size:.71em;font-weight:700;color:${col};margin-bottom:3px">${label} · ${x(m.ts||'—')}</div>
+          <div style="font-size:.87em;color:#1e2a3a;white-space:pre-wrap">${x(m.text)}</div>
+        </div>`;
+      }).join('')
+    : `<div style="text-align:center;color:#bbb;font-size:.84em;padding:12px">Noch keine Nachrichten.</div>`;
 
   document.getElementById('modBody').innerHTML=`
     <div class="msec">📋 Auftragsdetails</div>
@@ -812,13 +862,13 @@ function modOpen(id){
       💰 Rabatt aktiv – Endpreis wird automatisch berechnet
     </div>
 
-    <div class="msec">💬 Nachricht an Kunden senden</div>
-    <div class="msg-list">${msgsHtml}</div>
-    <div class="field" style="margin-bottom:0">
-      <label>Neue Nachricht / Notiz</label>
-      <textarea id="mNeueNachricht" placeholder="z.B. Ihr Auftrag ist im Druck. Voraussichtliche Fertigstellung: Freitag. Bitte STL-Datei senden…"></textarea>
+    <div class="msec">💬 Nachrichtenverlauf</div>
+    <div id="mChatVerlauf" style="max-height:260px;overflow-y:auto;border:1.5px solid var(--br);border-radius:10px;padding:10px 13px;background:#fafcff;margin-bottom:10px">${chatHtml}</div>
+    <div class="field" style="margin-bottom:6px">
+      <label>Deine Antwort / Nachricht an Kunden</label>
+      <textarea id="mNeueNachricht" placeholder="z.B. Ihr Auftrag ist im Druck. Fertigstellung ca. Freitag…" style="min-height:70px"></textarea>
     </div>
-    <p style="font-size:.77em;color:var(--t3);margin-top:6px">💡 Diese Nachricht sieht der Kunde in seinem Portalbereich.</p>
+    <p style="font-size:.75em;color:var(--t3)">💡 Nachrichten sind für den Kunden sichtbar. Kunden-Nachrichten erscheinen in blau.</p>
   `;
   document.getElementById('modWrap').classList.add('on');
 }
@@ -863,20 +913,31 @@ async function modSave(){
     msgs.push({text:neueMsg, ts:new Date().toLocaleString('de-DE')});
   }
 
-  const grundVal  = document.getElementById('mGrund').value;
-  const rabattVal = document.getElementById('mRabatt').value;
-  const grundpreis = grundVal !== '' ? parseFloat(grundVal) : null;
-  const rabatt_pct = rabattVal !== '' ? parseFloat(rabattVal) : 0;
+  const grundVal  = document.getElementById('mGrund')?.value;
+  const rabattVal = document.getElementById('mRabatt')?.value;
+  const grundpreis = grundVal !== '' && grundVal ? parseFloat(grundVal) : null;
+  const rabatt_pct = rabattVal ? parseFloat(rabattVal) : 0;
+
+  // Admin-Nachrichten aktualisieren
+  const akt=anfragen.find(e=>e.id===modId);
+  let adminMsgs=[];
+  try{ if(akt.admin_notiz) adminMsgs=JSON.parse(akt.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[{text:akt.admin_notiz,ts:'',von:'admin'}]; }
+  catch(err2){ if(akt.admin_notiz) adminMsgs=[{text:akt.admin_notiz,ts:'',von:'admin'}]; }
+
+  const neueNachricht = document.getElementById('mNeueNachricht').value.trim();
+  if(neueNachricht){
+    adminMsgs.push({ text:neueNachricht, ts:new Date().toLocaleString('de-DE'), von:'admin' });
+  }
 
   laden(true);
   try{
     await SB.from('bestellAnfragen').update({
       status, kosten, grundpreis, rabatt_pct,
-      admin_notiz: msgs.length?JSON.stringify(msgs):null
+      admin_notiz: adminMsgs.length ? JSON.stringify(adminMsgs) : null
     }).eq('id',modId);
 
-    const i=anfragen.findIndex(e=>e.id===modId);
-    if(i>-1) anfragen[i]={...anfragen[i],status,kosten,grundpreis,rabatt_pct,admin_notiz:msgs.length?JSON.stringify(msgs):null};
+    const idx2=anfragen.findIndex(e=>e.id===modId);
+    if(idx2>-1) anfragen[idx2]={...anfragen[idx2],status,kosten,grundpreis,rabatt_pct,admin_notiz:adminMsgs.length?JSON.stringify(adminMsgs):null};
     filterAnfragen(); statsUpdate(); modClose();
   }catch(e){ alert('Fehler beim Speichern!'); console.error(e); }
   finally{ laden(false); }
