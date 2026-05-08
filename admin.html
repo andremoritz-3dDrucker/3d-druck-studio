@@ -243,6 +243,7 @@ tr:hover td{background:#fafcff}
   <button class="ntab" onclick="tab('p-lager',this)">🧵 Filamentlager</button>
   <button class="ntab" onclick="tab('p-historie',this)">📋 Auftragshistorie</button>
   <button class="ntab" onclick="tab('p-auftrag',this)">➕ Neuer Auftrag</button>
+  <button class="ntab" onclick="tab('p-kunden',this)">👥 Kundenliste</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════
@@ -524,6 +525,40 @@ tr:hover td{background:#fafcff}
     </div>
   </div>
 
+
+  <!-- ─── TAB 5: KUNDENLISTE ────────────────────────── -->
+  <div class="panel" id="p-kunden">
+    <div class="card">
+      <div class="chead">
+        <h2>👥 Kundenliste</h2>
+        <button class="btn b-bl bsm" onclick="ladeKunden()">↻ Aktualisieren</button>
+      </div>
+      <div class="fbar" style="margin-bottom:16px">
+        <input type="text" id="kundenSuche" placeholder="🔍 Name, E-Mail, Ort suchen…" oninput="filterKunden()">
+      </div>
+      <div id="kundenStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>E-Mail</th>
+              <th>Telefon</th>
+              <th>Adresse</th>
+              <th>Dabei seit</th>
+              <th>Aufträge</th>
+              <th>Kontakt</th>
+            </tr>
+          </thead>
+          <tbody id="tKunden"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
+        </table>
+      </div>
+      <p style="font-size:.75em;color:var(--t3);margin-top:12px">
+        * Nur registrierte Kunden – Gast-Bestellungen erscheinen in den Bestellanfragen mit E-Mail.
+      </p>
+    </div>
+  </div>
+
 </div><!-- /#wrap -->
 
 
@@ -560,7 +595,7 @@ const SB = supabase.createClient(
 ═══════════════════════════════════════════════════════════ */
 function startAdmin(){
   ['topbar','nav','wrap'].forEach(id=>document.getElementById(id).style.display=id==='topbar'?'flex':id==='nav'?'flex':'block');
-  ladeDaten(); ladeAnfragen(); ladePostfach();
+  ladeDaten(); ladeAnfragen(); ladePostfach(); ladeKunden();
 }
 window.addEventListener('DOMContentLoaded',()=>{
   if(sessionStorage.getItem('adm')==='1'){
@@ -1314,6 +1349,109 @@ async function auftragBuchen(){
     await ladeDaten();
   }catch(e){ alert('Fehler beim Buchen!'); console.error(e); }
   finally{ document.getElementById('btnBuchen').disabled=false; laden(false); }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   KUNDENLISTE
+═══════════════════════════════════════════════════════════ */
+let kundenDaten = [];
+
+async function ladeKunden(){
+  try{
+    // Kunden laden
+    const { data: kd } = await SB.from('kunden')
+      .select('id,name,email,telefon,adresse,plz,ort,erstellt')
+      .order('erstellt_am', { ascending: false });
+
+    // Bestellzahlen pro Kunde laden
+    const { data: bd } = await SB.from('bestellAnfragen')
+      .select('kunden_id')
+      .not('kunden_id', 'is', null);
+
+    const bestellZahl = {};
+    (bd||[]).forEach(b => {
+      bestellZahl[b.kunden_id] = (bestellZahl[b.kunden_id]||0) + 1;
+    });
+
+    kundenDaten = (kd||[]).map(k => ({...k, anzahlBestellungen: bestellZahl[k.id]||0}));
+
+    // Stats
+    const statsEl = document.getElementById('kundenStats');
+    if(statsEl){
+      statsEl.innerHTML = `
+        <div class="scard" style="padding:12px 16px;min-width:120px">
+          <div class="slabel">Registriert</div>
+          <div class="sval">${kundenDaten.length}</div>
+        </div>
+        <div class="scard gn" style="padding:12px 16px;min-width:120px">
+          <div class="slabel">Mit Adresse</div>
+          <div class="sval">${kundenDaten.filter(k=>k.adresse).length}</div>
+        </div>
+        <div class="scard or" style="padding:12px 16px;min-width:120px">
+          <div class="slabel">Mit Aufträgen</div>
+          <div class="sval">${kundenDaten.filter(k=>k.anzahlBestellungen>0).length}</div>
+        </div>`;
+    }
+
+    filterKunden();
+  } catch(e){ console.error('Kunden laden:', e); }
+}
+
+function filterKunden(){
+  const su = (document.getElementById('kundenSuche')?.value||'').toLowerCase();
+  const liste = kundenDaten.filter(k => {
+    return !su || [k.name,k.email,k.ort||'',k.plz||''].some(s=>(s||'').toLowerCase().includes(su));
+  });
+
+  const tb = document.getElementById('tKunden');
+  if(!tb) return;
+
+  if(!liste.length){
+    tb.innerHTML = `<tr><td colspan="7" class="emp">Keine Kunden gefunden.</td></tr>`;
+    return;
+  }
+
+  tb.innerHTML = liste.map(k => {
+    const adresse = k.adresse
+      ? `${x(k.adresse)}<br><span style="font-size:.82em;color:var(--t3)">${x(k.plz)} ${x(k.ort)}</span>`
+      : `<span style="color:#ccc;font-size:.82em">Keine Adresse</span>`;
+
+    const bestellBadge = k.anzahlBestellungen > 0
+      ? `<span class="bdg bgn">${k.anzahlBestellungen} Auftrag${k.anzahlBestellungen>1?'e':''}</span>`
+      : `<span class="bdg bgr">Noch keine</span>`;
+
+    return `<tr>
+      <td>
+        <div style="font-weight:600;font-size:.93em">${x(k.name)}</div>
+      </td>
+      <td>
+        <a href="mailto:${x(k.email)}" style="color:var(--bl);font-size:.88em">${x(k.email)}</a>
+      </td>
+      <td style="font-size:.88em">
+        ${k.telefon
+          ? `<a href="tel:${x(k.telefon)}" style="color:var(--t2)">${x(k.telefon)}</a>`
+          : `<span style="color:#ccc">—</span>`}
+      </td>
+      <td style="font-size:.85em">${adresse}</td>
+      <td style="font-size:.82em;color:var(--t3);white-space:nowrap">${x(k.erstellt||'—')}</td>
+      <td>${bestellBadge}</td>
+      <td>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <a href="mailto:${x(k.email)}"
+            style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e3f0ff;color:var(--bl);border-radius:7px;font-size:.78em;font-weight:600;text-decoration:none"
+            title="E-Mail an ${x(k.name)}">
+            ✉ E-Mail
+          </a>
+          ${k.telefon ? `<a href="tel:${x(k.telefon)}"
+            style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e8f5e9;color:var(--gn2);border-radius:7px;font-size:.78em;font-weight:600;text-decoration:none"
+            title="Anrufen">
+            📞 Anrufen
+          </a>` : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 /* ═══════════════════════════════════════════════════════════
