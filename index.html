@@ -8,13 +8,11 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bl:#0056b3;--bl2:#004494;--gn:#28a745;--gn2:#1e7e34;
-  --rd:#dc3545;--or:#e65100;--bg:#f0f4f8;--wh:#fff;
-  --br:#dde4ee;--t1:#1e2a3a;--t2:#4a5568;--t3:#718096;
+--bl:#0056b3;--bl2:#004494;--gn:#28a745;--gn2:#1e7e34;
+--rd:#dc3545;--or:#e65100;--bg:#f0f4f8;--wh:#fff;
+--br:#dde4ee;--t1:#1e2a3a;--t2:#4a5568;--t3:#718096;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px}
-
-/* ── HEADER ── */
 header{background:linear-gradient(135deg,#0d1b2e,#0056b3);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
 .hi{max-width:920px;margin:0 auto;padding:0 16px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .hlogo{display:flex;align-items:center;gap:10px;flex-shrink:0}
@@ -25,18 +23,13 @@ header{background:linear-gradient(135deg,#0d1b2e,#0056b3);color:#fff;position:st
 .nbtn:hover{background:rgba(255,255,255,.22)}
 .nbtn.acc{background:rgba(255,255,255,.22);font-weight:600}
 .nuser{font-size:.8em;opacity:.75;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* ── MAIN ── */
+.nbadge{display:inline-flex;align-items:center;justify-content:center;background:var(--rd);color:#fff;width:17px;height:17px;border-radius:50%;font-size:.68em;font-weight:700;margin-left:4px;vertical-align:middle}
 main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .view{display:none}.view.on{display:block}
-
-/* ── CARDS ── */
 .card{background:var(--wh);border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.08);padding:26px;margin-bottom:20px}
 .card-sm{max-width:480px;margin-left:auto;margin-right:auto}
 .card h2{font-size:1.2em;font-weight:700;margin-bottom:4px}
 .card-sub{font-size:.84em;color:var(--t3);margin-bottom:22px}
-
-/* ── FORMS ── */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .fc{grid-column:1/-1}
 .field{display:flex;flex-direction:column;gap:5px}
@@ -46,8 +39,6 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .field input[disabled]{background:#f5f5f5;color:#999;cursor:not-allowed}
 .field textarea{resize:vertical;min-height:80px}
 .sep{font-size:.73em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.07em;margin:20px 0 10px;padding-bottom:6px;border-bottom:1.5px solid #dbeeff}
-
-/* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;width:100%}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .b-bl{background:linear-gradient(135deg,var(--bl),#0073e6);color:#fff;box-shadow:0 2px 8px rgba(0,86,179,.22)}
@@ -58,15 +49,11 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .b-out:hover:not(:disabled){background:var(--bg);border-color:#aab}
 .b-sm{padding:6px 13px;font-size:12px;width:auto}
 .brow{display:flex;gap:10px;margin-top:18px}.brow .btn{flex:1}
-
-/* ── ALERTS ── */
 .alert{padding:11px 15px;border-radius:9px;font-size:.84em;margin-bottom:16px;display:none;line-height:1.5}
 .alert.on{display:block}
 .a-err{background:#fde8ea;border:1px solid #f5c6cb;color:#922}
 .a-ok{background:#e8f5e9;border:1px solid #c3e6cb;color:#155724}
 .a-info{background:#e3f0ff;border:1px solid #b8d4f0;color:var(--bl)}
-
-/* ── BADGES ── */
 .bdg{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75em;font-weight:700;white-space:nowrap}
 .b-neu{background:#e3f0ff;color:var(--bl)}
 .b-arb{background:#fff8e1;color:#c07a00}
@@ -74,8 +61,6 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .b-ok{background:#e8f5e9;color:#1a6b30}
 .b-rd{background:#fde8ea;color:var(--rd)}
 .b-gr{background:#f0f0f0;color:#666}
-
-/* ── HERO ── */
 .hero{text-align:center;padding:32px 16px 24px}
 .hero-icon{width:78px;height:78px;background:linear-gradient(135deg,var(--bl),var(--gn));border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 20px;box-shadow:0 8px 24px rgba(0,86,179,.22)}
 .hero h1{font-size:1.65em;margin-bottom:10px}
@@ -87,16 +72,12 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .oc-icon{font-size:32px;margin-bottom:10px}
 .oc-title{font-size:.96em;font-weight:700;margin-bottom:5px}
 .oc-desc{font-size:.77em;color:var(--t3);line-height:1.55}
-
-/* ── PROFIL BOX ── */
 .pbox{display:flex;align-items:center;gap:15px;background:linear-gradient(135deg,#eef5ff,#eef8f0);border:1px solid #d4e7fb;border-radius:14px;padding:15px 18px;margin-bottom:18px}
 .pavatar{width:48px;height:48px;background:linear-gradient(135deg,var(--bl),var(--gn));border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.05em;color:#fff;font-weight:700;flex-shrink:0}
 .pinfo{flex:1;min-width:0}
 .pinfo h3{font-size:.97em;margin-bottom:2px}
 .pinfo span{font-size:.81em;color:var(--t3);display:block}
 .pactions{display:flex;gap:7px;flex-shrink:0}
-
-/* ── AUFTRAGSKARTEN ── */
 .order-card{border:1.5px solid var(--br);border-radius:13px;padding:16px 18px;margin-bottom:13px;background:var(--wh);transition:box-shadow .2s}
 .order-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
 .order-card.storniert{opacity:.55;background:#fafafa}
@@ -109,25 +90,17 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .oc-val{font-size:.87em;color:var(--t1);line-height:1.4}
 .oc-full{grid-column:1/-1}
 .oc-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f4f8}
-
-/* ── NACHRICHTEN ── */
 .msg-box{background:#eef5ff;border:1px solid #c3d9f8;border-left:3px solid var(--bl);border-radius:9px;padding:10px 14px;margin-top:6px}
 .msg-box-lbl{font-size:.71em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 .msg-entry{padding:4px 0;border-bottom:1px dashed #c3d9f8;font-size:.85em;color:var(--t1);line-height:1.55}
 .msg-entry:last-child{border-bottom:none;padding-bottom:0}
 .msg-ts{font-size:.75em;color:var(--t3);margin-bottom:1px}
-
-/* ── STORNO BTN ── */
 .btn-storno{display:inline-block;padding:5px 12px;background:transparent;border:1.5px solid #f5c6cb;color:var(--rd);border-radius:7px;font-size:.77em;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;width:auto}
 .btn-storno:hover{background:#fde8ea;border-color:var(--rd)}
 .btn-storno:disabled{opacity:.35;cursor:not-allowed;border-color:#ddd;color:#bbb}
-
-/* ── PREIS-VORSCHAU ── */
 .preview-box{background:#f0f7ff;border:1px solid #c3d9f8;border-left:3px solid var(--bl);border-radius:9px;padding:12px 15px;margin-top:4px;font-size:.87em;line-height:1.85}
 .preview-lbl{font-size:.71em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
 .preview-warn{font-size:.76em;color:var(--t3);margin-top:4px}
-
-/* ── DATEI UPLOAD ── */
 .upload-area{border:2px dashed var(--br);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:#fafcff}
 .upload-area:hover,.upload-area.drag{border-color:var(--bl);background:#eef5ff}
 .upload-area input[type=file]{display:none}
@@ -136,17 +109,12 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .upload-preview{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
 .upload-chip{display:flex;align-items:center;gap:6px;background:#e3f0ff;border-radius:6px;padding:4px 10px;font-size:.79em;color:var(--bl);font-weight:500}
 .upload-chip button{background:none;border:none;cursor:pointer;color:var(--rd);font-size:13px;padding:0;width:auto;line-height:1}
-
-/* ── BESTÄTIGUNG ── */
 .confirm-wrap{text-align:center;padding:30px 16px}
 .confirm-icon{width:74px;height:74px;background:#e8f5e9;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 18px;box-shadow:0 4px 14px rgba(40,167,69,.15)}
 .confirm-id{background:#f8fafc;border:1.5px dashed #c0c8d4;border-radius:10px;padding:11px 20px;font-family:'Courier New',monospace;font-size:1.1em;letter-spacing:.06em;display:inline-block;margin:10px 0 20px;color:var(--t1)}
-
-/* ── EMPTY ── */
 .empty{text-align:center;padding:40px 16px;color:var(--t3)}
 .empty-icon{font-size:42px;margin-bottom:12px}
 .empty p{font-size:.88em;margin-bottom:16px}
-
 /* ── CHAT ── */
 .chat-wrap{border:1.5px solid var(--br);border-radius:12px;overflow:hidden;margin-top:8px}
 .chat-verlauf{max-height:300px;overflow-y:auto;padding:12px;background:#fafcff;display:flex;flex-direction:column;gap:9px}
@@ -163,306 +131,317 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .chat-send:hover{background:var(--bl2)}
 .chat-send:disabled{opacity:.5;cursor:not-allowed}
 .chat-leer{text-align:center;color:#bbb;font-size:.83em;padding:16px;font-style:italic}
-
+/* ── MAILBOX ── */
+.mailbox-card{border:1.5px solid var(--br);border-radius:13px;padding:16px 18px;margin-bottom:13px;background:var(--wh);cursor:pointer;transition:box-shadow .2s,border-color .2s}
+.mailbox-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);border-color:var(--bl)}
+.mailbox-card.ungelesen{border-left:4px solid var(--bl);background:#f8fbff}
+.mailbox-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.mailbox-projekt{font-size:.97em;font-weight:700;color:var(--t1)}
+.mailbox-datum{font-size:.77em;color:var(--t3)}
+.mailbox-preview{font-size:.84em;color:var(--t3);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mailbox-ungelesen-dot{width:9px;height:9px;background:var(--bl);border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle;flex-shrink:0}
 /* ── LADE ── */
 #ladeWrap{position:fixed;inset:0;background:rgba(255,255,255,.84);display:none;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(2px)}
 .lspin{width:26px;height:26px;border:3px solid #d8e2ef;border-top-color:var(--bl);border-radius:50%;animation:spin .65s linear infinite;margin-right:10px}
 .ltxt{font-size:14px;font-weight:600;color:var(--bl)}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 @media(max-width:540px){
-  .fg,.optgrid,.oc-meta{grid-template-columns:1fr}
-  .fc,.optcard.fw,.oc-full{grid-column:1}
-  .pbox{flex-wrap:wrap}.pactions{width:100%}
-  .pactions .btn{flex:1}
+.fg,.optgrid,.oc-meta{grid-template-columns:1fr}
+.fc,.optcard.fw,.oc-full{grid-column:1}
+.pbox{flex-wrap:wrap}.pactions{width:100%}
+.pactions .btn{flex:1}
 }
 </style>
 </head>
 <body>
-
 <header>
-  <div class="hi">
-    <div class="hlogo">
-      <div class="hlogo-icon">🖨️</div>
-      <div><div class="hname">3D-Druck Studio</div><div class="hsub">Kundenportal</div></div>
-    </div>
-    <nav class="hnav" id="hnav"></nav>
-  </div>
+<div class="hi">
+<div class="hlogo">
+<div class="hlogo-icon">🖨️</div>
+<div><div class="hname">3D-Druck Studio</div><div class="hsub">Kundenportal</div></div>
+</div>
+<nav class="hnav" id="hnav"></nav>
+</div>
 </header>
-
 <div id="ladeWrap"><div class="lspin"></div><span class="ltxt">Bitte warten…</span></div>
-
 <main>
-
 <!-- ══ START ══════════════════════════════════════════ -->
 <div class="view on" id="view-start">
-  <div class="hero">
-    <div class="hero-icon">🖨️</div>
-    <h1>Willkommen im Kundenportal</h1>
-    <p>Gib deinen Druckauftrag auf, verfolge den Status und verwalte dein Kundenkonto.</p>
-    <div class="optgrid">
-      <div class="optcard" onclick="zeige('view-login')">
-        <div class="oc-icon">🔑</div>
-        <div class="oc-title">Anmelden</div>
-        <div class="oc-desc">Mit deinem Kundenkonto einloggen und alle Aufträge verwalten.</div>
-      </div>
-      <div class="optcard" onclick="zeige('view-register')">
-        <div class="oc-icon">👤</div>
-        <div class="oc-title">Registrieren</div>
-        <div class="oc-desc">Kostenloses Konto mit gespeicherter Adresse & Auftragshistorie.</div>
-      </div>
-      <div class="optcard fw" onclick="zeige('view-gast')">
-        <div class="oc-icon">📦</div>
-        <div class="oc-title">Als Gast bestellen</div>
-        <div class="oc-desc">Schnell & ohne Registrierung – einfach Auftrag aufgeben, kein Konto nötig.</div>
-      </div>
-    </div>
-  </div>
+<div class="hero">
+<div class="hero-icon">🖨️</div>
+<h1>Willkommen im Kundenportal</h1>
+<p>Gib deinen Druckauftrag auf, verfolge den Status und verwalte dein Kundenkonto.</p>
+<div class="optgrid">
+<div class="optcard" onclick="zeige('view-login')">
+<div class="oc-icon">🔑</div>
+<div class="oc-title">Anmelden</div>
+<div class="oc-desc">Mit deinem Kundenkonto einloggen und alle Aufträge verwalten.</div>
 </div>
-
+<div class="optcard" onclick="zeige('view-register')">
+<div class="oc-icon">👤</div>
+<div class="oc-title">Registrieren</div>
+<div class="oc-desc">Kostenloses Konto mit gespeicherter Adresse & Auftragshistorie.</div>
+</div>
+<div class="optcard fw" onclick="zeige('view-gast')">
+<div class="oc-icon">📦</div>
+<div class="oc-title">Als Gast bestellen</div>
+<div class="oc-desc">Schnell & ohne Registrierung – einfach Auftrag aufgeben, kein Konto nötig.</div>
+</div>
+</div>
+</div>
+</div>
 <!-- ══ LOGIN ═══════════════════════════════════════════ -->
 <div class="view" id="view-login">
-  <div class="card card-sm">
-    <h2>Anmelden</h2>
-    <p class="card-sub">Mit deinem Kundenkonto einloggen</p>
-    <div class="alert a-err" id="loginErr"></div>
-    <div class="fg" style="grid-template-columns:1fr">
-      <div class="field"><label>E-Mail-Adresse</label><input type="email" id="loginEmail" placeholder="deine@email.de" autocomplete="email"></div>
-      <div class="field"><label>Passwort</label><input type="password" id="loginPW" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')anmelden()"></div>
-    </div>
-    <div class="brow">
-      <button class="btn b-out" onclick="zeige('view-start')">← Zurück</button>
-      <button class="btn b-bl" id="btnLogin" onclick="anmelden()">Anmelden</button>
-    </div>
-    <p style="text-align:center;margin-top:14px;font-size:.81em;color:var(--t3)">Noch kein Konto? <a href="#" onclick="zeige('view-register');return false">Registrieren</a></p>
-  </div>
+<div class="card card-sm">
+<h2>Anmelden</h2>
+<p class="card-sub">Mit deinem Kundenkonto einloggen</p>
+<div class="alert a-err" id="loginErr"></div>
+<div class="fg" style="grid-template-columns:1fr">
+<div class="field"><label>E-Mail-Adresse</label><input type="email" id="loginEmail" placeholder="deine@email.de" autocomplete="email"></div>
+<div class="field"><label>Passwort</label><input type="password" id="loginPW" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')anmelden()"></div>
 </div>
-
+<div class="brow">
+<button class="btn b-out" onclick="zeige('view-start')">← Zurück</button>
+<button class="btn b-bl" id="btnLogin" onclick="anmelden()">Anmelden</button>
+</div>
+<p style="text-align:center;margin-top:14px;font-size:.81em;color:var(--t3)">Noch kein Konto? <a href="#" onclick="zeige('view-register');return false">Registrieren</a></p>
+</div>
+</div>
 <!-- ══ REGISTRIEREN ════════════════════════════════════ -->
 <div class="view" id="view-register">
-  <div class="card">
-    <h2>Konto erstellen</h2>
-    <p class="card-sub">Einmalig registrieren – Aufträge schnell aufgeben & verfolgen</p>
-    <div class="alert a-err" id="regErr"></div>
-    <div class="sep">👤 Persönliche Daten</div>
-    <div class="fg">
-      <div class="field fc"><label>Vollständiger Name *</label><input type="text" id="regName" placeholder="Max Mustermann" autocomplete="name"></div>
-      <div class="field"><label>E-Mail-Adresse *</label><input type="email" id="regEmail" placeholder="deine@email.de" autocomplete="email"></div>
-      <div class="field"><label>Telefon (optional)</label><input type="tel" id="regTel" placeholder="+49 170 1234567" autocomplete="tel"></div>
-      <div class="field"><label>Passwort * (min. 8 Zeichen)</label><input type="password" id="regPW" placeholder="••••••••" autocomplete="new-password"></div>
-      <div class="field"><label>Passwort wiederholen *</label><input type="password" id="regPW2" placeholder="••••••••" autocomplete="new-password"></div>
-    </div>
-    <div class="sep">📍 Lieferadresse (optional)</div>
-    <div class="fg">
-      <div class="field fc"><label>Straße &amp; Hausnummer</label><input type="text" id="regAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
-      <div class="field"><label>PLZ</label><input type="text" id="regPlz" placeholder="12345" autocomplete="postal-code"></div>
-      <div class="field"><label>Ort / Stadt</label><input type="text" id="regOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
-    </div>
-    <div class="brow">
-      <button class="btn b-out" onclick="zeige('view-start')">← Zurück</button>
-      <button class="btn b-bl" id="btnReg" onclick="registrieren()">Konto erstellen</button>
-    </div>
-    <p style="text-align:center;margin-top:14px;font-size:.81em;color:var(--t3)">Bereits registriert? <a href="#" onclick="zeige('view-login');return false">Anmelden</a></p>
-  </div>
+<div class="card">
+<h2>Konto erstellen</h2>
+<p class="card-sub">Einmalig registrieren – Aufträge schnell aufgeben & verfolgen</p>
+<div class="alert a-err" id="regErr"></div>
+<div class="sep">👤 Persönliche Daten</div>
+<div class="fg">
+<div class="field fc"><label>Vollständiger Name *</label><input type="text" id="regName" placeholder="Max Mustermann" autocomplete="name"></div>
+<div class="field"><label>E-Mail-Adresse *</label><input type="email" id="regEmail" placeholder="deine@email.de" autocomplete="email"></div>
+<div class="field"><label>Telefon (optional)</label><input type="tel" id="regTel" placeholder="+49 170 1234567" autocomplete="tel"></div>
+<div class="field"><label>Passwort * (min. 8 Zeichen)</label><input type="password" id="regPW" placeholder="••••••••" autocomplete="new-password"></div>
+<div class="field"><label>Passwort wiederholen *</label><input type="password" id="regPW2" placeholder="••••••••" autocomplete="new-password"></div>
 </div>
-
+<div class="sep">📍 Lieferadresse (optional)</div>
+<div class="fg">
+<div class="field fc"><label>Straße &amp; Hausnummer</label><input type="text" id="regAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
+<div class="field"><label>PLZ</label><input type="text" id="regPlz" placeholder="12345" autocomplete="postal-code"></div>
+<div class="field"><label>Ort / Stadt</label><input type="text" id="regOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
+</div>
+<div class="brow">
+<button class="btn b-out" onclick="zeige('view-start')">← Zurück</button>
+<button class="btn b-bl" id="btnReg" onclick="registrieren()">Konto erstellen</button>
+</div>
+<p style="text-align:center;margin-top:14px;font-size:.81em;color:var(--t3)">Bereits registriert? <a href="#" onclick="zeige('view-login');return false">Anmelden</a></p>
+</div>
+</div>
 <!-- ══ DASHBOARD ═══════════════════════════════════════ -->
 <div class="view" id="view-dashboard">
-  <div id="profilBox"></div>
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-      <div><h2 style="margin-bottom:3px">Meine Aufträge</h2><p style="font-size:.82em;color:var(--t3)">Alle deine Bestellungen auf einen Blick</p></div>
-      <button class="btn b-gn b-sm" onclick="zeige('view-bestellung')">+ Neuer Auftrag</button>
-    </div>
-    <div id="auftragsListe"></div>
-  </div>
+<div id="profilBox"></div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+<div><h2 style="margin-bottom:3px">Meine Aufträge</h2><p style="font-size:.82em;color:var(--t3)">Alle deine Bestellungen auf einen Blick</p></div>
+<button class="btn b-gn b-sm" onclick="zeige('view-bestellung')">+ Neuer Auftrag</button>
 </div>
-
+<div id="auftragsListe"></div>
+</div>
+</div>
+<!-- ══ MAILBOX ══════════════════════════════════════════ -->
+<div class="view" id="view-mailbox">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+<div>
+<h2 style="margin-bottom:3px">💬 Meine Nachrichten</h2>
+<p style="font-size:.82em;color:var(--t3)">Kommunikation mit dem Studio zu deinen Aufträgen</p>
+</div>
+<button class="btn b-out b-sm" onclick="zeige('view-dashboard')">← Zurück</button>
+</div>
+<div id="mailboxListe"></div>
+</div>
+</div>
 <!-- ══ NEUER AUFTRAG (eingeloggt) ══════════════════════ -->
 <div class="view" id="view-bestellung">
-  <div class="card">
-    <h2>Neuer Druckauftrag</h2>
-    <p class="card-sub">Deine gespeicherte Adresse ist bereits vorausgefüllt</p>
-    <div class="alert a-err" id="bestellErr"></div>
-
-    <div class="sep">🖨️ Auftrag</div>
-    <div class="fg">
-      <div class="field fc"><label>Projektname / Bezeichnung *</label><input type="text" id="bProjekt" placeholder="z.B. Halterung für Monitor"></div>
-      <div class="field">
-        <label>Material &amp; Farbe wählen</label>
-        <select id="bMaterial" onchange="previewCalc('b')"><option value="">Lade verfügbare Materialien…</option></select>
-      </div>
-      <div class="field">
-        <label>Ca. Gramm (geschätzter Verbrauch)</label>
-        <input type="number" id="bGramm" min="1" step="1" placeholder="z.B. 120 g" oninput="previewCalc('b')">
-      </div>
-      <div class="field fc" id="bPreviewWrap" style="display:none">
-        <div class="preview-box">
-          <div class="preview-lbl">💡 Geschätzte Kosten (unverbindlich)</div>
-          <span id="bPreviewText"></span>
-          <div class="preview-warn">⚠ Der endgültige Preis wird vom Studio bestätigt.</div>
-        </div>
-      </div>
-      <div class="field fc"><label>Beschreibung &amp; Anforderungen</label><textarea id="bBeschr" placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz. Besonderheiten: …"></textarea></div>
-
-      <div class="field fc">
-        <label>Bild / Datei anhängen (optional)</label>
-        <div class="upload-area" id="bUploadArea" onclick="document.getElementById('bDatei').click()" ondragover="dragOver(event,'bUploadArea')" ondragleave="dragLeave('bUploadArea')" ondrop="dropFile(event,'bDatei','bUploadArea')">
-          <input type="file" id="bDatei" accept="image/*,.pdf,.stl,.obj,.step,.stp" multiple onchange="showFiles('bDatei')">
-          <div class="upload-icon">📎</div>
-          <div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong><br>Bilder, PDF, STL, OBJ, STEP – max. 10 MB pro Datei</div>
-        </div>
-        <div class="upload-preview" id="bDateiPreview"></div>
-      </div>
-    </div>
-
-    <div class="sep">📍 Lieferadresse</div>
-    <div class="fg">
-      <div class="field fc"><label>Straße &amp; Hausnummer *</label><input type="text" id="bAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
-      <div class="field"><label>PLZ *</label><input type="text" id="bPlz" placeholder="12345" autocomplete="postal-code"></div>
-      <div class="field"><label>Ort / Stadt *</label><input type="text" id="bOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
-      <div class="field fc"><label>Lieferhinweis (optional)</label><input type="text" id="bHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung bevorzugt, …"></div>
-    </div>
-    <div class="brow">
-      <button class="btn b-out" onclick="zeige('view-dashboard')">← Zurück</button>
-      <button class="btn b-bl" id="btnBestell" onclick="bestellungSenden()">Auftrag absenden ✓</button>
-    </div>
-  </div>
+<div class="card">
+<h2>Neuer Druckauftrag</h2>
+<p class="card-sub">Deine gespeicherte Adresse ist bereits vorausgefüllt</p>
+<div class="alert a-err" id="bestellErr"></div>
+<div class="sep">🖨️ Auftrag</div>
+<div class="fg">
+<div class="field fc"><label>Projektname / Bezeichnung *</label><input type="text" id="bProjekt" placeholder="z.B. Halterung für Monitor"></div>
+<div class="field">
+<label>Material &amp; Farbe wählen</label>
+<select id="bMaterial" onchange="previewCalc('b')"><option value="">Lade verfügbare Materialien…</option></select>
 </div>
-
+<div class="field">
+<label>Ca. Gramm (geschätzter Verbrauch)</label>
+<input type="number" id="bGramm" min="1" step="1" placeholder="z.B. 120 g" oninput="previewCalc('b')">
+</div>
+<div class="field fc" id="bPreviewWrap" style="display:none">
+<div class="preview-box">
+<div class="preview-lbl">💡 Geschätzte Kosten (unverbindlich)</div>
+<span id="bPreviewText"></span>
+<div class="preview-warn">⚠ Der endgültige Preis wird vom Studio bestätigt.</div>
+</div>
+</div>
+<div class="field fc"><label>Beschreibung &amp; Anforderungen</label><textarea id="bBeschr" placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz. Besonderheiten: …"></textarea></div>
+<div class="field fc">
+<label>Bild / Datei anhängen (optional)</label>
+<div class="upload-area" id="bUploadArea" onclick="document.getElementById('bDatei').click()" ondragover="dragOver(event,'bUploadArea')" ondragleave="dragLeave('bUploadArea')" ondrop="dropFile(event,'bDatei','bUploadArea')">
+<input type="file" id="bDatei" accept="image/*,.pdf,.stl,.obj,.step,.stp" multiple onchange="showFiles('bDatei')">
+<div class="upload-icon">📎</div>
+<div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong><br>Bilder, PDF, STL, OBJ, STEP – max. 10 MB pro Datei</div>
+</div>
+<div class="upload-preview" id="bDateiPreview"></div>
+</div>
+</div>
+<div class="sep">📍 Lieferadresse</div>
+<div class="fg">
+<div class="field fc"><label>Straße &amp; Hausnummer *</label><input type="text" id="bAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
+<div class="field"><label>PLZ *</label><input type="text" id="bPlz" placeholder="12345" autocomplete="postal-code"></div>
+<div class="field"><label>Ort / Stadt *</label><input type="text" id="bOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
+<div class="field fc"><label>Lieferhinweis (optional)</label><input type="text" id="bHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung bevorzugt, …"></div>
+</div>
+<div class="brow">
+<button class="btn b-out" onclick="zeige('view-dashboard')">← Zurück</button>
+<button class="btn b-bl" id="btnBestell" onclick="bestellungSenden()">Auftrag absenden ✓</button>
+</div>
+</div>
+</div>
 <!-- ══ GAST BESTELLUNG ══════════════════════════════════ -->
 <div class="view" id="view-gast">
-  <div class="card">
-    <h2>Als Gast bestellen</h2>
-    <p class="card-sub">Kein Konto nötig – einfach ausfüllen und absenden</p>
-    <div class="alert a-err" id="gastErr"></div>
-
-    <div class="sep">👤 Deine Kontaktdaten</div>
-    <div class="fg">
-      <div class="field"><label>Vollständiger Name *</label><input type="text" id="gName" placeholder="Max Mustermann" autocomplete="name"></div>
-      <div class="field"><label>E-Mail-Adresse *</label><input type="email" id="gEmail" placeholder="deine@email.de" autocomplete="email"></div>
-      <div class="field fc"><label>Telefon (optional)</label><input type="tel" id="gTel" placeholder="+49 170 1234567" autocomplete="tel"></div>
-    </div>
-
-    <div class="sep">🖨️ Auftrag</div>
-    <div class="fg">
-      <div class="field fc"><label>Projektname *</label><input type="text" id="gProjekt" placeholder="z.B. Halterung für Monitor"></div>
-      <div class="field">
-        <label>Material &amp; Farbe wählen</label>
-        <select id="gMaterial" onchange="previewCalc('g')"><option value="">Lade verfügbare Materialien…</option></select>
-      </div>
-      <div class="field">
-        <label>Ca. Gramm (geschätzter Verbrauch)</label>
-        <input type="number" id="gGramm" min="1" step="1" placeholder="z.B. 120 g" oninput="previewCalc('g')">
-      </div>
-      <div class="field fc" id="gPreviewWrap" style="display:none">
-        <div class="preview-box">
-          <div class="preview-lbl">💡 Geschätzte Kosten (unverbindlich)</div>
-          <span id="gPreviewText"></span>
-          <div class="preview-warn">⚠ Der endgültige Preis wird vom Studio bestätigt.</div>
-        </div>
-      </div>
-      <div class="field fc"><label>Beschreibung &amp; Anforderungen</label><textarea id="gBeschr" placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz."></textarea></div>
-
-      <div class="field fc">
-        <label>Bild / Datei anhängen (optional)</label>
-        <div class="upload-area" id="gUploadArea" onclick="document.getElementById('gDatei').click()" ondragover="dragOver(event,'gUploadArea')" ondragleave="dragLeave('gUploadArea')" ondrop="dropFile(event,'gDatei','gUploadArea')">
-          <input type="file" id="gDatei" accept="image/*,.pdf,.stl,.obj,.step,.stp" multiple onchange="showFiles('gDatei')">
-          <div class="upload-icon">📎</div>
-          <div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong><br>Bilder, PDF, STL, OBJ, STEP – max. 10 MB pro Datei</div>
-        </div>
-        <div class="upload-preview" id="gDateiPreview"></div>
-      </div>
-    </div>
-
-    <div class="sep">📍 Lieferadresse</div>
-    <div class="fg">
-      <div class="field fc"><label>Straße &amp; Hausnummer *</label><input type="text" id="gAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
-      <div class="field"><label>PLZ *</label><input type="text" id="gPlz" placeholder="12345" autocomplete="postal-code"></div>
-      <div class="field"><label>Ort / Stadt *</label><input type="text" id="gOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
-      <div class="field fc"><label>Lieferhinweis (optional)</label><input type="text" id="gHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung, …"></div>
-    </div>
-    <div class="brow">
-      <button class="btn b-out" onclick="zeige('view-start')">← Zurück</button>
-      <button class="btn b-bl" id="btnGast" onclick="gastSenden()">Auftrag absenden ✓</button>
-    </div>
-    <p style="text-align:center;margin-top:14px;font-size:.81em;color:var(--t3)">Bestellungen später verfolgen? <a href="#" onclick="zeige('view-register');return false">Konto erstellen</a></p>
-  </div>
+<div class="card">
+<h2>Als Gast bestellen</h2>
+<p class="card-sub">Kein Konto nötig – einfach ausfüllen und absenden</p>
+<div class="alert a-err" id="gastErr"></div>
+<div class="sep">👤 Deine Kontaktdaten</div>
+<div class="fg">
+<div class="field"><label>Vollständiger Name *</label><input type="text" id="gName" placeholder="Max Mustermann" autocomplete="name"></div>
+<div class="field"><label>E-Mail-Adresse *</label><input type="email" id="gEmail" placeholder="deine@email.de" autocomplete="email"></div>
+<div class="field fc"><label>Telefon (optional)</label><input type="tel" id="gTel" placeholder="+49 170 1234567" autocomplete="tel"></div>
 </div>
-
+<div class="sep">🖨️ Auftrag</div>
+<div class="fg">
+<div class="field fc"><label>Projektname *</label><input type="text" id="gProjekt" placeholder="z.B. Halterung für Monitor"></div>
+<div class="field">
+<label>Material &amp; Farbe wählen</label>
+<select id="gMaterial" onchange="previewCalc('g')"><option value="">Lade verfügbare Materialien…</option></select>
+</div>
+<div class="field">
+<label>Ca. Gramm (geschätzter Verbrauch)</label>
+<input type="number" id="gGramm" min="1" step="1" placeholder="z.B. 120 g" oninput="previewCalc('g')">
+</div>
+<div class="field fc" id="gPreviewWrap" style="display:none">
+<div class="preview-box">
+<div class="preview-lbl">💡 Geschätzte Kosten (unverbindlich)</div>
+<span id="gPreviewText"></span>
+<div class="preview-warn">⚠ Der endgültige Preis wird vom Studio bestätigt.</div>
+</div>
+</div>
+<div class="field fc"><label>Beschreibung &amp; Anforderungen</label><textarea id="gBeschr" placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz."></textarea></div>
+<div class="field fc">
+<label>Bild / Datei anhängen (optional)</label>
+<div class="upload-area" id="gUploadArea" onclick="document.getElementById('gDatei').click()" ondragover="dragOver(event,'gUploadArea')" ondragleave="dragLeave('gUploadArea')" ondrop="dropFile(event,'gDatei','gUploadArea')">
+<input type="file" id="gDatei" accept="image/*,.pdf,.stl,.obj,.step,.stp" multiple onchange="showFiles('gDatei')">
+<div class="upload-icon">📎</div>
+<div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong><br>Bilder, PDF, STL, OBJ, STEP – max. 10 MB pro Datei</div>
+</div>
+<div class="upload-preview" id="gDateiPreview"></div>
+</div>
+</div>
+<div class="sep">📍 Lieferadresse</div>
+<div class="fg">
+<div class="field fc"><label>Straße &amp; Hausnummer *</label><input type="text" id="gAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
+<div class="field"><label>PLZ *</label><input type="text" id="gPlz" placeholder="12345" autocomplete="postal-code"></div>
+<div class="field"><label>Ort / Stadt *</label><input type="text" id="gOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
+<div class="field fc"><label>Lieferhinweis (optional)</label><input type="text" id="gHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung, …"></div>
+</div>
+<div class="brow">
+<button class="btn b-out" onclick="zeige('view-start')">← Zurück</button>
+<button class="btn b-bl" id="btnGast" onclick="gastSenden()">Auftrag absenden ✓</button>
+</div>
+<p style="text-align:center;margin-top:14px;font-size:.81em;color:var(--t3)">Bestellungen später verfolgen? <a href="#" onclick="zeige('view-register');return false">Konto erstellen</a></p>
+</div>
+</div>
 <!-- ══ BESTÄTIGUNG ══════════════════════════════════════ -->
 <div class="view" id="view-ok">
-  <div class="card">
-    <div class="confirm-wrap">
-      <div class="confirm-icon">✅</div>
-      <h2>Auftrag erfolgreich eingegangen!</h2>
-      <p style="color:var(--t3);margin:10px 0 5px;font-size:.87em">Deine Bestellnummer:</p>
-      <div class="confirm-id" id="confirmId">—</div>
-      <p style="color:var(--t3);font-size:.84em;max-width:400px;margin:0 auto 24px;line-height:1.65">Wir melden uns zeitnah mit Bestätigung und Preis. Bitte notiere deine Bestellnummer.</p>
-      <div id="confirmBtns"></div>
-    </div>
-  </div>
+<div class="card">
+<div class="confirm-wrap">
+<div class="confirm-icon">✅</div>
+<h2>Auftrag erfolgreich eingegangen!</h2>
+<p style="color:var(--t3);margin:10px 0 5px;font-size:.87em">Deine Bestellnummer:</p>
+<div class="confirm-id" id="confirmId">—</div>
+<p style="color:var(--t3);font-size:.84em;max-width:400px;margin:0 auto 24px;line-height:1.65">Wir melden uns zeitnah mit Bestätigung und Preis. Bitte notiere deine Bestellnummer.</p>
+<div id="confirmBtns"></div>
 </div>
-
+</div>
+</div>
 <!-- ══ PROFIL BEARBEITEN ════════════════════════════════ -->
 <div class="view" id="view-profil">
-  <div class="card">
-    <h2>Profil bearbeiten</h2>
-    <p class="card-sub">Deine gespeicherten Daten aktualisieren</p>
-    <div class="alert a-err" id="profilErr"></div>
-    <div class="alert a-ok"  id="profilOk"></div>
-    <div class="sep">👤 Persönliche Daten</div>
-    <div class="fg">
-      <div class="field fc"><label>Vollständiger Name *</label><input type="text" id="editName" placeholder="Max Mustermann"></div>
-      <div class="field"><label>E-Mail (nicht änderbar)</label><input type="email" id="editEmail" disabled></div>
-      <div class="field"><label>Telefon</label><input type="tel" id="editTel" placeholder="+49 170 1234567"></div>
-    </div>
-    <div class="sep">📍 Lieferadresse</div>
-    <div class="fg">
-      <div class="field fc"><label>Straße &amp; Hausnummer</label><input type="text" id="editAdr" placeholder="Musterstraße 12"></div>
-      <div class="field"><label>PLZ</label><input type="text" id="editPlz" placeholder="12345"></div>
-      <div class="field"><label>Ort / Stadt</label><input type="text" id="editOrt" placeholder="Musterstadt"></div>
-    </div>
-    <div class="sep">🔒 Passwort ändern (optional)</div>
-    <div class="fg">
-      <div class="field"><label>Neues Passwort (leer = unverändert)</label><input type="password" id="editPW" placeholder="Min. 8 Zeichen"></div>
-      <div class="field"><label>Passwort wiederholen</label><input type="password" id="editPW2" placeholder="••••••••"></div>
-    </div>
-    <div class="brow">
-      <button class="btn b-out" onclick="zeige('view-dashboard')">← Zurück</button>
-      <button class="btn b-bl" id="btnProfil" onclick="profilSpeichern()">Änderungen speichern</button>
-    </div>
-  </div>
+<div class="card">
+<h2>Profil bearbeiten</h2>
+<p class="card-sub">Deine gespeicherten Daten aktualisieren</p>
+<div class="alert a-err" id="profilErr"></div>
+<div class="alert a-ok" id="profilOk"></div>
+<div class="sep">👤 Persönliche Daten</div>
+<div class="fg">
+<div class="field fc"><label>Vollständiger Name *</label><input type="text" id="editName" placeholder="Max Mustermann"></div>
+<div class="field"><label>E-Mail (nicht änderbar)</label><input type="email" id="editEmail" disabled></div>
+<div class="field"><label>Telefon</label><input type="tel" id="editTel" placeholder="+49 170 1234567"></div>
 </div>
-
+<div class="sep">📍 Lieferadresse</div>
+<div class="fg">
+<div class="field fc"><label>Straße &amp; Hausnummer</label><input type="text" id="editAdr" placeholder="Musterstraße 12"></div>
+<div class="field"><label>PLZ</label><input type="text" id="editPlz" placeholder="12345"></div>
+<div class="field"><label>Ort / Stadt</label><input type="text" id="editOrt" placeholder="Musterstadt"></div>
+</div>
+<div class="sep">🔒 Passwort ändern (optional)</div>
+<div class="fg">
+<div class="field"><label>Neues Passwort (leer = unverändert)</label><input type="password" id="editPW" placeholder="Min. 8 Zeichen"></div>
+<div class="field"><label>Passwort wiederholen</label><input type="password" id="editPW2" placeholder="••••••••"></div>
+</div>
+<div class="brow">
+<button class="btn b-out" onclick="zeige('view-dashboard')">← Zurück</button>
+<button class="btn b-bl" id="btnProfil" onclick="profilSpeichern()">Änderungen speichern</button>
+</div>
+</div>
+</div>
 </main>
-
 <script>
-/* ═══════════  SUPABASE  ═══════════ */
+/* ═══════════ SUPABASE ═══════════ */
 const sb = supabase.createClient(
-  'https://zasufuyaiturzgohqkky.supabase.co',
-  'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj'
+'https://zasufuyaiturzgohqkky.supabase.co',
+'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj'
 );
 
-/* ═══════════  STATE  ═══════════ */
+/* ═══════════ STATE ═══════════ */
 let aktKunde = null;
-let filamentDaten = []; // [{id, Material, Hertseller, startGewicht, Preis}]
+let filamentDaten = [];
 
-/* ═══════════  NAVIGATION  ═══════════ */
+/* ═══════════ NAVIGATION ═══════════ */
 function zeige(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
   if (id === 'view-bestellung' && aktKunde) vorausfuellen();
-  if (id === 'view-profil'    && aktKunde) profilLaden();
+  if (id === 'view-profil' && aktKunde) profilLaden();
+  if (id === 'view-mailbox' && aktKunde) ladeMailbox();
+  if (id === 'view-dashboard' && aktKunde) ladeDashboard();
 }
 
 function headerAktualisieren() {
   const nav = document.getElementById('hnav');
   if (aktKunde) {
+    // Ungelesene Nachrichten zählen
+    const ungelesene = (window._alleAuftraege||[]).filter(a => {
+      let adminMsgs = [];
+      try { if(a.admin_notiz) adminMsgs = JSON.parse(a.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[]; } catch(e){}
+      const gelesen = JSON.parse(localStorage.getItem('gelesen_'+a.id)||'0');
+      return adminMsgs.length > gelesen;
+    }).length;
+    const badge = ungelesene > 0 ? `<span class="nbadge">${ungelesene}</span>` : '';
     nav.innerHTML = `
       <span class="nuser">👤 ${x(aktKunde.name.split(' ')[0])}</span>
       <button class="nbtn" onclick="zeige('view-dashboard')">Meine Aufträge</button>
+      <button class="nbtn" onclick="zeige('view-mailbox')">💬 Nachrichten${badge}</button>
       <button class="nbtn" onclick="zeige('view-profil')">Profil</button>
       <button class="nbtn" onclick="abmelden()">Abmelden</button>`;
   } else {
@@ -472,11 +451,12 @@ function headerAktualisieren() {
   }
 }
 
-/* ═══════════  FILAMENTE LADEN  ═══════════ */
+/* ═══════════ FILAMENTE LADEN ═══════════ */
 async function ladeFilamente() {
   try {
-    const { data } = await sb.from('FilamentLager').select('id,Material,Hertseller,startGewicht,restGewicht,Preis').order('Material');
-    filamentDaten = (data || []).filter(f => parseFloat(f.restGewicht) > 0);
+    const { data } = await sb.from('FilamentLager').select('id,Material,Hertseller,startGewicht,restGewicht,Preis,gesperrt').order('Material');
+    // ▶ NEU: Nur Filamente die NICHT gesperrt sind UND noch Restgewicht haben
+    filamentDaten = (data || []).filter(f => !f.gesperrt && parseFloat(f.restGewicht) > 0);
     const opts = '<option value="">— Material &amp; Farbe wählen —</option>' +
       filamentDaten.map(f =>
         `<option value="${f.id}" data-preis="${f.Preis}" data-start="${f.startGewicht}">
@@ -485,7 +465,7 @@ async function ladeFilamente() {
       ).join('');
     ['bMaterial','gMaterial'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = opts;
+      if (el) el.innerHTML = opts || '<option value="">Aktuell keine Materialien verfügbar</option>';
     });
   } catch(e) {
     console.error('Filamente laden:', e);
@@ -496,12 +476,12 @@ async function ladeFilamente() {
   }
 }
 
-/* ═══════════  PREIS-VORSCHAU  ═══════════ */
+/* ═══════════ PREIS-VORSCHAU ═══════════ */
 function previewCalc(p) {
-  const sel   = document.getElementById(p + 'Material');
+  const sel = document.getElementById(p + 'Material');
   const gramm = parseFloat(document.getElementById(p + 'Gramm').value) || 0;
-  const wrap  = document.getElementById(p + 'PreviewWrap');
-  const text  = document.getElementById(p + 'PreviewText');
+  const wrap = document.getElementById(p + 'PreviewWrap');
+  const text = document.getElementById(p + 'PreviewText');
   if (!sel || !wrap || !text) return;
   const opt = sel.options[sel.selectedIndex];
   const preis = parseFloat(opt?.dataset?.preis) || 0;
@@ -509,7 +489,7 @@ function previewCalc(p) {
   if (!gramm || !preis || !sel.value) { wrap.style.display = 'none'; return; }
   const PAUSCHALE = 4.50;
   const matKosten = (preis / start) * gramm;
-  const gesamt    = matKosten + PAUSCHALE;
+  const gesamt = matKosten + PAUSCHALE;
   const min = (gesamt * 0.85).toFixed(2);
   const max = (gesamt * 1.15).toFixed(2);
   text.innerHTML =
@@ -519,9 +499,9 @@ function previewCalc(p) {
   wrap.style.display = 'block';
 }
 
-/* ═══════════  DATEI UPLOAD LOGIK  ═══════════ */
+/* ═══════════ DATEI UPLOAD ═══════════ */
 function showFiles(inputId) {
-  const input   = document.getElementById(inputId);
+  const input = document.getElementById(inputId);
   const preview = document.getElementById(inputId + 'Preview');
   if (!preview) return;
   preview.innerHTML = '';
@@ -533,96 +513,82 @@ function showFiles(inputId) {
     preview.appendChild(chip);
   });
 }
-
 function removeFile(inputId, idx) {
   const input = document.getElementById(inputId);
-  const dt    = new DataTransfer();
+  const dt = new DataTransfer();
   Array.from(input.files).forEach((f, i) => { if (i !== idx) dt.items.add(f); });
   input.files = dt.files;
   showFiles(inputId);
 }
-
-function dragOver(e, areaId) {
-  e.preventDefault();
-  document.getElementById(areaId).classList.add('drag');
-}
-function dragLeave(areaId) {
-  document.getElementById(areaId).classList.remove('drag');
-}
+function dragOver(e, areaId) { e.preventDefault(); document.getElementById(areaId).classList.add('drag'); }
+function dragLeave(areaId) { document.getElementById(areaId).classList.remove('drag'); }
 function dropFile(e, inputId, areaId) {
-  e.preventDefault();
-  dragLeave(areaId);
+  e.preventDefault(); dragLeave(areaId);
   const input = document.getElementById(inputId);
-  const dt    = new DataTransfer();
+  const dt = new DataTransfer();
   Array.from(input.files).forEach(f => dt.items.add(f));
   Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
-  input.files = dt.files;
-  showFiles(inputId);
+  input.files = dt.files; showFiles(inputId);
 }
-
 async function hochladen(inputId, orderId) {
   const input = document.getElementById(inputId);
   if (!input || !input.files.length) return [];
   const urls = [];
   for (const file of input.files) {
-    if (file.size > 10 * 1024 * 1024) { alert(`Datei "${file.name}" ist größer als 10 MB und wird übersprungen.`); continue; }
+    if (file.size > 10 * 1024 * 1024) { alert(`Datei "${file.name}" ist größer als 10 MB.`); continue; }
     const pfad = `bestellungen/${orderId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
     const { data, error } = await sb.storage.from('kundendateien').upload(pfad, file, { upsert: true });
-    if (error) { console.error('Upload Fehler:', error); continue; }
+    if (error) { console.error('Upload:', error); continue; }
     const { data: urlData } = sb.storage.from('kundendateien').getPublicUrl(pfad);
     if (urlData?.publicUrl) urls.push(urlData.publicUrl);
   }
   return urls;
 }
 
-/* ═══════════  SESSION  ═══════════ */
-function sessionSave(k)  { localStorage.setItem('ks', JSON.stringify(k)); }
-function sessionLoad()   { try { return JSON.parse(localStorage.getItem('ks')); } catch{ return null; } }
-function sessionClear()  { localStorage.removeItem('ks'); }
+/* ═══════════ SESSION ═══════════ */
+function sessionSave(k) { localStorage.setItem('ks', JSON.stringify(k)); }
+function sessionLoad() { try { return JSON.parse(localStorage.getItem('ks')); } catch{ return null; } }
+function sessionClear() { localStorage.removeItem('ks'); }
 
-/* ═══════════  HASH  ═══════════ */
+/* ═══════════ HASH ═══════════ */
 async function sha256(s) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-/* ═══════════  AUTH  ═══════════ */
+/* ═══════════ AUTH ═══════════ */
 async function anmelden() {
   alertClear('loginErr');
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pw    = document.getElementById('loginPW').value;
+  const pw = document.getElementById('loginPW').value;
   if (!email || !pw) { alertShow('loginErr','❌ Bitte E-Mail und Passwort eingeben.'); return; }
-  btnSet('btnLogin', true);
-  laden(true);
+  btnSet('btnLogin', true); laden(true);
   try {
     const hash = await sha256(pw);
     const { data } = await sb.from('kunden').select('*').eq('email',email).eq('passwort_hash',hash).limit(1);
     if (!data?.length) { alertShow('loginErr','❌ E-Mail oder Passwort falsch.'); return; }
-    aktKunde = data[0];
-    sessionSave(aktKunde);
-    headerAktualisieren();
+    aktKunde = data[0]; sessionSave(aktKunde); headerAktualisieren();
     document.getElementById('loginEmail').value = '';
-    document.getElementById('loginPW').value    = '';
-    await ladeDashboard();
-    zeige('view-dashboard');
+    document.getElementById('loginPW').value = '';
+    await ladeDashboard(); zeige('view-dashboard');
   } catch(e) { alertShow('loginErr','❌ Verbindungsfehler: ' + (e?.message||e)); }
   finally { btnSet('btnLogin',false); laden(false); }
 }
 
 async function registrieren() {
   alertClear('regErr');
-  const name  = document.getElementById('regName').value.trim();
+  const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim().toLowerCase();
-  const tel   = document.getElementById('regTel').value.trim();
-  const pw    = document.getElementById('regPW').value;
-  const pw2   = document.getElementById('regPW2').value;
-  const adr   = document.getElementById('regAdr').value.trim();
-  const plz   = document.getElementById('regPlz').value.trim();
-  const ort   = document.getElementById('regOrt').value.trim();
+  const tel = document.getElementById('regTel').value.trim();
+  const pw = document.getElementById('regPW').value;
+  const pw2 = document.getElementById('regPW2').value;
+  const adr = document.getElementById('regAdr').value.trim();
+  const plz = document.getElementById('regPlz').value.trim();
+  const ort = document.getElementById('regOrt').value.trim();
   if (!name||!email||!pw) { alertShow('regErr','❌ Bitte alle Pflichtfelder (*) ausfüllen.'); return; }
-  if (!validEmail(email))  { alertShow('regErr','❌ Bitte eine gültige E-Mail angeben.'); return; }
-  if (pw.length < 8)       { alertShow('regErr','❌ Passwort muss mind. 8 Zeichen haben.'); return; }
-  if (pw !== pw2)          { alertShow('regErr','❌ Passwörter stimmen nicht überein.'); return; }
+  if (!validEmail(email)) { alertShow('regErr','❌ Bitte eine gültige E-Mail angeben.'); return; }
+  if (pw.length < 8) { alertShow('regErr','❌ Passwort muss mind. 8 Zeichen haben.'); return; }
+  if (pw !== pw2) { alertShow('regErr','❌ Passwörter stimmen nicht überein.'); return; }
   btnSet('btnReg',true); laden(true);
   try {
     const { data: check } = await sb.from('kunden').select('id').eq('email',email).limit(1);
@@ -643,7 +609,7 @@ function abmelden() {
   }
 }
 
-/* ═══════════  DASHBOARD  ═══════════ */
+/* ═══════════ DASHBOARD ═══════════ */
 async function ladeDashboard() {
   if (!aktKunde) return;
   const ini = aktKunde.name.trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);
@@ -660,262 +626,199 @@ async function ladeDashboard() {
       </div>
       <div class="pactions">
         <button class="btn b-out b-sm" onclick="zeige('view-profil')">✏ Profil</button>
+        <button class="btn b-bl b-sm" onclick="zeige('view-mailbox')">💬 Nachrichten</button>
       </div>
     </div>`;
   laden(true);
   try {
     const { data } = await sb.from('bestellAnfragen').select('*').eq('kunden_id',aktKunde.id).order('erstellt_am',{ascending:false});
+    window._alleAuftraege = data || [];
+    headerAktualisieren(); // Badge aktualisieren
     const liste = document.getElementById('auftragsListe');
     if (!data?.length) {
       liste.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>Noch keine Aufträge vorhanden.</p><button class="btn b-bl b-sm" onclick="zeige('view-bestellung')">Ersten Auftrag aufgeben</button></div>`;
       return;
     }
-    liste.innerHTML = data.map(a => {
-      // Nachrichten parsen
-      let msgs = [];
-      try { if(a.admin_notiz){ const p=JSON.parse(a.admin_notiz); msgs=Array.isArray(p)?p:[{text:a.admin_notiz,ts:''}]; } }
-      catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
-
-      // Kunden-Nachrichten parsen
-      let kundenMsgs=[];
-      try{ if(a.kunden_nachrichten){ const p=JSON.parse(a.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
-      catch(e){ kundenMsgs=[]; }
-
-      // Alle Nachrichten zusammenführen
-      const alleNachrichten=[
-        ...msgs.map(m=>({...m,von:'admin'})),
-        ...kundenMsgs.map(m=>({...m,von:'kunde'}))
-      ].sort((aa,bb)=>new Date(aa.ts||0)-new Date(bb.ts||0));
-
-      const chatMsgsHtml = alleNachrichten.length
-        ? alleNachrichten.map(m=>{
-            const istAdmin=m.von==='admin';
-            return `<div class="chat-msg ${istAdmin?'admin':'kunde'}">
-              <div class="chat-meta ${istAdmin?'admin':'kunde'}">${istAdmin?'🖨️ Studio':'👤 Du'} · ${x(m.ts||'')}</div>
-              <div class="chat-text">${x(m.text)}</div>
-            </div>`;
-          }).join('')
-        : `<div class="chat-leer">Noch keine Nachrichten – schreib uns!</div>`;
-
-      const nachrichtenHtml = `
-        <div style="margin-top:10px">
-          <div style="font-size:.76em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">💬 Nachrichten</div>
-          <div class="chat-wrap">
-            <div class="chat-verlauf" id="cv_${a.id}">${chatMsgsHtml}</div>
-            <div class="chat-input-wrap">
-              <textarea class="chat-input" id="ci_${a.id}" placeholder="Nachricht schreiben…" rows="1"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();nachrichtSenden('${a.id}')}"></textarea>
-              <button class="chat-send" id="cs_${a.id}" onclick="nachrichtSenden('${a.id}')">Senden ➤</button>
-            </div>
-          </div>
-        </div>`;
-
-      const kannStorno = a.status === 'Anfrage eingegangen';
-      const storno = kannStorno
-        ? `<button class="btn-storno" onclick="stornieren('${a.id}','${x(a.projekt)}')">✕ Stornieren</button>`
-        : `<button class="btn-storno" disabled title="Storno nicht mehr möglich – Auftrag in Bearbeitung">✕ Stornieren</button>`;
-
-      const preis = a.kosten != null
-        ? `<strong style="color:var(--gn);font-size:1.05em">${parseFloat(a.kosten).toFixed(2)} €</strong>`
-        : `<span style="color:#b0bcc8">Ausstehend</span>`;
-
-      const dateien = a.datei_urls ? (() => {
-        try {
-          const urls = JSON.parse(a.datei_urls);
-          if (!Array.isArray(urls) || !urls.length) return '';
-          return `<div class="oc-item oc-full">
-            <div class="oc-lbl">📎 Angehängte Dateien</div>
-            <div class="oc-val">${urls.map((u,i)=>`<a href="${x(u)}" target="_blank" style="color:var(--bl);margin-right:10px">Datei ${i+1}</a>`).join('')}</div>
-          </div>`;
-        } catch{ return ''; }
-      })() : '';
-
-      return `<div class="order-card ${a.status==='Storniert'?'storniert':''}">
-        <div class="oc-head">
-          <div>
-            <div class="oc-projekt">${x(a.projekt)}</div>
-            ${a.beschreibung?`<div style="font-size:.82em;color:var(--t3);margin-top:2px">${x(a.beschreibung.slice(0,80))}${a.beschreibung.length>80?'…':''}</div>`:''}
-          </div>
-          <div>
-            <div class="oc-datum">${x(a.datum)}</div>
-            <div style="text-align:right;margin-top:4px">${bdg(a.status)}</div>
-          </div>
-        </div>
-        <div class="oc-meta">
-          <div class="oc-item">
-            <div class="oc-lbl">Material</div>
-            <div class="oc-val">${x(a.material_wunsch)||'—'}${a.ca_gramm?`<br><span style="font-size:.83em;color:var(--t3)">ca. ${a.ca_gramm} g</span>`:''}</div>
-          </div>
-          <div class="oc-item">
-            <div class="oc-lbl">Kosten</div>
-            <div class="oc-val">${preis}${a.rabatt_pct>0?`<br><span style="font-size:.78em;color:var(--gn)">inkl. ${a.rabatt_pct}% Rabatt</span>`:''}</div>
-          </div>
-          <div class="oc-item oc-full">
-            <div class="oc-lbl">Lieferadresse</div>
-            <div class="oc-val">${a.adresse?`${x(a.adresse)}, ${x(a.plz)} ${x(a.ort)}`:'—'}${a.liefer_hinweis?`<br><span style="color:var(--or);font-size:.83em">💬 ${x(a.liefer_hinweis)}</span>`:''}</div>
-          </div>
-          ${dateien}
-        </div>
-        ${nachrichtenHtml}
-        <div class="oc-actions">
-          <div style="font-size:.77em;color:var(--t3)">Bestellnr: <code>${x(a.id)}</code></div>
-          ${storno}
-        </div>
-      </div>`;
-    }).join('');
+    liste.innerHTML = data.map(a => auftragsKarteHtml(a)).join('');
   } catch(e) { console.error('Dashboard:', e); }
   finally {
     laden(false);
-    // Chat-Verläufe nach unten scrollen
-    setTimeout(()=>{
-      document.querySelectorAll('.chat-verlauf').forEach(v=>{ v.scrollTop=v.scrollHeight; });
-    }, 50);
+    setTimeout(()=>{ document.querySelectorAll('.chat-verlauf').forEach(v=>{ v.scrollTop=v.scrollHeight; }); }, 50);
   }
 }
 
-/* ═══════════  VORAUSFÜLLEN  ═══════════ */
-function vorausfuellen() {
-  if (!aktKunde) return;
-  document.getElementById('bAdr').value    = aktKunde.adresse || '';
-  document.getElementById('bPlz').value    = aktKunde.plz     || '';
-  document.getElementById('bOrt').value    = aktKunde.ort     || '';
-  document.getElementById('bHinweis').value = '';
-  alertClear('bestellErr');
-}
+/* ═══════════ AUFTRAGS-KARTE HTML ═══════════ */
+function auftragsKarteHtml(a) {
+  let msgs = [];
+  try { if(a.admin_notiz){ const p=JSON.parse(a.admin_notiz); msgs=Array.isArray(p)?p:[{text:a.admin_notiz,ts:''}]; } }
+  catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
+  let kundenMsgs=[];
+  try{ if(a.kunden_nachrichten){ const p=JSON.parse(a.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
+  catch(e){ kundenMsgs=[]; }
+  const alleNachrichten=[
+    ...msgs.map(m=>({...m,von:'admin'})),
+    ...kundenMsgs.map(m=>({...m,von:'kunde'}))
+  ].sort((aa,bb)=>new Date(aa.ts||0)-new Date(bb.ts||0));
 
-/* ═══════════  BESTELLUNG EINGELOGGT  ═══════════ */
-async function bestellungSenden() {
-  if (!aktKunde) { zeige('view-login'); return; }
-  alertClear('bestellErr');
-  const projekt = document.getElementById('bProjekt').value.trim();
-  const mat     = document.getElementById('bMaterial').value;
-  const matTxt  = document.getElementById('bMaterial').options[document.getElementById('bMaterial').selectedIndex]?.text || mat;
-  const gramm   = parseFloat(document.getElementById('bGramm').value) || null;
-  const desc    = document.getElementById('bBeschr').value.trim();
-  const adr     = document.getElementById('bAdr').value.trim();
-  const plz     = document.getElementById('bPlz').value.trim();
-  const ort     = document.getElementById('bOrt').value.trim();
-  const hinweis = document.getElementById('bHinweis').value.trim();
-  if (!projekt || !adr || !plz || !ort) { alertShow('bestellErr','❌ Bitte alle Pflichtfelder (*) ausfüllen.'); return; }
-  btnSet('btnBestell',true); laden(true);
-  const orderId = genId();
-  try {
-    const dateiUrls = await hochladen('bDatei', orderId);
-    const { error } = await sb.from('bestellAnfragen').insert([{
-      id:orderId, kunden_id:aktKunde.id,
-      gastname:null, gast_email:null,
-      telefon:aktKunde.telefon||'',
-      projekt, beschreibung:desc,
-      material_wunsch: mat ? matTxt.split('(')[0].trim() : 'Keine Präferenz',
-      ca_gramm:gramm,
-      adresse:adr, plz, ort, liefer_hinweis:hinweis,
-      status:'Anfrage eingegangen',
-      datum:new Date().toLocaleDateString('de-DE'),
-      kosten:null,
-      datei_urls: dateiUrls.length ? JSON.stringify(dateiUrls) : null
-    }]);
-    if (error) throw error;
-    // Adresse im Profil aktualisieren
-    if (adr !== aktKunde.adresse || plz !== aktKunde.plz || ort !== aktKunde.ort) {
-      await sb.from('kunden').update({adresse:adr,plz,ort}).eq('id',aktKunde.id);
-      aktKunde = {...aktKunde,adresse:adr,plz,ort}; sessionSave(aktKunde);
-    }
-    ['bProjekt','bBeschr','bHinweis','bGramm'].forEach(id=>{ document.getElementById(id).value=''; });
-    document.getElementById('bDatei').value='';
-    document.getElementById('bDateiPreview').innerHTML='';
-    document.getElementById('bMaterial').selectedIndex=0;
-    document.getElementById('bPreviewWrap').style.display='none';
-    document.getElementById('confirmId').textContent = orderId;
-    document.getElementById('confirmBtns').innerHTML = `<button class="btn b-bl b-sm" onclick="ladeDashboard().then(()=>zeige('view-dashboard'))">Meine Aufträge ansehen →</button>`;
-    zeige('view-ok');
-  } catch(e) { alertShow('bestellErr','❌ Fehler: ' + (e?.message||e)); }
-  finally { btnSet('btnBestell',false); laden(false); }
-}
+  const chatMsgsHtml = alleNachrichten.length
+    ? alleNachrichten.map(m=>{
+        const istAdmin=m.von==='admin';
+        return `<div class="chat-msg ${istAdmin?'admin':'kunde'}">
+          <div class="chat-meta ${istAdmin?'admin':'kunde'}">${istAdmin?'🖨️ Studio':'👤 Du'} · ${x(m.ts||'')}</div>
+          <div class="chat-text">${x(m.text)}</div>
+        </div>`;
+      }).join('')
+    : `<div class="chat-leer">Noch keine Nachrichten – schreib uns!</div>`;
 
-/* ═══════════  GAST BESTELLUNG  ═══════════ */
-async function gastSenden() {
-  alertClear('gastErr');
-  const name    = document.getElementById('gName').value.trim();
-  const email   = document.getElementById('gEmail').value.trim();
-  const tel     = document.getElementById('gTel').value.trim();
-  const projekt = document.getElementById('gProjekt').value.trim();
-  const mat     = document.getElementById('gMaterial').value;
-  const matTxt  = document.getElementById('gMaterial').options[document.getElementById('gMaterial').selectedIndex]?.text || mat;
-  const gramm   = parseFloat(document.getElementById('gGramm').value) || null;
-  const desc    = document.getElementById('gBeschr').value.trim();
-  const adr     = document.getElementById('gAdr').value.trim();
-  const plz     = document.getElementById('gPlz').value.trim();
-  const ort     = document.getElementById('gOrt').value.trim();
-  const hinweis = document.getElementById('gHinweis').value.trim();
-  if (!name||!email||!projekt||!adr||!plz||!ort) { alertShow('gastErr','❌ Bitte alle Pflichtfelder (*) ausfüllen.'); return; }
-  if (!validEmail(email)) { alertShow('gastErr','❌ Bitte eine gültige E-Mail angeben.'); return; }
-  btnSet('btnGast',true); laden(true);
-  const orderId = genId();
-  try {
-    const dateiUrls = await hochladen('gDatei', orderId);
-    const { error } = await sb.from('bestellAnfragen').insert([{
-      id:orderId, kunden_id:null,
-      gastname:name, gast_email:email, telefon:tel,
-      projekt, beschreibung:desc,
-      material_wunsch: mat ? matTxt.split('(')[0].trim() : 'Keine Präferenz',
-      ca_gramm:gramm,
-      adresse:adr, plz, ort, liefer_hinweis:hinweis,
-      status:'Anfrage eingegangen',
-      datum:new Date().toLocaleDateString('de-DE'),
-      kosten:null,
-      datei_urls: dateiUrls.length ? JSON.stringify(dateiUrls) : null
-    }]);
-    if (error) throw error;
-    ['gName','gEmail','gTel','gProjekt','gBeschr','gAdr','gPlz','gOrt','gHinweis','gGramm'].forEach(id=>{ document.getElementById(id).value=''; });
-    document.getElementById('gDatei').value='';
-    document.getElementById('gDateiPreview').innerHTML='';
-    document.getElementById('gMaterial').selectedIndex=0;
-    document.getElementById('gPreviewWrap').style.display='none';
-    document.getElementById('confirmId').textContent = orderId;
-    document.getElementById('confirmBtns').innerHTML = `
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn b-out b-sm" onclick="zeige('view-start')">Zur Startseite</button>
-        <button class="btn b-bl b-sm" onclick="zeige('view-register')">Konto erstellen →</button>
+  const nachrichtenHtml = `
+    <div style="margin-top:10px">
+      <div style="font-size:.76em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">💬 Nachrichten</div>
+      <div class="chat-wrap">
+        <div class="chat-verlauf" id="cv_${a.id}">${chatMsgsHtml}</div>
+        <div class="chat-input-wrap">
+          <textarea class="chat-input" id="ci_${a.id}" placeholder="Nachricht schreiben…" rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();nachrichtSenden('${a.id}')}"></textarea>
+          <button class="chat-send" id="cs_${a.id}" onclick="nachrichtSenden('${a.id}')">Senden ➤</button>
+        </div>
+      </div>
+    </div>`;
+
+  const kannStorno = a.status === 'Anfrage eingegangen';
+  const storno = kannStorno
+    ? `<button class="btn-storno" onclick="stornieren('${a.id}','${x(a.projekt)}')">✕ Stornieren</button>`
+    : `<button class="btn-storno" disabled title="Storno nicht mehr möglich">✕ Stornieren</button>`;
+  const preis = a.kosten != null
+    ? `<strong style="color:var(--gn);font-size:1.05em">${parseFloat(a.kosten).toFixed(2)} €</strong>`
+    : `<span style="color:#b0bcc8">Ausstehend</span>`;
+  const dateien = a.datei_urls ? (() => {
+    try {
+      const urls = JSON.parse(a.datei_urls);
+      if (!Array.isArray(urls) || !urls.length) return '';
+      return `<div class="oc-item oc-full">
+        <div class="oc-lbl">📎 Dateien</div>
+        <div class="oc-val">${urls.map((u,i)=>`<a href="${x(u)}" target="_blank" style="color:var(--bl);margin-right:10px">Datei ${i+1}</a>`).join('')}</div>
       </div>`;
-    zeige('view-ok');
-  } catch(e) { alertShow('gastErr','❌ Fehler: ' + (e?.message||e)); }
-  finally { btnSet('btnGast',false); laden(false); }
+    } catch{ return ''; }
+  })() : '';
+
+  return `<div class="order-card ${a.status==='Storniert'?'storniert':''}">
+    <div class="oc-head">
+      <div>
+        <div class="oc-projekt">${x(a.projekt)}</div>
+        ${a.beschreibung?`<div style="font-size:.82em;color:var(--t3);margin-top:2px">${x(a.beschreibung.slice(0,80))}${a.beschreibung.length>80?'…':''}</div>`:''}
+      </div>
+      <div>
+        <div class="oc-datum">${x(a.datum)}</div>
+        <div style="text-align:right;margin-top:4px">${bdg(a.status)}</div>
+      </div>
+    </div>
+    <div class="oc-meta">
+      <div class="oc-item">
+        <div class="oc-lbl">Material</div>
+        <div class="oc-val">${x(a.material_wunsch)||'—'}${a.ca_gramm?`<br><span style="font-size:.83em;color:var(--t3)">ca. ${a.ca_gramm} g</span>`:''}</div>
+      </div>
+      <div class="oc-item">
+        <div class="oc-lbl">Kosten</div>
+        <div class="oc-val">${preis}${a.rabatt_pct>0?`<br><span style="font-size:.78em;color:var(--gn)">inkl. ${a.rabatt_pct}% Rabatt</span>`:''}</div>
+      </div>
+      <div class="oc-item oc-full">
+        <div class="oc-lbl">Lieferadresse</div>
+        <div class="oc-val">${a.adresse?`${x(a.adresse)}, ${x(a.plz)} ${x(a.ort)}`:'—'}${a.liefer_hinweis?`<br><span style="color:var(--or);font-size:.83em">💬 ${x(a.liefer_hinweis)}</span>`:''}</div>
+      </div>
+      ${dateien}
+    </div>
+    ${nachrichtenHtml}
+    <div class="oc-actions">
+      <div style="font-size:.77em;color:var(--t3)">Bestellnr: <code>${x(a.id)}</code></div>
+      ${storno}
+    </div>
+  </div>`;
 }
 
-/* ═══════════  STORNIEREN  ═══════════ */
+/* ═══════════ MAILBOX ═══════════ */
+async function ladeMailbox() {
+  if (!aktKunde) return;
+  laden(true);
+  try {
+    const { data } = await sb.from('bestellAnfragen').select('*').eq('kunden_id',aktKunde.id).order('erstellt_am',{ascending:false});
+    const liste = document.getElementById('mailboxListe');
+    if (!data?.length) {
+      liste.innerHTML = `<div class="empty"><div class="empty-icon">💬</div><p>Noch keine Nachrichten vorhanden.</p></div>`;
+      return;
+    }
+    liste.innerHTML = data.map(a => {
+      let adminMsgs = [];
+      try { if(a.admin_notiz) adminMsgs = JSON.parse(a.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[]; } catch(e){}
+      let kundenMsgs = [];
+      try { if(a.kunden_nachrichten) kundenMsgs = JSON.parse(a.kunden_nachrichten); if(!Array.isArray(kundenMsgs)) kundenMsgs=[]; } catch(e){}
+
+      const alle = [
+        ...adminMsgs.map(m=>({...m,von:'admin'})),
+        ...kundenMsgs.map(m=>({...m,von:'kunde'}))
+      ].sort((a,b)=>new Date(a.ts||0)-new Date(b.ts||0));
+
+      const letzte = alle[alle.length - 1];
+      const anzahlAdmin = adminMsgs.length;
+      const gelesenCount = parseInt(localStorage.getItem('gelesen_'+a.id)||'0');
+      const ungelesen = anzahlAdmin > gelesenCount;
+
+      const vorschau = letzte
+        ? `${letzte.von==='admin'?'🖨️ Studio:':'👤 Du:'} ${x(letzte.text.slice(0,80))}${letzte.text.length>80?'…':''}`
+        : 'Noch keine Nachrichten – klicken zum Schreiben';
+
+      return `<div class="mailbox-card ${ungelesen?'ungelesen':''}" onclick="mailboxOeffnen('${a.id}')">
+        <div class="mailbox-head">
+          <div style="display:flex;align-items:center;gap:6px">
+            ${ungelesen?'<span class="mailbox-ungelesen-dot"></span>':''}
+            <span class="mailbox-projekt">${x(a.projekt)}</span>
+          </div>
+          <div>
+            <span class="mailbox-datum">${x(a.datum)}</span>
+            ${bdg(a.status)}
+          </div>
+        </div>
+        <div class="mailbox-preview">${vorschau}</div>
+        <div style="font-size:.76em;color:var(--t3);margin-top:5px">
+          ${alle.length} Nachricht${alle.length!==1?'en':''} · Nr: <code>${x(a.id)}</code>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.error('Mailbox:', e); }
+  finally { laden(false); }
+}
+
+function mailboxOeffnen(orderId) {
+  // Admin-Nachrichten als gelesen markieren
+  const a = (window._alleAuftraege||[]).find(e=>e.id===orderId);
+  if (a) {
+    let adminMsgs = [];
+    try { if(a.admin_notiz) adminMsgs = JSON.parse(a.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[]; } catch(e){}
+    localStorage.setItem('gelesen_'+orderId, adminMsgs.length.toString());
+  }
+  // Zum Dashboard scrollen und Chat öffnen
+  zeige('view-dashboard');
+  setTimeout(()=>{
+    const el = document.getElementById('cv_'+orderId);
+    if (el) { el.closest('.order-card').scrollIntoView({behavior:'smooth',block:'center'}); }
+  }, 300);
+  headerAktualisieren();
+}
+
+/* ═══════════ NACHRICHTEN SENDEN ═══════════ */
 async function nachrichtSenden(orderId) {
   if (!aktKunde) return;
-  const input  = document.getElementById('ci_' + orderId);
+  const input = document.getElementById('ci_' + orderId);
   const sendBtn = document.getElementById('cs_' + orderId);
-  const text   = input?.value?.trim();
+  const text = input?.value?.trim();
   if (!text) return;
-
   sendBtn.disabled = true;
   try {
-    // Bestehende Kunden-Nachrichten laden
-    const { data } = await sb.from('bestellAnfragen')
-      .select('kunden_nachrichten')
-      .eq('id', orderId)
-      .single();
-
+    const { data } = await sb.from('bestellAnfragen').select('kunden_nachrichten').eq('id', orderId).single();
     let msgs = [];
-    try { if(data?.kunden_nachrichten) msgs = JSON.parse(data.kunden_nachrichten); if(!Array.isArray(msgs)) msgs=[]; }
-    catch(e){ msgs=[]; }
-
-    msgs.push({
-      text,
-      ts:   new Date().toLocaleString('de-DE'),
-      von:  'kunde',
-      name: aktKunde.name
-    });
-
-    const { error } = await sb.from('bestellAnfragen')
-      .update({ kunden_nachrichten: JSON.stringify(msgs) })
-      .eq('id', orderId);
-
+    try { if(data?.kunden_nachrichten) msgs = JSON.parse(data.kunden_nachrichten); if(!Array.isArray(msgs)) msgs=[]; } catch(e){}
+    msgs.push({ text, ts: new Date().toLocaleString('de-DE'), von: 'kunde', name: aktKunde.name });
+    const { error } = await sb.from('bestellAnfragen').update({ kunden_nachrichten: JSON.stringify(msgs) }).eq('id', orderId);
     if (error) throw error;
-
-    // Lokal sofort anzeigen
     input.value = '';
     const verlauf = document.getElementById('cv_' + orderId);
     if (verlauf) {
@@ -927,15 +830,17 @@ async function nachrichtSenden(orderId) {
       verlauf.appendChild(div);
       verlauf.scrollTop = verlauf.scrollHeight;
     }
+    // Auch in _alleAuftraege updaten für Badge
+    const idx = (window._alleAuftraege||[]).findIndex(e=>e.id===orderId);
+    if (idx > -1) window._alleAuftraege[idx].kunden_nachrichten = JSON.stringify(msgs);
   } catch(e) {
     alert('❌ Nachricht konnte nicht gesendet werden: ' + (e?.message||e));
-  } finally {
-    sendBtn.disabled = false;
-  }
+  } finally { sendBtn.disabled = false; }
 }
 
+/* ═══════════ STORNIEREN ═══════════ */
 async function stornieren(id, proj) {
-  if (!confirm(`Auftrag "${proj}" wirklich stornieren?\n\nNur möglich wenn noch nicht bearbeitet.`)) return;
+  if (!confirm(`Auftrag "${proj}" wirklich stornieren?`)) return;
   laden(true);
   try {
     const { error } = await sb.from('bestellAnfragen').update({status:'Storniert'}).eq('id',id).eq('status','Anfrage eingegangen');
@@ -945,32 +850,127 @@ async function stornieren(id, proj) {
   finally { laden(false); }
 }
 
-/* ═══════════  PROFIL  ═══════════ */
-function profilLaden() {
+/* ═══════════ VORAUSFÜLLEN ═══════════ */
+function vorausfuellen() {
   if (!aktKunde) return;
-  document.getElementById('editName').value  = aktKunde.name    ||'';
-  document.getElementById('editEmail').value = aktKunde.email   ||'';
-  document.getElementById('editTel').value   = aktKunde.telefon ||'';
-  document.getElementById('editAdr').value   = aktKunde.adresse ||'';
-  document.getElementById('editPlz').value   = aktKunde.plz     ||'';
-  document.getElementById('editOrt').value   = aktKunde.ort     ||'';
-  document.getElementById('editPW').value    = '';
-  document.getElementById('editPW2').value   = '';
-  alertClear('profilErr'); alertClear('profilOk');
+  document.getElementById('bAdr').value = aktKunde.adresse || '';
+  document.getElementById('bPlz').value = aktKunde.plz || '';
+  document.getElementById('bOrt').value = aktKunde.ort || '';
+  document.getElementById('bHinweis').value = '';
+  alertClear('bestellErr');
 }
 
+/* ═══════════ BESTELLUNG EINGELOGGT ═══════════ */
+async function bestellungSenden() {
+  if (!aktKunde) { zeige('view-login'); return; }
+  alertClear('bestellErr');
+  const projekt = document.getElementById('bProjekt').value.trim();
+  const mat = document.getElementById('bMaterial').value;
+  const matTxt = document.getElementById('bMaterial').options[document.getElementById('bMaterial').selectedIndex]?.text || mat;
+  const gramm = parseFloat(document.getElementById('bGramm').value) || null;
+  const desc = document.getElementById('bBeschr').value.trim();
+  const adr = document.getElementById('bAdr').value.trim();
+  const plz = document.getElementById('bPlz').value.trim();
+  const ort = document.getElementById('bOrt').value.trim();
+  const hinweis = document.getElementById('bHinweis').value.trim();
+  if (!projekt || !adr || !plz || !ort) { alertShow('bestellErr','❌ Bitte alle Pflichtfelder (*) ausfüllen.'); return; }
+  btnSet('btnBestell',true); laden(true);
+  const orderId = genId();
+  try {
+    const dateiUrls = await hochladen('bDatei', orderId);
+    const { error } = await sb.from('bestellAnfragen').insert([{
+      id:orderId, kunden_id:aktKunde.id,
+      gastname:null, gast_email:null, telefon:aktKunde.telefon||'',
+      projekt, beschreibung:desc,
+      material_wunsch: mat ? matTxt.split('(')[0].trim() : 'Keine Präferenz',
+      ca_gramm:gramm, adresse:adr, plz, ort, liefer_hinweis:hinweis,
+      status:'Anfrage eingegangen', datum:new Date().toLocaleDateString('de-DE'),
+      kosten:null, datei_urls: dateiUrls.length ? JSON.stringify(dateiUrls) : null
+    }]);
+    if (error) throw error;
+    if (adr !== aktKunde.adresse || plz !== aktKunde.plz || ort !== aktKunde.ort) {
+      await sb.from('kunden').update({adresse:adr,plz,ort}).eq('id',aktKunde.id);
+      aktKunde = {...aktKunde,adresse:adr,plz,ort}; sessionSave(aktKunde);
+    }
+    ['bProjekt','bBeschr','bHinweis','bGramm'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('bDatei').value=''; document.getElementById('bDateiPreview').innerHTML='';
+    document.getElementById('bMaterial').selectedIndex=0; document.getElementById('bPreviewWrap').style.display='none';
+    document.getElementById('confirmId').textContent = orderId;
+    document.getElementById('confirmBtns').innerHTML = `<button class="btn b-bl b-sm" onclick="ladeDashboard().then(()=>zeige('view-dashboard'))">Meine Aufträge ansehen →</button>`;
+    zeige('view-ok');
+  } catch(e) { alertShow('bestellErr','❌ Fehler: ' + (e?.message||e)); }
+  finally { btnSet('btnBestell',false); laden(false); }
+}
+
+/* ═══════════ GAST BESTELLUNG ═══════════ */
+async function gastSenden() {
+  alertClear('gastErr');
+  const name = document.getElementById('gName').value.trim();
+  const email = document.getElementById('gEmail').value.trim();
+  const tel = document.getElementById('gTel').value.trim();
+  const projekt = document.getElementById('gProjekt').value.trim();
+  const mat = document.getElementById('gMaterial').value;
+  const matTxt = document.getElementById('gMaterial').options[document.getElementById('gMaterial').selectedIndex]?.text || mat;
+  const gramm = parseFloat(document.getElementById('gGramm').value) || null;
+  const desc = document.getElementById('gBeschr').value.trim();
+  const adr = document.getElementById('gAdr').value.trim();
+  const plz = document.getElementById('gPlz').value.trim();
+  const ort = document.getElementById('gOrt').value.trim();
+  const hinweis = document.getElementById('gHinweis').value.trim();
+  if (!name||!email||!projekt||!adr||!plz||!ort) { alertShow('gastErr','❌ Bitte alle Pflichtfelder (*) ausfüllen.'); return; }
+  if (!validEmail(email)) { alertShow('gastErr','❌ Bitte eine gültige E-Mail angeben.'); return; }
+  btnSet('btnGast',true); laden(true);
+  const orderId = genId();
+  try {
+    const dateiUrls = await hochladen('gDatei', orderId);
+    const { error } = await sb.from('bestellAnfragen').insert([{
+      id:orderId, kunden_id:null, gastname:name, gast_email:email, telefon:tel,
+      projekt, beschreibung:desc,
+      material_wunsch: mat ? matTxt.split('(')[0].trim() : 'Keine Präferenz',
+      ca_gramm:gramm, adresse:adr, plz, ort, liefer_hinweis:hinweis,
+      status:'Anfrage eingegangen', datum:new Date().toLocaleDateString('de-DE'),
+      kosten:null, datei_urls: dateiUrls.length ? JSON.stringify(dateiUrls) : null
+    }]);
+    if (error) throw error;
+    ['gName','gEmail','gTel','gProjekt','gBeschr','gAdr','gPlz','gOrt','gHinweis','gGramm'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('gDatei').value=''; document.getElementById('gDateiPreview').innerHTML='';
+    document.getElementById('gMaterial').selectedIndex=0; document.getElementById('gPreviewWrap').style.display='none';
+    document.getElementById('confirmId').textContent = orderId;
+    document.getElementById('confirmBtns').innerHTML = `
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn b-out b-sm" onclick="zeige('view-start')">Zur Startseite</button>
+        <button class="btn b-bl b-sm" onclick="zeige('view-register')">Konto erstellen →</button>
+      </div>`;
+    zeige('view-ok');
+  } catch(e) { alertShow('gastErr','❌ Fehler: ' + (e?.message||e)); }
+  finally { btnSet('btnGast',false); laden(false); }
+}
+
+/* ═══════════ PROFIL ═══════════ */
+function profilLaden() {
+  if (!aktKunde) return;
+  document.getElementById('editName').value = aktKunde.name||'';
+  document.getElementById('editEmail').value = aktKunde.email||'';
+  document.getElementById('editTel').value = aktKunde.telefon||'';
+  document.getElementById('editAdr').value = aktKunde.adresse||'';
+  document.getElementById('editPlz').value = aktKunde.plz||'';
+  document.getElementById('editOrt').value = aktKunde.ort||'';
+  document.getElementById('editPW').value = '';
+  document.getElementById('editPW2').value = '';
+  alertClear('profilErr'); alertClear('profilOk');
+}
 async function profilSpeichern() {
   alertClear('profilErr'); alertClear('profilOk');
   const name = document.getElementById('editName').value.trim();
-  const tel  = document.getElementById('editTel').value.trim();
-  const adr  = document.getElementById('editAdr').value.trim();
-  const plz  = document.getElementById('editPlz').value.trim();
-  const ort  = document.getElementById('editOrt').value.trim();
-  const pw   = document.getElementById('editPW').value;
-  const pw2  = document.getElementById('editPW2').value;
+  const tel = document.getElementById('editTel').value.trim();
+  const adr = document.getElementById('editAdr').value.trim();
+  const plz = document.getElementById('editPlz').value.trim();
+  const ort = document.getElementById('editOrt').value.trim();
+  const pw = document.getElementById('editPW').value;
+  const pw2 = document.getElementById('editPW2').value;
   if (!name) { alertShow('profilErr','❌ Bitte einen Namen eingeben.'); return; }
   if (pw && pw.length < 8) { alertShow('profilErr','❌ Neues Passwort mind. 8 Zeichen.'); return; }
-  if (pw && pw !== pw2)    { alertShow('profilErr','❌ Passwörter stimmen nicht überein.'); return; }
+  if (pw && pw !== pw2) { alertShow('profilErr','❌ Passwörter stimmen nicht überein.'); return; }
   btnSet('btnProfil',true); laden(true);
   try {
     const upd = {name, telefon:tel, adresse:adr, plz, ort};
@@ -984,26 +984,32 @@ async function profilSpeichern() {
   finally { btnSet('btnProfil',false); laden(false); }
 }
 
-/* ═══════════  HILFSFUNKTIONEN  ═══════════ */
-function laden(an)          { document.getElementById('ladeWrap').style.display = an?'flex':'none'; }
-function btnSet(id,dis)     { const e=document.getElementById(id); if(e) e.disabled=dis; }
-function alertShow(id,txt)  { const e=document.getElementById(id); if(e){e.textContent=txt;e.classList.add('on');} }
-function alertClear(id)     { const e=document.getElementById(id); if(e){e.textContent='';e.classList.remove('on');} }
-function validEmail(e)      { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-function genId()            { return 'B-' + Date.now().toString().slice(-8).toUpperCase(); }
-function x(s)               { return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
-
+/* ═══════════ HILFSFUNKTIONEN ═══════════ */
+function laden(an) { document.getElementById('ladeWrap').style.display = an?'flex':'none'; }
+function btnSet(id,dis) { const e=document.getElementById(id); if(e) e.disabled=dis; }
+function alertShow(id,txt) { const e=document.getElementById(id); if(e){e.textContent=txt;e.classList.add('on');} }
+function alertClear(id) { const e=document.getElementById(id); if(e){e.textContent='';e.classList.remove('on');} }
+function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function genId() { return 'B-' + Date.now().toString().slice(-8).toUpperCase(); }
+function x(s) { return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 function bdg(st) {
   const m={'Anfrage eingegangen':'b-neu','In Bearbeitung':'b-arb','Im Druck':'b-druck','Qualitätsprüfung':'b-arb','Versandbereit':'b-ok','Abgeschlossen':'b-ok','Storniert':'b-rd'};
   return `<span class="bdg ${m[st]||'b-gr'}">${x(st)}</span>`;
 }
 
-/* ═══════════  INIT  ═══════════ */
-window.addEventListener('DOMContentLoaded', () => {
-  const s = sessionLoad();
-  if (s) { aktKunde = s; headerAktualisieren(); ladeDashboard(); zeige('view-dashboard'); }
-  else   { headerAktualisieren(); }
-  ladeFilamente();
+/* ═══════════ INIT ═══════════ */
+window.addEventListener('DOMContentLoaded', async () => {
+  const k = sessionLoad();
+  if (k) {
+    aktKunde = k;
+    headerAktualisieren();
+    await ladeFilamente();
+    await ladeDashboard();
+    zeige('view-dashboard');
+  } else {
+    headerAktualisieren();
+    await ladeFilamente();
+  }
 });
 </script>
 </body>
