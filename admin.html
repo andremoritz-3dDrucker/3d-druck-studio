@@ -234,8 +234,11 @@ tr:hover td{background:#fafcff}
      NAV TABS
 ════════════════════════════════════════════════════════ -->
 <div id="nav" style="display:none">
-  <button class="ntab on" onclick="tab('p-anfragen',this)">
-    📥 Kundenanfragen <span class="nbadge" id="nbAnfragen" style="display:none">0</span>
+  <button class="ntab on" onclick="tab('p-postfach',this)">
+    📬 Posteingang <span class="nbadge" id="nbPost" style="display:none">0</span>
+  </button>
+  <button class="ntab" onclick="tab('p-anfragen',this)">
+    📥 Bestellanfragen <span class="nbadge" id="nbAnfragen" style="display:none">0</span>
   </button>
   <button class="ntab" onclick="tab('p-lager',this)">🧵 Filamentlager</button>
   <button class="ntab" onclick="tab('p-historie',this)">📋 Auftragshistorie</button>
@@ -247,8 +250,61 @@ tr:hover td{background:#fafcff}
 ════════════════════════════════════════════════════════ -->
 <div id="wrap" style="display:none">
 
+  <!-- ─── TAB 0: POSTEINGANG ──────────────────────────── -->
+  <div class="panel on" id="p-postfach">
+    <div style="padding:4px 0 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <h2 style="border:none;padding:0;font-size:1.3em">📬 Posteingang</h2>
+        <p style="font-size:.84em;color:var(--t3);margin-top:3px">Nachrichten von Kunden und Gaesten</p>
+      </div>
+      <button class="btn b-bl bsm" onclick="ladePostfach()">&#8635; Aktualisieren</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:320px 1fr;gap:16px;min-height:500px" id="postfachGrid">
+
+      <!-- Linke Spalte: Konversationsliste -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1.5px solid var(--br);display:flex;gap:8px">
+          <input type="text" id="pfSuche" placeholder="&#128269; Suchen..." oninput="filterPost()"
+            style="flex:1;padding:8px 11px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;outline:none">
+          <select id="pfFilter" onchange="filterPost()"
+            style="padding:8px 10px;border:1.5px solid var(--br);border-radius:8px;font-size:12px;outline:none">
+            <option value="">Alle</option>
+            <option value="unread">Ungelesen</option>
+            <option value="read">Gelesen</option>
+          </select>
+        </div>
+        <div id="pfListe" style="overflow-y:auto;max-height:580px">
+          <div style="text-align:center;color:#bbb;padding:30px;font-size:.84em">Lade...</div>
+        </div>
+      </div>
+
+      <!-- Rechte Spalte: Chat -->
+      <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column" id="pfChatWrap">
+        <div style="padding:18px 20px;border-bottom:1.5px solid var(--br);background:#f8fafc" id="pfChatHeader">
+          <div style="color:#bbb;font-size:.9em;text-align:center;padding:20px 0">
+            Konversation auswaehlen
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px;background:#fafcff;display:flex;flex-direction:column;gap:10px;min-height:300px;max-height:400px" id="pfChatVerlauf"></div>
+        <div style="padding:12px 16px;border-top:1.5px solid var(--br);background:#fff;display:none" id="pfChatInput">
+          <div style="display:flex;gap:8px">
+            <textarea id="pfAntwortText"
+              placeholder="Antwort schreiben... (Enter = Senden, Shift+Enter = neue Zeile)"
+              style="flex:1;padding:10px 12px;border:1.5px solid var(--br);border-radius:9px;font-size:14px;font-family:inherit;resize:none;min-height:44px;max-height:120px;outline:none"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pfAntworten()}"></textarea>
+            <button class="btn b-bl" style="width:auto;padding:10px 18px;align-self:flex-end" onclick="pfAntworten()">
+              Senden &#10148;
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ─── TAB 1: KUNDENANFRAGEN ─────────────────────── -->
-  <div class="panel on" id="p-anfragen">
+  <div class="panel" id="p-anfragen">
 
     <!-- Stats -->
     <div class="sgrid">
@@ -504,7 +560,7 @@ const SB = supabase.createClient(
 ═══════════════════════════════════════════════════════════ */
 function startAdmin(){
   ['topbar','nav','wrap'].forEach(id=>document.getElementById(id).style.display=id==='topbar'?'flex':id==='nav'?'flex':'block');
-  ladeDaten(); ladeAnfragen();
+  ladeDaten(); ladeAnfragen(); ladePostfach();
 }
 window.addEventListener('DOMContentLoaded',()=>{
   if(sessionStorage.getItem('adm')==='1'){
@@ -577,6 +633,7 @@ function renderLager(){
       <td>${statusBdg}</td>
       <td style="display:flex;gap:5px;flex-wrap:wrap">
         ${sperrBtn}
+        <button class="btn bsm" style="background:#8e44ad" onclick="filamentPrivat('${f.id}','${x(f.Material).replace(/'/g,'')}',${r})">&#127968; Privat</button>
         <button class="btn b-rd bsm" onclick="filamentDel('${f.id}')">✕</button>
       </td>
     </tr>`;
@@ -593,6 +650,41 @@ async function filamentSperren(id, sperren){
     if(error) throw error;
     await ladeDaten();
   }catch(e){ alert('Fehler: '+(e.message||e)); laden(false); }
+}
+
+async function filamentPrivat(id, material, restGewicht){
+  const grammStr = prompt(
+    'Gramm fuer Privatgebrauch ausbuchen:\n(' + material + ', noch ' + restGewicht.toFixed(0) + 'g vorhanden)',
+    ''
+  );
+  if(grammStr === null) return;
+  const gramm = parseFloat(grammStr);
+  if(!gramm || gramm <= 0){ alert('Bitte eine gueltige Grammzahl eingeben.'); return; }
+  if(gramm > restGewicht){ alert('Nicht genug Filament! Verfuegbar: ' + restGewicht.toFixed(0) + 'g'); return; }
+
+  const grund = prompt('Grund (optional):', 'Privatgebrauch') || 'Privatgebrauch';
+
+  laden(true);
+  try{
+    const neuesRest = restGewicht - gramm;
+    await SB.from('FilamentLager').update({ restGewicht: neuesRest.toString() }).eq('id', id);
+    // In Auftragshistorie eintragen
+    await SB.from('auftragsHistorie').insert([{
+      id: 'priv_' + Date.now(),
+      spuled: id,
+      erledigt: true,
+      datum: new Date().toLocaleDateString('de-DE'),
+      projekt: grund,
+      kunde: 'Privatgebrauch',
+      material: material,
+      verbrauchG: gramm,
+      kosten: 0
+    }]);
+    await ladeDaten();
+  }catch(e){
+    alert('Fehler: ' + (e.message||e));
+    laden(false);
+  }
 }
 
 async function filamentAdd(){
@@ -671,6 +763,195 @@ async function historieDel(id, g, spuId){
   if(spuId){ const s=lager.find(f=>f.id===spuId); if(s){ const nr=parseFloat(s.restGewicht)+g; await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',spuId); } }
   await SB.from('auftragsHistorie').delete().eq('id',id);
   await ladeDaten();
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   POSTFACH – ADMIN
+═══════════════════════════════════════════════════════════ */
+// Postfach liest direkt aus bestellAnfragen (kunden_nachrichten + admin_notiz)
+let postfachDaten=[], aktivePfId=null;
+
+function pfAlleNachrichten(eintrag){
+  // Admin-Nachrichten
+  let adminMsgs=[];
+  try{ if(eintrag.admin_notiz){ const p=JSON.parse(eintrag.admin_notiz); adminMsgs=Array.isArray(p)?p:[{text:eintrag.admin_notiz,ts:'',von:'admin'}]; } }
+  catch(e){ if(eintrag.admin_notiz) adminMsgs=[{text:eintrag.admin_notiz,ts:'',von:'admin'}]; }
+  // Kunden-Nachrichten
+  let kundenMsgs=[];
+  try{ if(eintrag.kunden_nachrichten){ const p=JSON.parse(eintrag.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
+  catch(e){ kundenMsgs=[]; }
+  // Zusammenfuehren & sortieren
+  return [...adminMsgs.map(m=>({...m,von:'admin'})),...kundenMsgs.map(m=>({...m,von:'kunde'}))]
+    .sort((a,b)=>new Date(a.ts||0)-new Date(b.ts||0));
+}
+
+function pfHatUngeleseneKundenMsg(eintrag){
+  // Ungelesen = Kunden-Nachricht vorhanden UND gelesen_admin nicht gesetzt
+  let kundenMsgs=[];
+  try{ if(eintrag.kunden_nachrichten){ const p=JSON.parse(eintrag.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
+  catch(e){ kundenMsgs=[]; }
+  return kundenMsgs.length>0 && !eintrag.gelesen_admin;
+}
+
+async function ladePostfach(){
+  try{
+    // Alle Bestellungen mit mindestens einer Nachricht laden
+    const {data}=await SB.from('bestellAnfragen')
+      .select('id,datum,projekt,kunde,gastname,gast_email,kunden_id,admin_notiz,kunden_nachrichten,gelesen_admin,status,erstellt_am')
+      .order('erstellt_am',{ascending:false});
+
+    // Nur Eintraege mit Nachrichten anzeigen
+    postfachDaten=(data||[]).filter(e=>{
+      const haNachrichten = e.admin_notiz || e.kunden_nachrichten;
+      return haNachrichten;
+    });
+
+    filterPost();
+    const ungelesen=postfachDaten.filter(p=>pfHatUngeleseneKundenMsg(p)).length;
+    const nb=document.getElementById('nbPost');
+    if(nb){nb.textContent=ungelesen;nb.style.display=ungelesen>0?'inline-flex':'none';}
+  }catch(e){console.error('Postfach laden:',e);}
+}
+
+function filterPost(){
+  const suche=(document.getElementById('pfSuche')?.value||'').toLowerCase();
+  const fil=document.getElementById('pfFilter')?.value||'';
+  const liste=postfachDaten.filter(p=>{
+    const name=p.gastname||p.kunde||'';
+    const email=p.gast_email||'';
+    const ms=!suche||[name,email,p.projekt||''].some(s=>s.toLowerCase().includes(suche));
+    const ung=pfHatUngeleseneKundenMsg(p);
+    const mf=!fil||(fil==='unread'&&ung)||(fil==='read'&&!ung);
+    return ms&&mf;
+  });
+  const el=document.getElementById('pfListe');
+  if(!el) return;
+  if(!liste.length){
+    el.innerHTML='<div style="text-align:center;color:#bbb;padding:30px;font-size:.84em">Keine Nachrichten vorhanden</div>';
+    return;
+  }
+  el.innerHTML=liste.map(p=>{
+    const alleNachrichten=pfAlleNachrichten(p);
+    const letzte=alleNachrichten[alleNachrichten.length-1];
+    const vorschau=letzte?letzte.text.slice(0,55)+(letzte.text.length>55?'...':''):'';
+    const aktiv=aktivePfId===p.id?'background:#e3f0ff;':'';
+    const ung=pfHatUngeleseneKundenMsg(p);
+    const dat=p.datum||'';
+    const name=p.gastname||p.kunde||'Gast';
+    return `<div onclick="pfOeffnen('${p.id}')"
+      style="padding:13px 16px;border-bottom:1px solid #f0f4f8;cursor:pointer;transition:background .15s;${aktiv}${ung?'border-left:3px solid var(--bl);':'border-left:3px solid transparent;'}"
+      onmouseover="this.style.background='#f0f6ff'"
+      onmouseout="this.style.background='${aktiv?'#e3f0ff':''}'">
+      <div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:3px">
+        <div style="font-weight:${ung?700:500};font-size:.9em;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          ${ung?'&#128309; ':''}${x(name)}
+        </div>
+        <div style="font-size:.72em;color:var(--t3);white-space:nowrap">${x(dat)}</div>
+      </div>
+      <div style="font-size:.82em;font-weight:${ung?600:400};color:${ung?'var(--bl)':'var(--t2)'};margin-bottom:2px">
+        &#128204; ${x(p.projekt||'Kein Betreff')}
+      </div>
+      <div style="font-size:.79em;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x(vorschau)}</div>
+    </div>`;
+  }).join('');
+}
+
+async function pfOeffnen(id){
+  aktivePfId=id; filterPost();
+  const p=postfachDaten.find(e=>e.id===id); if(!p) return;
+  const name=p.gastname||p.kunde||'Gast';
+  const email=p.gast_email||'';
+
+  // Header
+  document.getElementById('pfChatHeader').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-weight:700;font-size:1em;color:var(--t1)">${x(name)}</div>
+        ${email?`<div style="font-size:.82em;color:var(--t3)"><a href="mailto:${x(email)}">${x(email)}</a></div>`:''}
+        <div style="font-size:.84em;color:var(--t2);margin-top:2px;font-weight:600">&#128204; ${x(p.projekt||'Kein Betreff')}</div>
+        <div style="font-size:.78em;color:var(--t3);margin-top:2px">${badgeHtml(p.status)}</div>
+      </div>
+      <button class="btn b-bl bsm" onclick="tab('p-anfragen',document.querySelector('.ntab:nth-child(2))');modOpen('${p.id}')"
+        style="font-size:11px">&#128196; Zur Bestellung</button>
+    </div>`;
+
+  // Verlauf rendern
+  const alleNachrichten=pfAlleNachrichten(p);
+  const verlauf=document.getElementById('pfChatVerlauf');
+  verlauf.style.display='flex';
+  verlauf.style.flexDirection='column';
+  verlauf.style.gap='10px';
+
+  if(alleNachrichten.length){
+    verlauf.innerHTML=alleNachrichten.map(m=>{
+      const isA=m.von==='admin';
+      const bg=isA?'#e3f0ff':'#f3e5f5';
+      const col=isA?'#0056b3':'#6a1b9a';
+      const align=isA?'align-self:flex-end':'align-self:flex-start';
+      return `<div style="padding:9px 13px;border-radius:10px;max-width:85%;background:${bg};border-left:3px solid ${col};${align}">
+        <div style="font-size:.71em;font-weight:700;color:${col};margin-bottom:3px">
+          ${isA?'&#128100; Du (Admin)':'&#128100; '+x(m.von_name||name)} &middot; ${x(m.ts||'')}
+        </div>
+        <div style="font-size:.88em;color:#1e2a3a;white-space:pre-wrap;line-height:1.55">${x(m.text)}</div>
+      </div>`;
+    }).join('');
+  } else {
+    verlauf.innerHTML='<div style="text-align:center;color:#bbb;font-size:.84em;padding:20px">Noch keine Nachrichten – schreibe die erste!</div>';
+  }
+
+  document.getElementById('pfChatInput').style.display='block';
+  document.getElementById('pfAntwortText').value='';
+  setTimeout(()=>{verlauf.scrollTop=verlauf.scrollHeight;},50);
+
+  // Als gelesen markieren wenn Kunden-Nachrichten vorhanden
+  if(pfHatUngeleseneKundenMsg(p)){
+    await SB.from('bestellAnfragen').update({gelesen_admin:true}).eq('id',id);
+    p.gelesen_admin=true;
+    const ung=postfachDaten.filter(pp=>pfHatUngeleseneKundenMsg(pp)).length;
+    const nb=document.getElementById('nbPost');
+    if(nb){nb.textContent=ung;nb.style.display=ung>0?'inline-flex':'none';}
+    filterPost();
+  }
+}
+
+async function pfAntworten(){
+  if(!aktivePfId) return;
+  const ta=document.getElementById('pfAntwortText');
+  const text=ta.value.trim(); if(!text) return;
+  ta.disabled=true;
+
+  const p=postfachDaten.find(e=>e.id===aktivePfId);
+  // Admin-Nachrichten aus admin_notiz laden
+  let adminMsgs=[];
+  try{ if(p.admin_notiz){ const parsed=JSON.parse(p.admin_notiz); adminMsgs=Array.isArray(parsed)?parsed:[{text:p.admin_notiz,ts:'',von:'admin'}]; } }
+  catch(e){ if(p.admin_notiz) adminMsgs=[{text:p.admin_notiz,ts:'',von:'admin'}]; }
+
+  adminMsgs.push({text,von:'admin',von_name:'Studio',ts:new Date().toLocaleString('de-DE')});
+
+  try{
+    await SB.from('bestellAnfragen')
+      .update({admin_notiz:JSON.stringify(adminMsgs),gelesen_admin:true})
+      .eq('id',aktivePfId);
+    p.admin_notiz=JSON.stringify(adminMsgs);
+    p.gelesen_admin=true;
+    ta.value='';
+    filterPost();
+    pfOeffnen(aktivePfId);
+  }catch(e){alert('Fehler beim Senden: '+(e.message||e));}
+  finally{ta.disabled=false;ta.focus();}
+}
+
+async function pfArchivieren(id){
+  if(!confirm('Konversation archivieren? (Bestellung bleibt erhalten)')) return;
+  // Nachrichten loeschen (nicht Bestellung)
+  await SB.from('bestellAnfragen').update({admin_notiz:null,kunden_nachrichten:null}).eq('id',id);
+  postfachDaten=postfachDaten.filter(p=>p.id!==id);
+  aktivePfId=null;
+  document.getElementById('pfChatHeader').innerHTML='<div style="color:#bbb;font-size:.9em;text-align:center;padding:20px 0">Konversation auswaehlen</div>';
+  document.getElementById('pfChatVerlauf').innerHTML='';
+  document.getElementById('pfChatInput').style.display='none';
+  filterPost();
 }
 
 /* ═══════════════════════════════════════════════════════════
