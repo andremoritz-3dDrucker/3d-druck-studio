@@ -996,18 +996,25 @@ function filterAnfragen(){
     const adr=a.adresse?`<span style="font-size:.82em">${x(a.adresse)}<br>${x(a.plz)} ${x(a.ort)}</span>`:`<span style="color:#ccc">—</span>`;
     const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
     const hasMsg=a.admin_notiz&&a.admin_notiz.trim().length>0;
+    // Kundenname: Gast oder aus Kundenkonto
+    const kundenname = a.gastname || a.kunde || '(Kundenkonto)';
     return `<tr>
       <td style="font-size:.81em;color:var(--t3);white-space:nowrap">${x(a.datum)}</td>
       <td style="font-family:monospace;font-size:.79em">${x(a.id)}</td>
-      <td>${name}</td>
+      <td>
+        <div style="font-weight:600;font-size:.9em">${x(kundenname)}</div>
+        ${a.gast_email?`<div style="font-size:.77em;color:var(--t3)"><a href="mailto:${x(a.gast_email)}">${x(a.gast_email)}</a></div>`:''}
+        ${!a.gastname?`<span style="font-size:.75em;background:#e3f0ff;color:var(--bl);padding:1px 6px;border-radius:4px;font-weight:600">Konto</span>`:`<span style="font-size:.75em;background:#f3e5f5;color:#6a1b9a;padding:1px 6px;border-radius:4px;font-weight:600">Gast</span>`}
+      </td>
       <td><strong>${x(a.projekt)}</strong>${a.beschreibung?`<div style="font-size:.78em;color:#999;margin-top:2px">${x(a.beschreibung.slice(0,50))}${a.beschreibung.length>50?'…':''}</div>`:''}</td>
-      <td style="font-size:.83em">${x(a.material_wunsch)}</td>
+      <td style="font-size:.83em">${x(a.material_wunsch)}${a.ca_gramm?`<br><span style="color:var(--t3);font-size:.82em">ca. ${a.ca_gramm} g</span>`:''}</td>
       <td>${adr}</td>
       <td>${badge(a.status)}</td>
       <td>${pr}</td>
-      <td>
-        <button class="btn b-bl bsm" style="margin-bottom:4px" onclick="modOpen('${a.id}')">✏ Bearbeiten</button>
-        ${a.status!=='Abgeschlossen'&&a.status!=='Storniert'?`<button class="btn b-gn bsm" onclick="auftragAbschliessen('${a.id}')">✓ Fertig</button>`:''}
+      <td style="min-width:110px">
+        <button class="btn b-bl bsm" style="margin-bottom:4px;width:100%" onclick="modOpen('${a.id}')">✏ Bearbeiten</button>
+        ${a.status!=='Abgeschlossen'&&a.status!=='Storniert'?`<button class="btn b-gn bsm" style="margin-bottom:4px;width:100%" onclick="auftragAbschliessen('${a.id}')">✓ Fertig</button>`:''}
+        <button class="btn b-rd bsm" style="width:100%" onclick="auftragLoeschen('${a.id}','${x(kundenname).replace(/'/g,'')}','${x(a.projekt).replace(/'/g,'')}')">🗑 Löschen</button>
       </td>
     </tr>`;
   }).join('');
@@ -1226,6 +1233,33 @@ async function modSave(){
 
 // Modal schließen beim Klick außerhalb
 document.getElementById('modWrap').addEventListener('click',function(e){ if(e.target===this) modClose(); });
+
+async function auftragLoeschen(id, kundenname, projekt){
+  if(!confirm(`Auftrag wirklich löschen?
+
+Kunde: ${kundenname}
+Projekt: ${projekt}
+
+Dieser Vorgang kann nicht rückgängig gemacht werden!`)) return;
+  laden(true);
+  try{
+    const { error } = await SB.from('bestellAnfragen').delete().eq('id', id);
+    if(error) throw error;
+    anfragen = anfragen.filter(a => a.id !== id);
+    filterAnfragen();
+    statsUpdate();
+    // Auch im Postfach entfernen falls vorhanden
+    postfachDaten = postfachDaten.filter(p => p.id !== id);
+    if(aktivePfId === id){
+      aktivePfId = null;
+      document.getElementById('pfChatHeader').innerHTML='<div style="color:#bbb;font-size:.9em;text-align:center;padding:20px 0">Konversation auswaehlen</div>';
+      document.getElementById('pfChatVerlauf').innerHTML='';
+      document.getElementById('pfChatInput').style.display='none';
+    }
+    filterPost();
+  }catch(e){ alert('Fehler beim Löschen: '+(e.message||e)); }
+  finally{ laden(false); }
+}
 
 /* ═══════════════════════════════════════════════════════════
    KALKULATION (Manueller Auftrag)
