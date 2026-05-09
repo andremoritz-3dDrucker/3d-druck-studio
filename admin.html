@@ -154,6 +154,13 @@ tr:hover td{background:#fafcff}
 .msg-text{font-size:.88em;color:var(--t1);line-height:1.55;white-space:pre-wrap}
 .msg-empty{font-size:.84em;color:#bbb;font-style:italic;text-align:center;padding:12px}
 
+/* ── NEU: MULTICOLOR TAGS ──────────────────────────── */
+.mc-tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.75em;font-weight:700;background:#e3f0ff;color:var(--bl);margin:1px 2px}
+.mc-block{background:#f3f8ff;border:1px solid #c8dff8;border-radius:8px;padding:10px 13px;margin-top:6px}
+.mc-block-lbl{font-size:.72em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.mc-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px dashed #dde4ee;font-size:.86em}
+.mc-row:last-child{border-bottom:none}
+
 /* ── LADE-OVERLAY ──────────────────────────────────── */
 #ladeWrap{position:fixed;inset:0;background:rgba(255,255,255,.84);display:none;align-items:center;justify-content:center;z-index:9000;backdrop-filter:blur(2px)}
 .lspin{width:28px;height:28px;border:3px solid #d8e2ef;border-top-color:var(--bl);border-radius:50%;animation:spin .65s linear infinite;margin-right:10px}
@@ -175,9 +182,7 @@ tr:hover td{background:#fafcff}
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════
-     LOGIN
-════════════════════════════════════════════════════════ -->
+<!-- LOGIN -->
 <div id="loginWrap">
   <div class="lbox">
     <div class="llogo">🖨️</div>
@@ -200,9 +205,7 @@ tr:hover td{background:#fafcff}
   <div class="lspin"></div><span class="ltxt">Bitte warten…</span>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     MODAL – ANFRAGE BEARBEITEN
-════════════════════════════════════════════════════════ -->
+<!-- MODAL -->
 <div id="modWrap">
   <div class="mbox">
     <div class="mhead">
@@ -217,9 +220,7 @@ tr:hover td{background:#fafcff}
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     TOPBAR
-════════════════════════════════════════════════════════ -->
+<!-- TOPBAR -->
 <div id="topbar" style="display:none">
   <div class="tbl">
     <div class="tlogo">🖨️</div>
@@ -230,9 +231,7 @@ tr:hover td{background:#fafcff}
   <button class="tlogout" onclick="logout()">⬡ Abmelden</button>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     NAV TABS
-════════════════════════════════════════════════════════ -->
+<!-- NAV TABS -->
 <div id="nav" style="display:none">
   <button class="ntab on" onclick="tab('p-postfach',this)">
     📬 Posteingang <span class="nbadge" id="nbPost" style="display:none">0</span>
@@ -246,12 +245,9 @@ tr:hover td{background:#fafcff}
   <button class="ntab" onclick="tab('p-kunden',this)">👥 Kundenliste</button>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     HAUPTINHALT
-════════════════════════════════════════════════════════ -->
 <div id="wrap" style="display:none">
 
-  <!-- ─── TAB 0: POSTEINGANG ──────────────────────────── -->
+  <!-- ─── POSTEINGANG ─── -->
   <div class="panel on" id="p-postfach">
     <div style="padding:4px 0 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
       <div>
@@ -260,10 +256,7 @@ tr:hover td{background:#fafcff}
       </div>
       <button class="btn b-bl bsm" onclick="ladePostfach()">&#8635; Aktualisieren</button>
     </div>
-
     <div style="display:grid;grid-template-columns:320px 1fr;gap:16px;min-height:500px" id="postfachGrid">
-
-      <!-- Linke Spalte: Konversationsliste -->
       <div class="card" style="padding:0;overflow:hidden">
         <div style="padding:14px 16px;border-bottom:1.5px solid var(--br);display:flex;gap:8px">
           <input type="text" id="pfSuche" placeholder="&#128269; Suchen..." oninput="filterPost()"
@@ -279,13 +272,9 @@ tr:hover td{background:#fafcff}
           <div style="text-align:center;color:#bbb;padding:30px;font-size:.84em">Lade...</div>
         </div>
       </div>
-
-      <!-- Rechte Spalte: Chat -->
       <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column" id="pfChatWrap">
         <div style="padding:18px 20px;border-bottom:1.5px solid var(--br);background:#f8fafc" id="pfChatHeader">
-          <div style="color:#bbb;font-size:.9em;text-align:center;padding:20px 0">
-            Konversation auswaehlen
-          </div>
+          <div style="color:#bbb;font-size:.9em;text-align:center;padding:20px 0">Konversation auswaehlen</div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:16px;background:#fafcff;display:flex;flex-direction:column;gap:10px;min-height:300px;max-height:400px" id="pfChatVerlauf"></div>
         <div style="padding:12px 16px;border-top:1.5px solid var(--br);background:#fff;display:none" id="pfChatInput">
@@ -300,14 +289,11 @@ tr:hover td{background:#fafcff}
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ─── TAB 1: KUNDENANFRAGEN ─────────────────────── -->
+  <!-- ─── BESTELLANFRAGEN ─── -->
   <div class="panel" id="p-anfragen">
-
-    <!-- Stats -->
     <div class="sgrid">
       <div class="scard"><div class="slabel">Alle Anfragen</div><div class="sval" id="sAlle">—</div></div>
       <div class="scard or"><div class="slabel">Neu / Offen</div><div class="sval" id="sNeu">—</div></div>
@@ -315,28 +301,19 @@ tr:hover td{background:#fafcff}
       <div class="scard gn"><div class="slabel">Abgeschlossen</div><div class="sval" id="sAbge">—</div></div>
       <div class="scard rd"><div class="slabel">Umsatz gesamt</div><div class="sval" id="sUmsatz">—</div></div>
     </div>
-
     <div class="card">
       <div class="chead">
         <h2>📥 Alle Kundenanfragen</h2>
         <button class="btn b-bl bsm" onclick="ladeAnfragen()">↻ Aktualisieren</button>
       </div>
-
-      <!-- Filter -->
       <div class="fbar">
         <select id="fStatus" onchange="filterAnfragen()">
           <option value="">— Alle Status —</option>
-          <option>Anfrage eingegangen</option>
-          <option>In Bearbeitung</option>
-          <option>Im Druck</option>
-          <option>Qualitätsprüfung</option>
-          <option>Versandbereit</option>
-          <option>Abgeschlossen</option>
-          <option>Storniert</option>
+          <option>Anfrage eingegangen</option><option>In Bearbeitung</option><option>Im Druck</option>
+          <option>Qualitätsprüfung</option><option>Versandbereit</option><option>Abgeschlossen</option><option>Storniert</option>
         </select>
         <input type="text" id="fSuche" placeholder="🔍 Name, Projekt, E-Mail, Bestellnr. …" oninput="filterAnfragen()">
       </div>
-
       <div class="twrap">
         <table>
           <thead>
@@ -352,90 +329,50 @@ tr:hover td{background:#fafcff}
     </div>
   </div>
 
-  <!-- ─── TAB 2: FILAMENTLAGER ──────────────────────── -->
+  <!-- ─── FILAMENTLAGER ─── -->
   <div class="panel" id="p-lager">
     <div class="card-row">
       <div class="card">
         <div class="chead"><h2>🧵 Neue Spule hinzufügen</h2></div>
         <div class="fgrid">
-          <div class="field">
-            <label>Hersteller</label>
-            <input type="text" id="lHer" placeholder="z.B. Anycubic">
-          </div>
-          <div class="field">
-            <label>Farbe / Bezeichnung</label>
-            <input type="text" id="lFarbe" placeholder="z.B. Schwarz">
-          </div>
+          <div class="field"><label>Hersteller</label><input type="text" id="lHer" placeholder="z.B. Anycubic"></div>
+          <div class="field"><label>Farbe / Bezeichnung</label><input type="text" id="lFarbe" placeholder="z.B. Schwarz"></div>
           <div class="field">
             <label>Material-Typ</label>
             <select id="lMat">
               <optgroup label="── PLA Varianten ──">
-                <option>PLA</option>
-                <option>PLA+</option>
-                <option>PLA Silk</option>
-                <option>PLA Matt</option>
-                <option>PLA High Speed</option>
-                <option>XPLA</option>
-                <option>PLA-CF (Carbon)</option>
-                <option>PLA Wood Fill</option>
-                <option>PLA Metal Fill</option>
-                <option>PLA Marble</option>
+                <option>PLA</option><option>PLA+</option><option>PLA Silk</option><option>PLA Matt</option>
+                <option>PLA High Speed</option><option>XPLA</option><option>PLA-CF (Carbon)</option>
+                <option>PLA Wood Fill</option><option>PLA Metal Fill</option><option>PLA Marble</option>
               </optgroup>
               <optgroup label="── PETG Varianten ──">
-                <option>PETG</option>
-                <option>PETG-CF (Carbon)</option>
-                <option>PETG-GF (Glasfaser)</option>
+                <option>PETG</option><option>PETG-CF (Carbon)</option><option>PETG-GF (Glasfaser)</option>
               </optgroup>
               <optgroup label="── Nylon / PA ──">
-                <option>Nylon PA6</option>
-                <option>Nylon PA12</option>
-                <option>Nylon PA-CF (Carbon)</option>
-                <option>Nylon PA-GF (Glasfaser)</option>
+                <option>Nylon PA6</option><option>Nylon PA12</option><option>Nylon PA-CF (Carbon)</option><option>Nylon PA-GF (Glasfaser)</option>
               </optgroup>
               <optgroup label="── Technische Filamente ──">
-                <option>ABS</option>
-                <option>ABS-CF (Carbon)</option>
-                <option>ASA</option>
-                <option>ASA-CF (Carbon)</option>
-                <option>PC (Polycarbonat)</option>
-                <option>PC-CF (Carbon)</option>
-                <option>PP (Polypropylen)</option>
-                <option>HIPS</option>
-                <option>POM (Delrin)</option>
+                <option>ABS</option><option>ABS-CF (Carbon)</option><option>ASA</option><option>ASA-CF (Carbon)</option>
+                <option>PC (Polycarbonat)</option><option>PC-CF (Carbon)</option><option>PP (Polypropylen)</option>
+                <option>HIPS</option><option>POM (Delrin)</option>
               </optgroup>
               <optgroup label="── Glasfaser (GF) ──">
-                <option>GF-PLA (Glasfaser)</option>
-                <option>GF-PETG (Glasfaser)</option>
-                <option>GF-PA12 (Glasfaser)</option>
-                <option>GF30-PA (30% Glasfaser)</option>
+                <option>GF-PLA (Glasfaser)</option><option>GF-PETG (Glasfaser)</option>
+                <option>GF-PA12 (Glasfaser)</option><option>GF30-PA (30% Glasfaser)</option>
               </optgroup>
               <optgroup label="── Flexibel ──">
-                <option>TPU 95A</option>
-                <option>TPU 87A (weich)</option>
-                <option>TPE</option>
-                <option>TPC</option>
+                <option>TPU 95A</option><option>TPU 87A (weich)</option><option>TPE</option><option>TPC</option>
               </optgroup>
               <optgroup label="── Spezialmaterialien ──">
-                <option>Resin (Standard)</option>
-                <option>Resin (ABS-Like)</option>
-                <option>Resin (Water Washable)</option>
+                <option>Resin (Standard)</option><option>Resin (ABS-Like)</option><option>Resin (Water Washable)</option>
               </optgroup>
             </select>
           </div>
-          <div class="field">
-            <label>Startgewicht (g)</label>
-            <input type="number" id="lGew" value="1000" min="1">
-          </div>
-          <div class="field fcol">
-            <label>Einkaufspreis (€)</label>
-            <input type="number" id="lPre" step="0.01" placeholder="z.B. 16.99">
-          </div>
+          <div class="field"><label>Startgewicht (g)</label><input type="number" id="lGew" value="1000" min="1"></div>
+          <div class="field fcol"><label>Einkaufspreis (€)</label><input type="number" id="lPre" step="0.01" placeholder="z.B. 16.99"></div>
         </div>
-        <div class="brow">
-          <button class="btn b-bl" onclick="filamentAdd()">+ Spule hinzufügen</button>
-        </div>
+        <div class="brow"><button class="btn b-bl" onclick="filamentAdd()">+ Spule hinzufügen</button></div>
       </div>
-
       <div class="card">
         <div class="chead"><h2>📦 Aktueller Bestand</h2></div>
         <div class="twrap">
@@ -448,7 +385,7 @@ tr:hover td{background:#fafcff}
     </div>
   </div>
 
-  <!-- ─── TAB 3: AUFTRAGSHISTORIE ───────────────────── -->
+  <!-- ─── AUFTRAGSHISTORIE ─── -->
   <div class="panel" id="p-historie">
     <div class="card">
       <div class="chead">
@@ -466,39 +403,23 @@ tr:hover td{background:#fafcff}
     </div>
   </div>
 
-  <!-- ─── TAB 4: NEUER AUFTRAG ──────────────────────── -->
+  <!-- ─── NEUER AUFTRAG ─── -->
   <div class="panel" id="p-auftrag">
     <div class="card-row">
       <div class="card">
         <div class="chead"><h2>➕ Manuellen Auftrag erfassen</h2></div>
         <div class="fgrid">
-          <div class="field fcol">
-            <label>Projektname / Bezeichnung</label>
-            <input type="text" id="jPro" placeholder="z.B. Gehäuse für Raspberry Pi">
-          </div>
-          <div class="field fcol">
-            <label>Auftraggeber (Name)</label>
-            <input type="text" id="jKun" placeholder="Max Mustermann">
-          </div>
-          <div class="field fcol">
-            <label>Verwendetes Filament</label>
-            <select id="jSpu" onchange="berechne()"><option value="">— Spule wählen —</option></select>
-          </div>
+          <div class="field fcol"><label>Projektname / Bezeichnung</label><input type="text" id="jPro" placeholder="z.B. Gehäuse für Raspberry Pi"></div>
+          <div class="field fcol"><label>Auftraggeber (Name)</label><input type="text" id="jKun" placeholder="Max Mustermann"></div>
+          <div class="field fcol"><label>Verwendetes Filament</label><select id="jSpu" onchange="berechne()"><option value="">— Spule wählen —</option></select></div>
           <div class="field">
             <label>Verbrauch (g)</label>
             <input type="number" id="jGra" placeholder="z.B. 125" step="any" oninput="berechne()">
             <span class="warn" id="warnGew">⚠ Mehr als Restgewicht!</span>
           </div>
-          <div class="field">
-            <label>Rabatt (%)</label>
-            <input type="number" id="jDis" value="0" min="0" max="100" oninput="berechne()">
-          </div>
-          <div class="field">
-            <label>Verschleiß / Strom (€ fest)</label>
-            <input type="number" id="jFix" value="4.50" step="0.01" oninput="berechne()">
-          </div>
+          <div class="field"><label>Rabatt (%)</label><input type="number" id="jDis" value="0" min="0" max="100" oninput="berechne()"></div>
+          <div class="field"><label>Verschleiß / Strom (€ fest)</label><input type="number" id="jFix" value="4.50" step="0.01" oninput="berechne()"></div>
         </div>
-
         <div class="kbox">
           Material: <span id="kMat">0,00</span> €<br>
           Verschleiß/Strom: <span id="kFix">4,50</span> €<br>
@@ -510,7 +431,6 @@ tr:hover td{background:#fafcff}
           <button class="btn b-gn" id="btnBuchen" onclick="auftragBuchen()">✓ Auftrag buchen &amp; speichern</button>
         </div>
       </div>
-
       <div class="card">
         <div class="chead"><h2>💡 Preisinfo</h2></div>
         <div style="font-size:.88em;color:var(--t2);line-height:1.8">
@@ -525,8 +445,7 @@ tr:hover td{background:#fafcff}
     </div>
   </div>
 
-
-  <!-- ─── TAB 5: KUNDENLISTE ────────────────────────── -->
+  <!-- ─── KUNDENLISTE ─── -->
   <div class="panel" id="p-kunden">
     <div class="card">
       <div class="chead">
@@ -540,31 +459,20 @@ tr:hover td{background:#fafcff}
       <div class="twrap">
         <table>
           <thead>
-            <tr>
-              <th>Name</th>
-              <th>E-Mail</th>
-              <th>Telefon</th>
-              <th>Adresse</th>
-              <th>Dabei seit</th>
-              <th>Aufträge</th>
-              <th>Kontakt</th>
-            </tr>
+            <tr><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Adresse</th><th>Dabei seit</th><th>Aufträge</th><th>Kontakt</th></tr>
           </thead>
           <tbody id="tKunden"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
         </table>
       </div>
-      <p style="font-size:.75em;color:var(--t3);margin-top:12px">
-        * Nur registrierte Kunden – Gast-Bestellungen erscheinen in den Bestellanfragen mit E-Mail.
-      </p>
+      <p style="font-size:.75em;color:var(--t3);margin-top:12px">* Nur registrierte Kunden – Gast-Bestellungen erscheinen in den Bestellanfragen mit E-Mail.</p>
     </div>
   </div>
 
 </div><!-- /#wrap -->
 
-
 <script>
 /* ═══════════════════════════════════════════════════════════
-   PASSWORT (Base64)  →  Kx9m-Druck#2025
+   PASSWORT
 ═══════════════════════════════════════════════════════════ */
 const _P = atob('S3g5bS1EcnVjayMyMDI1');
 
@@ -615,10 +523,8 @@ function tab(id,btn){
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DATEN (Filament + Historie)
+   DATEN
 ═══════════════════════════════════════════════════════════ */
-// Filamentlager wird direkt aus Supabase geladen
-
 let lager=[], historie=[], anfragen=[];
 let aktKosten=0, modId=null;
 
@@ -627,24 +533,22 @@ async function ladeDaten(){
   try{
     let {data:ld}=await SB.from('FilamentLager').select('*').order('Material',{ascending:true});
     lager=ld||[];
-
     let {data:hd}=await SB.from('auftragsHistorie').select('*');
     historie=(hd||[]).sort((a,b)=>b.id.localeCompare(a.id));
-
     renderLager(); renderHistorie(); renderFilamentDropdown();
     document.getElementById('onlineStatus').textContent='🟢 Online';
   }catch(e){
     document.getElementById('onlineStatus').textContent='🔴 Fehler';
     console.error('ladeDaten Fehler:', e);
-    alert('❌ Datenbankfehler: ' + (e.message||e) + '\n\nMöglicherweise muss das RLS-Fix-Script in Supabase ausgeführt werden.');
+    alert('❌ Datenbankfehler: ' + (e.message||e));
   }
   finally{ laden(false); }
 }
 
-/* ─── LAGER ──────────────────────────────────────── */
+/* ─── LAGER ─── */
 function renderLager(){
   const tb=document.getElementById('tLager');
-  if(!lager.length){ tb.innerHTML=`<tr><td colspan="6" class="emp">📭 Noch kein Filament in Supabase – bitte oben eine Spule hinzufügen.</td></tr>`; return; }
+  if(!lager.length){ tb.innerHTML=`<tr><td colspan="6" class="emp">📭 Noch kein Filament – bitte oben eine Spule hinzufügen.</td></tr>`; return; }
   tb.innerHTML=lager.map(f=>{
     const r=parseFloat(f.restGewicht);
     const gesperrt=f.gesperrt||false;
@@ -652,14 +556,12 @@ function renderLager(){
     const restStyle=r<100&&!gesperrt?'color:var(--rd);font-weight:700':'';
     const statusBdg=gesperrt
       ?`<span class="bdg" style="background:#fde8ea;color:var(--rd)">🔒 Gesperrt</span>`
-      :(r<=0
-        ?`<span class="bdg" style="background:#fde8ea;color:var(--rd)">⚠ Leer</span>`
-        :(r<100
-          ?`<span class="bdg" style="background:#fff3e0;color:var(--or)">⚠ Gering</span>`
-          :`<span class="bdg" style="background:#e8f5e9;color:var(--gn)">✓ Verfügbar</span>`));
+      :(r<=0?`<span class="bdg" style="background:#fde8ea;color:var(--rd)">⚠ Leer</span>`
+        :r<100?`<span class="bdg" style="background:#fff3e0;color:var(--or)">⚠ Gering</span>`
+        :`<span class="bdg" style="background:#e8f5e9;color:var(--gn)">✓ Verfügbar</span>`);
     const sperrBtn=gesperrt
-      ?`<button class="btn b-gn bsm" onclick="filamentSperren('${f.id}',false)" title="Spule wieder freigeben">🔓 Freigeben</button>`
-      :`<button class="btn b-or bsm" onclick="filamentSperren('${f.id}',true)" title="Spule für Kunden sperren">🔒 Sperren</button>`;
+      ?`<button class="btn b-gn bsm" onclick="filamentSperren('${f.id}',false)" title="Freigeben">🔓 Freigeben</button>`
+      :`<button class="btn b-or bsm" onclick="filamentSperren('${f.id}',true)" title="Sperren">🔒 Sperren</button>`;
     return `<tr style="${rowStyle}">
       <td>${x(f.Material)}</td>
       <td style="font-size:.82em;color:var(--t3)">${x(f.Hertseller)}</td>
@@ -679,47 +581,30 @@ async function filamentSperren(id, sperren){
   laden(true);
   try{
     const grund = sperren ? prompt('Grund für Sperrung (optional):', '') : null;
-    const { error } = await SB.from('FilamentLager')
-      .update({ gesperrt: sperren, sperr_grund: grund||'' })
-      .eq('id', id);
+    const { error } = await SB.from('FilamentLager').update({ gesperrt: sperren, sperr_grund: grund||'' }).eq('id', id);
     if(error) throw error;
     await ladeDaten();
   }catch(e){ alert('Fehler: '+(e.message||e)); laden(false); }
 }
 
 async function filamentPrivat(id, material, restGewicht){
-  const grammStr = prompt(
-    'Gramm fuer Privatgebrauch ausbuchen:\n(' + material + ', noch ' + restGewicht.toFixed(0) + 'g vorhanden)',
-    ''
-  );
+  const grammStr = prompt('Gramm fuer Privatgebrauch ausbuchen:\n(' + material + ', noch ' + restGewicht.toFixed(0) + 'g vorhanden)', '');
   if(grammStr === null) return;
   const gramm = parseFloat(grammStr);
   if(!gramm || gramm <= 0){ alert('Bitte eine gueltige Grammzahl eingeben.'); return; }
   if(gramm > restGewicht){ alert('Nicht genug Filament! Verfuegbar: ' + restGewicht.toFixed(0) + 'g'); return; }
-
   const grund = prompt('Grund (optional):', 'Privatgebrauch') || 'Privatgebrauch';
-
   laden(true);
   try{
     const neuesRest = restGewicht - gramm;
     await SB.from('FilamentLager').update({ restGewicht: neuesRest.toString() }).eq('id', id);
-    // In Auftragshistorie eintragen
     await SB.from('auftragsHistorie').insert([{
-      id: 'priv_' + Date.now(),
-      spuled: id,
-      erledigt: true,
-      datum: new Date().toLocaleDateString('de-DE'),
-      projekt: grund,
-      kunde: 'Privatgebrauch',
-      material: material,
-      verbrauchG: gramm,
-      kosten: 0
+      id: 'priv_' + Date.now(), spuled: id, erledigt: true,
+      datum: new Date().toLocaleDateString('de-DE'), projekt: grund,
+      kunde: 'Privatgebrauch', material: material, verbrauchG: gramm, kosten: 0
     }]);
     await ladeDaten();
-  }catch(e){
-    alert('Fehler: ' + (e.message||e));
-    laden(false);
-  }
+  }catch(e){ alert('Fehler: ' + (e.message||e)); laden(false); }
 }
 
 async function filamentAdd(){
@@ -733,8 +618,7 @@ async function filamentAdd(){
   laden(true);
   try {
     const { error } = await SB.from('FilamentLager').insert([{
-      id:'s_'+Date.now(), Hertseller:her,
-      Material:`${mat} (${farbe})`,
+      id:'s_'+Date.now(), Hertseller:her, Material:`${mat} (${farbe})`,
       startGewicht:gew.toString(), restGewicht:gew.toString(), Preis:pre.toString()
     }]);
     if(error) throw error;
@@ -744,8 +628,7 @@ async function filamentAdd(){
     document.getElementById('lPre').value='';
     await ladeDaten();
   } catch(e) {
-    console.error('Filament speichern fehlgeschlagen:', e);
-    alert('❌ Fehler beim Speichern: ' + (e.message || e) + '\n\nBitte das SQL-Fix-Script in Supabase ausführen!');
+    alert('❌ Fehler beim Speichern: ' + (e.message || e));
     laden(false);
   }
 }
@@ -764,7 +647,7 @@ function renderFilamentDropdown(){
   });
 }
 
-/* ─── AUFTRAGSHISTORIE ────────────────────────────── */
+/* ─── AUFTRAGSHISTORIE ─── */
 function renderHistorie(){
   const tb=document.getElementById('tHistorie');
   if(!historie.length){ tb.innerHTML=`<tr><td colspan="7" class="emp">Noch keine Aufträge.</td></tr>`; return; }
@@ -800,29 +683,57 @@ async function historieDel(id, g, spuId){
   await ladeDaten();
 }
 
+/* ═══════════════════════════════════════════════════════════
+   NEU: MULTICOLOR HILFSFUNKTION
+   Gibt HTML zurück – kompakt (für Tabelle) oder detailliert (für Modal/Postfach)
+═══════════════════════════════════════════════════════════ */
+function mcAnzeige(a, kompakt) {
+  if (!a.multicolor_materialien) return '';
+  let mc;
+  try { mc = JSON.parse(a.multicolor_materialien); } catch(e) { return ''; }
+  if (!Array.isArray(mc) || !mc.length) return '';
+
+  if (kompakt) {
+    // Kurze Darstellung für die Tabellenzelle
+    return '<div style="margin-top:3px">' +
+      mc.map((m,i) => `<span class="mc-tag">F${i+1}</span> ${x(m.material)}`).join(' · ') +
+    '</div>';
+  }
+
+  // Ausführliche Darstellung für Modal / Postfach-Header
+  return '<div class="mc-block">' +
+    '<div class="mc-block-lbl">🌈 Multicolor-Materialien</div>' +
+    mc.map((m,i) =>
+      `<div class="mc-row">
+        <span class="mc-tag">Farbe ${i+1}</span>
+        <strong>${x(m.material)}</strong>
+        <span style="color:var(--t3);font-size:.85em">${x(m.hertseller||'')}</span>
+        <span style="margin-left:auto;font-weight:600">${m.gramm} g</span>
+      </div>`
+    ).join('') +
+    `<div style="font-size:.82em;color:var(--t3);margin-top:6px;font-weight:600">
+      Gesamt: ${mc.reduce((s,m)=>s+m.gramm,0)} g
+    </div>` +
+  '</div>';
+}
 
 /* ═══════════════════════════════════════════════════════════
-   POSTFACH – ADMIN
+   POSTFACH
 ═══════════════════════════════════════════════════════════ */
-// Postfach liest direkt aus bestellAnfragen (kunden_nachrichten + admin_notiz)
 let postfachDaten=[], aktivePfId=null;
 
 function pfAlleNachrichten(eintrag){
-  // Admin-Nachrichten
   let adminMsgs=[];
   try{ if(eintrag.admin_notiz){ const p=JSON.parse(eintrag.admin_notiz); adminMsgs=Array.isArray(p)?p:[{text:eintrag.admin_notiz,ts:'',von:'admin'}]; } }
   catch(e){ if(eintrag.admin_notiz) adminMsgs=[{text:eintrag.admin_notiz,ts:'',von:'admin'}]; }
-  // Kunden-Nachrichten
   let kundenMsgs=[];
   try{ if(eintrag.kunden_nachrichten){ const p=JSON.parse(eintrag.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
   catch(e){ kundenMsgs=[]; }
-  // Zusammenfuehren & sortieren
   return [...adminMsgs.map(m=>({...m,von:'admin'})),...kundenMsgs.map(m=>({...m,von:'kunde'}))]
     .sort((a,b)=>new Date(a.ts||0)-new Date(b.ts||0));
 }
 
 function pfHatUngeleseneKundenMsg(eintrag){
-  // Ungelesen = Kunden-Nachricht vorhanden UND gelesen_admin nicht gesetzt
   let kundenMsgs=[];
   try{ if(eintrag.kunden_nachrichten){ const p=JSON.parse(eintrag.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
   catch(e){ kundenMsgs=[]; }
@@ -831,17 +742,10 @@ function pfHatUngeleseneKundenMsg(eintrag){
 
 async function ladePostfach(){
   try{
-    // Alle Bestellungen mit mindestens einer Nachricht laden
     const {data}=await SB.from('bestellAnfragen')
-      .select('id,datum,projekt,kunde,gastname,gast_email,kunden_id,admin_notiz,kunden_nachrichten,gelesen_admin,status,erstellt_am')
+      .select('id,datum,projekt,kunde,gastname,gast_email,kunden_id,admin_notiz,kunden_nachrichten,gelesen_admin,status,erstellt_am,multicolor_materialien')
       .order('erstellt_am',{ascending:false});
-
-    // Nur Eintraege mit Nachrichten anzeigen
-    postfachDaten=(data||[]).filter(e=>{
-      const haNachrichten = e.admin_notiz || e.kunden_nachrichten;
-      return haNachrichten;
-    });
-
+    postfachDaten=(data||[]).filter(e=>e.admin_notiz||e.kunden_nachrichten);
     filterPost();
     const ungelesen=postfachDaten.filter(p=>pfHatUngeleseneKundenMsg(p)).length;
     const nb=document.getElementById('nbPost');
@@ -874,6 +778,8 @@ function filterPost(){
     const ung=pfHatUngeleseneKundenMsg(p);
     const dat=p.datum||'';
     const name=p.gastname||p.kunde||'Gast';
+    /* NEU: 🌈 Symbol wenn Multicolor */
+    const isMC = !!p.multicolor_materialien;
     return `<div onclick="pfOeffnen('${p.id}')"
       style="padding:13px 16px;border-bottom:1px solid #f0f4f8;cursor:pointer;transition:background .15s;${aktiv}${ung?'border-left:3px solid var(--bl);':'border-left:3px solid transparent;'}"
       onmouseover="this.style.background='#f0f6ff'"
@@ -885,7 +791,7 @@ function filterPost(){
         <div style="font-size:.72em;color:var(--t3);white-space:nowrap">${x(dat)}</div>
       </div>
       <div style="font-size:.82em;font-weight:${ung?600:400};color:${ung?'var(--bl)':'var(--t2)'};margin-bottom:2px">
-        &#128204; ${x(p.projekt||'Kein Betreff')}
+        &#128204; ${x(p.projekt||'Kein Betreff')}${isMC?' 🌈':''}
       </div>
       <div style="font-size:.79em;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x(vorschau)}</div>
     </div>`;
@@ -898,7 +804,9 @@ async function pfOeffnen(id){
   const name=p.gastname||p.kunde||'Gast';
   const email=p.gast_email||'';
 
-  // Header
+  /* NEU: Multicolor-Block im Chat-Header anzeigen */
+  const mcBlock = mcAnzeige(p, false);
+
   document.getElementById('pfChatHeader').innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
       <div>
@@ -906,17 +814,15 @@ async function pfOeffnen(id){
         ${email?`<div style="font-size:.82em;color:var(--t3)"><a href="mailto:${x(email)}">${x(email)}</a></div>`:''}
         <div style="font-size:.84em;color:var(--t2);margin-top:2px;font-weight:600">&#128204; ${x(p.projekt||'Kein Betreff')}</div>
         <div style="font-size:.78em;color:var(--t3);margin-top:2px">${badgeHtml(p.status)}</div>
+        ${mcBlock}
       </div>
-      <button class="btn b-bl bsm" onclick="tab('p-anfragen',document.querySelector('.ntab:nth-child(2))');modOpen('${p.id}')"
+      <button class="btn b-bl bsm" onclick="tab('p-anfragen',document.querySelector('.ntab:nth-child(2)'));modOpen('${p.id}')"
         style="font-size:11px">&#128196; Zur Bestellung</button>
     </div>`;
 
-  // Verlauf rendern
   const alleNachrichten=pfAlleNachrichten(p);
   const verlauf=document.getElementById('pfChatVerlauf');
-  verlauf.style.display='flex';
-  verlauf.style.flexDirection='column';
-  verlauf.style.gap='10px';
+  verlauf.style.display='flex'; verlauf.style.flexDirection='column'; verlauf.style.gap='10px';
 
   if(alleNachrichten.length){
     verlauf.innerHTML=alleNachrichten.map(m=>{
@@ -939,7 +845,6 @@ async function pfOeffnen(id){
   document.getElementById('pfAntwortText').value='';
   setTimeout(()=>{verlauf.scrollTop=verlauf.scrollHeight;},50);
 
-  // Als gelesen markieren wenn Kunden-Nachrichten vorhanden
   if(pfHatUngeleseneKundenMsg(p)){
     await SB.from('bestellAnfragen').update({gelesen_admin:true}).eq('id',id);
     p.gelesen_admin=true;
@@ -955,31 +860,21 @@ async function pfAntworten(){
   const ta=document.getElementById('pfAntwortText');
   const text=ta.value.trim(); if(!text) return;
   ta.disabled=true;
-
   const p=postfachDaten.find(e=>e.id===aktivePfId);
-  // Admin-Nachrichten aus admin_notiz laden
   let adminMsgs=[];
   try{ if(p.admin_notiz){ const parsed=JSON.parse(p.admin_notiz); adminMsgs=Array.isArray(parsed)?parsed:[{text:p.admin_notiz,ts:'',von:'admin'}]; } }
   catch(e){ if(p.admin_notiz) adminMsgs=[{text:p.admin_notiz,ts:'',von:'admin'}]; }
-
   adminMsgs.push({text,von:'admin',von_name:'Studio',ts:new Date().toLocaleString('de-DE')});
-
   try{
-    await SB.from('bestellAnfragen')
-      .update({admin_notiz:JSON.stringify(adminMsgs),gelesen_admin:true})
-      .eq('id',aktivePfId);
-    p.admin_notiz=JSON.stringify(adminMsgs);
-    p.gelesen_admin=true;
-    ta.value='';
-    filterPost();
-    pfOeffnen(aktivePfId);
+    await SB.from('bestellAnfragen').update({admin_notiz:JSON.stringify(adminMsgs),gelesen_admin:true}).eq('id',aktivePfId);
+    p.admin_notiz=JSON.stringify(adminMsgs); p.gelesen_admin=true;
+    ta.value=''; filterPost(); pfOeffnen(aktivePfId);
   }catch(e){alert('Fehler beim Senden: '+(e.message||e));}
   finally{ta.disabled=false;ta.focus();}
 }
 
 async function pfArchivieren(id){
   if(!confirm('Konversation archivieren? (Bestellung bleibt erhalten)')) return;
-  // Nachrichten loeschen (nicht Bestellung)
   await SB.from('bestellAnfragen').update({admin_notiz:null,kunden_nachrichten:null}).eq('id',id);
   postfachDaten=postfachDaten.filter(p=>p.id!==id);
   aktivePfId=null;
@@ -1030,9 +925,11 @@ function filterAnfragen(){
       :`<span style="color:var(--bl);font-weight:600">🔑 Kundenkonto</span>`;
     const adr=a.adresse?`<span style="font-size:.82em">${x(a.adresse)}<br>${x(a.plz)} ${x(a.ort)}</span>`:`<span style="color:#ccc">—</span>`;
     const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
-    const hasMsg=a.admin_notiz&&a.admin_notiz.trim().length>0;
-    // Kundenname: Gast oder aus Kundenkonto
     const kundenname = a.gastname || a.kunde || '(Kundenkonto)';
+
+    /* NEU: Multicolor kompakt in der Materialspalte */
+    const mcKompakt = mcAnzeige(a, true);
+
     return `<tr>
       <td style="font-size:.81em;color:var(--t3);white-space:nowrap">${x(a.datum)}</td>
       <td style="font-family:monospace;font-size:.79em">${x(a.id)}</td>
@@ -1042,7 +939,11 @@ function filterAnfragen(){
         ${!a.gastname?`<span style="font-size:.75em;background:#e3f0ff;color:var(--bl);padding:1px 6px;border-radius:4px;font-weight:600">Konto</span>`:`<span style="font-size:.75em;background:#f3e5f5;color:#6a1b9a;padding:1px 6px;border-radius:4px;font-weight:600">Gast</span>`}
       </td>
       <td><strong>${x(a.projekt)}</strong>${a.beschreibung?`<div style="font-size:.78em;color:#999;margin-top:2px">${x(a.beschreibung.slice(0,50))}${a.beschreibung.length>50?'…':''}</div>`:''}</td>
-      <td style="font-size:.83em">${x(a.material_wunsch)}${a.ca_gramm?`<br><span style="color:var(--t3);font-size:.82em">ca. ${a.ca_gramm} g</span>`:''}</td>
+      <td style="font-size:.83em">
+        ${x(a.material_wunsch)}
+        ${mcKompakt}
+        ${a.ca_gramm?`<br><span style="color:var(--t3);font-size:.82em">ca. ${a.ca_gramm} g</span>`:''}
+      </td>
       <td>${adr}</td>
       <td>${badge(a.status)}</td>
       <td>${pr}</td>
@@ -1055,27 +956,20 @@ function filterAnfragen(){
   }).join('');
 }
 
-/* ─── AUFTRAG ABSCHLIESSEN ────────────────────────── */
+/* ─── AUFTRAG ABSCHLIESSEN ─── */
 async function auftragAbschliessen(id){
-  const a=anfragen.find(x=>x.id===id);
+  const a=anfragen.find(e=>e.id===id);
   if(!a) return;
   if(a.kosten==null){ alert('Bitte zuerst einen Preis festlegen (✏ Bearbeiten)!'); return; }
   if(!confirm(`Auftrag "${a.projekt}" als abgeschlossen markieren?\nWird in die Auftragshistorie verschoben.`)) return;
   laden(true);
   try{
-    // In Historie übernehmen
     await SB.from('auftragsHistorie').insert([{
-      id:'job_'+Date.now(),
-      spuled:null,
-      erledigt:true,
+      id:'job_'+Date.now(), spuled:null, erledigt:true,
       datum:a.datum||new Date().toLocaleDateString('de-DE'),
-      projekt:a.projekt,
-      kunde:a.gastname||'(Kundenkonto)',
-      material:a.material_wunsch||'Unbekannt',
-      verbrauchG:0,
-      kosten:parseFloat(a.kosten)||0
+      projekt:a.projekt, kunde:a.gastname||'(Kundenkonto)',
+      material:a.material_wunsch||'Unbekannt', verbrauchG:0, kosten:parseFloat(a.kosten)||0
     }]);
-    // Status auf Abgeschlossen
     await SB.from('bestellAnfragen').update({status:'Abgeschlossen'}).eq('id',id);
     await ladeDaten(); await ladeAnfragen();
   }catch(e){ alert('Fehler!'); console.error(e); }
@@ -1083,7 +977,7 @@ async function auftragAbschliessen(id){
 }
 
 /* ═══════════════════════════════════════════════════════════
-   MODAL – ANFRAGE BEARBEITEN (Status + Preis + Nachricht)
+   MODAL – ANFRAGE BEARBEITEN
 ═══════════════════════════════════════════════════════════ */
 function modOpen(id){
   const a=anfragen.find(e=>e.id===id);
@@ -1091,17 +985,13 @@ function modOpen(id){
   modId=id;
   document.getElementById('modTitle').textContent=`Anfrage: ${a.id}`;
 
-  // Admin-Nachrichten laden
   let adminMsgs=[];
   try{ if(a.admin_notiz) adminMsgs=JSON.parse(a.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[{text:a.admin_notiz,ts:'',von:'admin'}]; }
   catch(e){ if(a.admin_notiz) adminMsgs=[{text:a.admin_notiz,ts:'',von:'admin'}]; }
-
-  // Kunden-Nachrichten laden
   let kundenMsgs=[];
   try{ if(a.kunden_nachrichten) kundenMsgs=JSON.parse(a.kunden_nachrichten); if(!Array.isArray(kundenMsgs)) kundenMsgs=[]; }
   catch(e){ kundenMsgs=[]; }
 
-  // Alle zusammenführen & nach Zeitstempel sortieren
   const alleNachrichten=[
     ...adminMsgs.map(m=>({...m,von:'admin'})),
     ...kundenMsgs.map(m=>({...m,von:'kunde'}))
@@ -1120,6 +1010,9 @@ function modOpen(id){
       }).join('')
     : `<div style="text-align:center;color:#bbb;font-size:.84em;padding:12px">Noch keine Nachrichten.</div>`;
 
+  /* NEU: Multicolor-Block im Modal */
+  const mcBlock = mcAnzeige(a, false);
+
   document.getElementById('modBody').innerHTML=`
     <div class="msec">📋 Auftragsdetails</div>
     <div class="igrid">
@@ -1131,6 +1024,8 @@ function modOpen(id){
       <div class="iitem"><div class="ilbl">Material-Wunsch</div><div class="ival">${x(a.material_wunsch)}</div></div>
       <div class="iitem full"><div class="ilbl">Projekt / Beschreibung</div><div class="ival"><strong>${x(a.projekt)}</strong>${a.beschreibung?'<br>'+x(a.beschreibung):''}</div></div>
     </div>
+
+    ${mcBlock ? `<div class="msec">🌈 Multicolor-Materialien</div>${mcBlock}` : ''}
 
     <div class="msec">📍 Lieferadresse</div>
     <div class="igrid">
@@ -1158,27 +1053,23 @@ function modOpen(id){
         <label>Grundpreis (€) – vor Rabatt</label>
         <input type="number" id="mGrund" step="0.01" min="0"
           value="${a.grundpreis!=null?a.grundpreis:(a.kosten!=null?a.kosten:'')}"
-          placeholder="z.B. 24.50"
-          oninput="modBerechne()">
+          placeholder="z.B. 24.50" oninput="modBerechne()">
       </div>
       <div class="field">
         <label>Rabatt (%)</label>
         <input type="number" id="mRabatt" step="1" min="0" max="100"
-          value="${a.rabatt_pct!=null?a.rabatt_pct:0}"
-          oninput="modBerechne()">
+          value="${a.rabatt_pct!=null?a.rabatt_pct:0}" oninput="modBerechne()">
       </div>
       <div class="field">
         <label>ca. Gramm (vom Kunden angegeben)</label>
         <input type="number" id="mGramm" step="1" min="0"
-          value="${a.ca_gramm!=null?a.ca_gramm:''}"
-          placeholder="—" readonly
+          value="${a.ca_gramm!=null?a.ca_gramm:''}" placeholder="—" readonly
           style="background:#f7f8fa;color:#888">
       </div>
       <div class="field">
         <label>Endpreis für Kunden (€)</label>
         <input type="number" id="mKosten" step="0.01" min="0"
-          value="${a.kosten!=null?a.kosten:''}"
-          placeholder="Wird automatisch berechnet">
+          value="${a.kosten!=null?a.kosten:''}" placeholder="Wird automatisch berechnet">
       </div>
     </div>
     <div id="mRabattInfo" style="display:none;background:#e8f5e9;border:1px solid #c3e6cb;border-radius:8px;padding:9px 14px;font-size:.85em;color:#155724;margin-top:4px">
@@ -1191,9 +1082,10 @@ function modOpen(id){
       <label>Deine Antwort / Nachricht an Kunden</label>
       <textarea id="mNeueNachricht" placeholder="z.B. Ihr Auftrag ist im Druck. Fertigstellung ca. Freitag…" style="min-height:70px"></textarea>
     </div>
-    <p style="font-size:.75em;color:var(--t3)">💡 Nachrichten sind für den Kunden sichtbar. Kunden-Nachrichten erscheinen in blau.</p>
+    <p style="font-size:.75em;color:var(--t3)">💡 Nachrichten sind für den Kunden sichtbar. Kunden-Nachrichten erscheinen in lila.</p>
   `;
   document.getElementById('modWrap').classList.add('on');
+  setTimeout(()=>{ const cv=document.getElementById('mChatVerlauf'); if(cv) cv.scrollTop=cv.scrollHeight; },50);
 }
 
 function modClose(){
@@ -1224,41 +1116,24 @@ async function modSave(){
   const status =document.getElementById('mStatus').value;
   const kv     =document.getElementById('mKosten').value;
   const kosten =kv!==''?parseFloat(kv):null;
-  const neueMsg=document.getElementById('mNeueNachricht').value.trim();
-
-  // Nachrichten-Array aufbauen
-  const a=anfragen.find(e=>e.id===modId);
-  let msgs=[];
-  try{ if(a.admin_notiz) msgs=JSON.parse(a.admin_notiz); if(!Array.isArray(msgs)) msgs=[{text:a.admin_notiz,ts:''}]; }
-  catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
-
-  if(neueMsg){
-    msgs.push({text:neueMsg, ts:new Date().toLocaleString('de-DE')});
-  }
-
   const grundVal  = document.getElementById('mGrund')?.value;
   const rabattVal = document.getElementById('mRabatt')?.value;
   const grundpreis = grundVal !== '' && grundVal ? parseFloat(grundVal) : null;
   const rabatt_pct = rabattVal ? parseFloat(rabattVal) : 0;
-
-  // Admin-Nachrichten aktualisieren
   const akt=anfragen.find(e=>e.id===modId);
   let adminMsgs=[];
   try{ if(akt.admin_notiz) adminMsgs=JSON.parse(akt.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[{text:akt.admin_notiz,ts:'',von:'admin'}]; }
   catch(err2){ if(akt.admin_notiz) adminMsgs=[{text:akt.admin_notiz,ts:'',von:'admin'}]; }
-
   const neueNachricht = document.getElementById('mNeueNachricht').value.trim();
   if(neueNachricht){
     adminMsgs.push({ text:neueNachricht, ts:new Date().toLocaleString('de-DE'), von:'admin' });
   }
-
   laden(true);
   try{
     await SB.from('bestellAnfragen').update({
       status, kosten, grundpreis, rabatt_pct,
       admin_notiz: adminMsgs.length ? JSON.stringify(adminMsgs) : null
     }).eq('id',modId);
-
     const idx2=anfragen.findIndex(e=>e.id===modId);
     if(idx2>-1) anfragen[idx2]={...anfragen[idx2],status,kosten,grundpreis,rabatt_pct,admin_notiz:adminMsgs.length?JSON.stringify(adminMsgs):null};
     filterAnfragen(); statsUpdate(); modClose();
@@ -1266,24 +1141,16 @@ async function modSave(){
   finally{ laden(false); }
 }
 
-// Modal schließen beim Klick außerhalb
 document.getElementById('modWrap').addEventListener('click',function(e){ if(e.target===this) modClose(); });
 
 async function auftragLoeschen(id, kundenname, projekt){
-  if(!confirm(`Auftrag wirklich löschen?
-
-Kunde: ${kundenname}
-Projekt: ${projekt}
-
-Dieser Vorgang kann nicht rückgängig gemacht werden!`)) return;
+  if(!confirm(`Auftrag wirklich löschen?\n\nKunde: ${kundenname}\nProjekt: ${projekt}\n\nDieser Vorgang kann nicht rückgängig gemacht werden!`)) return;
   laden(true);
   try{
     const { error } = await SB.from('bestellAnfragen').delete().eq('id', id);
     if(error) throw error;
     anfragen = anfragen.filter(a => a.id !== id);
-    filterAnfragen();
-    statsUpdate();
-    // Auch im Postfach entfernen falls vorhanden
+    filterAnfragen(); statsUpdate();
     postfachDaten = postfachDaten.filter(p => p.id !== id);
     if(aktivePfId === id){
       aktivePfId = null;
@@ -1297,7 +1164,7 @@ Dieser Vorgang kann nicht rückgängig gemacht werden!`)) return;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   KALKULATION (Manueller Auftrag)
+   KALKULATION
 ═══════════════════════════════════════════════════════════ */
 function berechne(){
   const sid=document.getElementById('jSpu').value;
@@ -1308,10 +1175,7 @@ function berechne(){
   let mat=0;
   if(sid){
     const s=lager.find(f=>f.id===sid);
-    if(s){
-      mat=(parseFloat(s.Preis)/parseFloat(s.startGewicht))*g;
-      w.style.display=g>parseFloat(s.restGewicht)?'block':'none';
-    }
+    if(s){ mat=(parseFloat(s.Preis)/parseFloat(s.startGewicht))*g; w.style.display=g>parseFloat(s.restGewicht)?'block':'none'; }
   } else w.style.display='none';
   const zwi=mat+fix, rab=zwi*(dis/100);
   aktKosten=zwi-rab;
@@ -1322,9 +1186,6 @@ function berechne(){
   document.getElementById('kEnd').textContent=aktKosten.toFixed(2).replace('.',',');
 }
 
-/* ═══════════════════════════════════════════════════════════
-   MANUELLEN AUFTRAG BUCHEN
-═══════════════════════════════════════════════════════════ */
 async function auftragBuchen(){
   const sid=document.getElementById('jSpu').value;
   const g=parseFloat(document.getElementById('jGra').value)||0;
@@ -1338,8 +1199,7 @@ async function auftragBuchen(){
     await SB.from('auftragsHistorie').insert([{
       id:'job_'+Date.now(), spuled:sid, erledigt:false,
       datum:new Date().toLocaleDateString('de-DE'),
-      projekt:pro, kunde:kun, material:s.Material,
-      verbrauchG:g, kosten:aktKosten
+      projekt:pro, kunde:kun, material:s.Material, verbrauchG:g, kosten:aktKosten
     }]);
     const nr=parseFloat(s.restGewicht)-g;
     await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',sid);
@@ -1351,7 +1211,6 @@ async function auftragBuchen(){
   finally{ document.getElementById('btnBuchen').disabled=false; laden(false); }
 }
 
-
 /* ═══════════════════════════════════════════════════════════
    KUNDENLISTE
 ═══════════════════════════════════════════════════════════ */
@@ -1359,95 +1218,42 @@ let kundenDaten = [];
 
 async function ladeKunden(){
   try{
-    // Kunden laden
-    const { data: kd } = await SB.from('kunden')
-      .select('id,name,email,telefon,adresse,plz,ort,erstellt')
-      .order('erstellt_am', { ascending: false });
-
-    // Bestellzahlen pro Kunde laden
-    const { data: bd } = await SB.from('bestellAnfragen')
-      .select('kunden_id')
-      .not('kunden_id', 'is', null);
-
+    const { data: kd } = await SB.from('kunden').select('id,name,email,telefon,adresse,plz,ort,erstellt').order('erstellt_am', { ascending: false });
+    const { data: bd } = await SB.from('bestellAnfragen').select('kunden_id').not('kunden_id', 'is', null);
     const bestellZahl = {};
-    (bd||[]).forEach(b => {
-      bestellZahl[b.kunden_id] = (bestellZahl[b.kunden_id]||0) + 1;
-    });
-
+    (bd||[]).forEach(b => { bestellZahl[b.kunden_id] = (bestellZahl[b.kunden_id]||0) + 1; });
     kundenDaten = (kd||[]).map(k => ({...k, anzahlBestellungen: bestellZahl[k.id]||0}));
-
-    // Stats
     const statsEl = document.getElementById('kundenStats');
     if(statsEl){
       statsEl.innerHTML = `
-        <div class="scard" style="padding:12px 16px;min-width:120px">
-          <div class="slabel">Registriert</div>
-          <div class="sval">${kundenDaten.length}</div>
-        </div>
-        <div class="scard gn" style="padding:12px 16px;min-width:120px">
-          <div class="slabel">Mit Adresse</div>
-          <div class="sval">${kundenDaten.filter(k=>k.adresse).length}</div>
-        </div>
-        <div class="scard or" style="padding:12px 16px;min-width:120px">
-          <div class="slabel">Mit Aufträgen</div>
-          <div class="sval">${kundenDaten.filter(k=>k.anzahlBestellungen>0).length}</div>
-        </div>`;
+        <div class="scard" style="padding:12px 16px;min-width:120px"><div class="slabel">Registriert</div><div class="sval">${kundenDaten.length}</div></div>
+        <div class="scard gn" style="padding:12px 16px;min-width:120px"><div class="slabel">Mit Adresse</div><div class="sval">${kundenDaten.filter(k=>k.adresse).length}</div></div>
+        <div class="scard or" style="padding:12px 16px;min-width:120px"><div class="slabel">Mit Aufträgen</div><div class="sval">${kundenDaten.filter(k=>k.anzahlBestellungen>0).length}</div></div>`;
     }
-
     filterKunden();
   } catch(e){ console.error('Kunden laden:', e); }
 }
 
 function filterKunden(){
   const su = (document.getElementById('kundenSuche')?.value||'').toLowerCase();
-  const liste = kundenDaten.filter(k => {
-    return !su || [k.name,k.email,k.ort||'',k.plz||''].some(s=>(s||'').toLowerCase().includes(su));
-  });
-
+  const liste = kundenDaten.filter(k => !su || [k.name,k.email,k.ort||'',k.plz||''].some(s=>(s||'').toLowerCase().includes(su)));
   const tb = document.getElementById('tKunden');
   if(!tb) return;
-
-  if(!liste.length){
-    tb.innerHTML = `<tr><td colspan="7" class="emp">Keine Kunden gefunden.</td></tr>`;
-    return;
-  }
-
+  if(!liste.length){ tb.innerHTML = `<tr><td colspan="7" class="emp">Keine Kunden gefunden.</td></tr>`; return; }
   tb.innerHTML = liste.map(k => {
-    const adresse = k.adresse
-      ? `${x(k.adresse)}<br><span style="font-size:.82em;color:var(--t3)">${x(k.plz)} ${x(k.ort)}</span>`
-      : `<span style="color:#ccc;font-size:.82em">Keine Adresse</span>`;
-
-    const bestellBadge = k.anzahlBestellungen > 0
-      ? `<span class="bdg bgn">${k.anzahlBestellungen} Auftrag${k.anzahlBestellungen>1?'e':''}</span>`
-      : `<span class="bdg bgr">Noch keine</span>`;
-
+    const adresse = k.adresse ? `${x(k.adresse)}<br><span style="font-size:.82em;color:var(--t3)">${x(k.plz)} ${x(k.ort)}</span>` : `<span style="color:#ccc;font-size:.82em">Keine Adresse</span>`;
+    const bestellBadge = k.anzahlBestellungen > 0 ? `<span class="bdg bgn">${k.anzahlBestellungen} Auftrag${k.anzahlBestellungen>1?'e':''}</span>` : `<span class="bdg bgr">Noch keine</span>`;
     return `<tr>
-      <td>
-        <div style="font-weight:600;font-size:.93em">${x(k.name)}</div>
-      </td>
-      <td>
-        <a href="mailto:${x(k.email)}" style="color:var(--bl);font-size:.88em">${x(k.email)}</a>
-      </td>
-      <td style="font-size:.88em">
-        ${k.telefon
-          ? `<a href="tel:${x(k.telefon)}" style="color:var(--t2)">${x(k.telefon)}</a>`
-          : `<span style="color:#ccc">—</span>`}
-      </td>
+      <td><div style="font-weight:600;font-size:.93em">${x(k.name)}</div></td>
+      <td><a href="mailto:${x(k.email)}" style="color:var(--bl);font-size:.88em">${x(k.email)}</a></td>
+      <td style="font-size:.88em">${k.telefon?`<a href="tel:${x(k.telefon)}" style="color:var(--t2)">${x(k.telefon)}</a>`:`<span style="color:#ccc">—</span>`}</td>
       <td style="font-size:.85em">${adresse}</td>
       <td style="font-size:.82em;color:var(--t3);white-space:nowrap">${x(k.erstellt||'—')}</td>
       <td>${bestellBadge}</td>
       <td>
         <div style="display:flex;flex-direction:column;gap:4px">
-          <a href="mailto:${x(k.email)}"
-            style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e3f0ff;color:var(--bl);border-radius:7px;font-size:.78em;font-weight:600;text-decoration:none"
-            title="E-Mail an ${x(k.name)}">
-            ✉ E-Mail
-          </a>
-          ${k.telefon ? `<a href="tel:${x(k.telefon)}"
-            style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e8f5e9;color:var(--gn2);border-radius:7px;font-size:.78em;font-weight:600;text-decoration:none"
-            title="Anrufen">
-            📞 Anrufen
-          </a>` : ''}
+          <a href="mailto:${x(k.email)}" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e3f0ff;color:var(--bl);border-radius:7px;font-size:.78em;font-weight:600;text-decoration:none" title="E-Mail an ${x(k.name)}">✉ E-Mail</a>
+          ${k.telefon ? `<a href="tel:${x(k.telefon)}" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e8f5e9;color:var(--gn2);border-radius:7px;font-size:.78em;font-weight:600;text-decoration:none" title="Anrufen">📞 Anrufen</a>` : ''}
         </div>
       </td>
     </tr>`;
@@ -1458,17 +1264,12 @@ function filterKunden(){
    HILFSFUNKTIONEN
 ═══════════════════════════════════════════════════════════ */
 function laden(an){ document.getElementById('ladeWrap').style.display=an?'flex':'none'; }
-
 function x(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
-
 function badge(st){
-  const m={
-    'Anfrage eingegangen':'bbl','In Bearbeitung':'byw',
-    'Im Druck':'bli','Qualitätsprüfung':'byw',
-    'Versandbereit':'bgn','Abgeschlossen':'bgn','Storniert':'brd'
-  };
+  const m={'Anfrage eingegangen':'bbl','In Bearbeitung':'byw','Im Druck':'bli','Qualitätsprüfung':'byw','Versandbereit':'bgn','Abgeschlossen':'bgn','Storniert':'brd'};
   return `<span class="bdg ${m[st]||'bgr'}">${x(st)}</span>`;
 }
+function badgeHtml(st){ return badge(st); }
 </script>
 </body>
 </html>
