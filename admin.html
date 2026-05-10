@@ -161,6 +161,16 @@ tr:hover td{background:#fafcff}
 .mc-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px dashed #dde4ee;font-size:.86em}
 .mc-row:last-child{border-bottom:none}
 
+/* ── NEU: PREISBERECHNUNGS-BOX IM MODAL ────────────── */
+.mod-preis-box{background:#f0f7ff;border:1px solid #c3d9f8;border-left:4px solid var(--bl);border-radius:10px;padding:14px 18px;margin:12px 0 4px;display:none}
+.mod-preis-box.on{display:block}
+.mod-preis-box-titel{font-size:.72em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.mod-preis-zeile{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px dashed #dde4ee;font-size:.87em;color:var(--t2)}
+.mod-preis-zeile:last-child{border-bottom:none}
+.mod-preis-zeile.total-zeile{padding-top:8px;margin-top:2px;border-top:2px solid #c3d9f8;border-bottom:none;font-size:1em;font-weight:700;color:var(--bl)}
+.mod-preis-zeile.rabatt-zeile{color:var(--gn2);font-weight:600}
+.mod-preis-zeile.endpreis-zeile{font-size:1.1em;font-weight:700;color:var(--gn);padding-top:8px;margin-top:2px;border-top:2px solid #c3e6cb}
+
 /* ── LADE-OVERLAY ──────────────────────────────────── */
 #ladeWrap{position:fixed;inset:0;background:rgba(255,255,255,.84);display:none;align-items:center;justify-content:center;z-index:9000;backdrop-filter:blur(2px)}
 .lspin{width:28px;height:28px;border:3px solid #d8e2ef;border-top-color:var(--bl);border-radius:50%;animation:spin .65s linear infinite;margin-right:10px}
@@ -685,7 +695,6 @@ async function historieDel(id, g, spuId){
 
 /* ═══════════════════════════════════════════════════════════
    NEU: MULTICOLOR HILFSFUNKTION
-   Gibt HTML zurück – kompakt (für Tabelle) oder detailliert (für Modal/Postfach)
 ═══════════════════════════════════════════════════════════ */
 function mcAnzeige(a, kompakt) {
   if (!a.multicolor_materialien) return '';
@@ -694,13 +703,11 @@ function mcAnzeige(a, kompakt) {
   if (!Array.isArray(mc) || !mc.length) return '';
 
   if (kompakt) {
-    // Kurze Darstellung für die Tabellenzelle
     return '<div style="margin-top:3px">' +
       mc.map((m,i) => `<span class="mc-tag">F${i+1}</span> ${x(m.material)}`).join(' · ') +
     '</div>';
   }
 
-  // Ausführliche Darstellung für Modal / Postfach-Header
   return '<div class="mc-block">' +
     '<div class="mc-block-lbl">🌈 Multicolor-Materialien</div>' +
     mc.map((m,i) =>
@@ -778,7 +785,6 @@ function filterPost(){
     const ung=pfHatUngeleseneKundenMsg(p);
     const dat=p.datum||'';
     const name=p.gastname||p.kunde||'Gast';
-    /* NEU: 🌈 Symbol wenn Multicolor */
     const isMC = !!p.multicolor_materialien;
     return `<div onclick="pfOeffnen('${p.id}')"
       style="padding:13px 16px;border-bottom:1px solid #f0f4f8;cursor:pointer;transition:background .15s;${aktiv}${ung?'border-left:3px solid var(--bl);':'border-left:3px solid transparent;'}"
@@ -803,8 +809,6 @@ async function pfOeffnen(id){
   const p=postfachDaten.find(e=>e.id===id); if(!p) return;
   const name=p.gastname||p.kunde||'Gast';
   const email=p.gast_email||'';
-
-  /* NEU: Multicolor-Block im Chat-Header anzeigen */
   const mcBlock = mcAnzeige(p, false);
 
   document.getElementById('pfChatHeader').innerHTML=`
@@ -926,8 +930,6 @@ function filterAnfragen(){
     const adr=a.adresse?`<span style="font-size:.82em">${x(a.adresse)}<br>${x(a.plz)} ${x(a.ort)}</span>`:`<span style="color:#ccc">—</span>`;
     const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
     const kundenname = a.gastname || a.kunde || '(Kundenkonto)';
-
-    /* NEU: Multicolor kompakt in der Materialspalte */
     const mcKompakt = mcAnzeige(a, true);
 
     return `<tr>
@@ -1010,8 +1012,18 @@ function modOpen(id){
       }).join('')
     : `<div style="text-align:center;color:#bbb;font-size:.84em;padding:12px">Noch keine Nachrichten.</div>`;
 
-  /* NEU: Multicolor-Block im Modal */
   const mcBlock = mcAnzeige(a, false);
+
+  /* ── Filament-Dropdown für automatische Preisberechnung ── */
+  const filamentOptionen = '<option value="">— Filament wählen (optional) —</option>' +
+    lager.filter(f => parseFloat(f.restGewicht) > 0 && !f.gesperrt).map(f =>
+      `<option value="${f.id}" data-preis="${f.Preis}" data-start="${f.startGewicht}">
+        ${x(f.Material)} – ${x(f.Hertseller)} (${parseFloat(f.restGewicht).toFixed(0)} g)
+      </option>`
+    ).join('');
+
+  /* Vorausgewähltes Gramm (vom Kunden angegeben, wenn vorhanden) */
+  const vorGramm = a.ca_gramm || '';
 
   document.getElementById('modBody').innerHTML=`
     <div class="msec">📋 Auftragsdetails</div>
@@ -1037,7 +1049,7 @@ function modOpen(id){
 
     <div class="msec">⚙️ Status &amp; Preis ändern</div>
     <div class="fgrid">
-      <div class="field">
+      <div class="field fcol">
         <label>Auftragsstatus</label>
         <select id="mStatus">
           <option ${a.status==='Anfrage eingegangen'?'selected':''}>Anfrage eingegangen</option>
@@ -1049,31 +1061,62 @@ function modOpen(id){
           <option ${a.status==='Storniert'?'selected':''}>Storniert</option>
         </select>
       </div>
-      <div class="field">
-        <label>Grundpreis (€) – vor Rabatt</label>
-        <input type="number" id="mGrund" step="0.01" min="0"
-          value="${a.grundpreis!=null?a.grundpreis:(a.kosten!=null?a.kosten:'')}"
-          placeholder="z.B. 24.50" oninput="modBerechne()">
-      </div>
-      <div class="field">
-        <label>Rabatt (%)</label>
-        <input type="number" id="mRabatt" step="1" min="0" max="100"
-          value="${a.rabatt_pct!=null?a.rabatt_pct:0}" oninput="modBerechne()">
-      </div>
-      <div class="field">
-        <label>ca. Gramm (vom Kunden angegeben)</label>
-        <input type="number" id="mGramm" step="1" min="0"
-          value="${a.ca_gramm!=null?a.ca_gramm:''}" placeholder="—" readonly
-          style="background:#f7f8fa;color:#888">
-      </div>
-      <div class="field">
-        <label>Endpreis für Kunden (€)</label>
-        <input type="number" id="mKosten" step="0.01" min="0"
-          value="${a.kosten!=null?a.kosten:''}" placeholder="Wird automatisch berechnet">
-      </div>
     </div>
-    <div id="mRabattInfo" style="display:none;background:#e8f5e9;border:1px solid #c3e6cb;border-radius:8px;padding:9px 14px;font-size:.85em;color:#155724;margin-top:4px">
-      💰 Rabatt aktiv – Endpreis wird automatisch berechnet
+
+    <!-- ══ NEU: AUTOMATISCHE PREISBERECHNUNG ══ -->
+    <div style="background:#f8fafc;border:1.5px solid var(--br);border-radius:11px;padding:16px 18px;margin-top:14px">
+      <div style="font-size:.8em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">
+        🧮 Automatische Preisberechnung
+      </div>
+      <div class="fgrid">
+        <div class="field fcol">
+          <label>Filament auswählen</label>
+          <select id="mFilament" onchange="modBerechneAuto()">${filamentOptionen}</select>
+          <span style="font-size:.75em;color:var(--t3);margin-top:3px">
+            Wähle das tatsächlich verwendete Filament → Materialpreis wird automatisch berechnet
+          </span>
+        </div>
+        <div class="field">
+          <label>Verbrauch (g)</label>
+          <input type="number" id="mGrammEdit" min="1" step="1" placeholder="z.B. 120"
+            value="${vorGramm}" oninput="modBerechneAuto()">
+        </div>
+        <div class="field">
+          <label>Pauschale Strom &amp; Verschleiß (€)</label>
+          <input type="number" id="mPauschale" min="0" step="0.01" value="4.50" oninput="modBerechneAuto()">
+        </div>
+        <div class="field">
+          <label>Rabatt (%) – optional</label>
+          <input type="number" id="mRabatt" step="1" min="0" max="100"
+            value="${a.rabatt_pct!=null?a.rabatt_pct:0}" oninput="modBerechneAuto()">
+        </div>
+      </div>
+
+      <!-- Preisvorschau-Box (wird eingeblendet sobald Filament + Gramm gesetzt) -->
+      <div class="mod-preis-box" id="mPreisBox">
+        <div class="mod-preis-box-titel">💶 Preisvorschau</div>
+        <div id="mPreisZeilen"></div>
+        <div id="mPreisEndzeile"></div>
+      </div>
+
+      <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field">
+          <label>Grundpreis (€) – vor Rabatt</label>
+          <input type="number" id="mGrund" step="0.01" min="0"
+            value="${a.grundpreis!=null?a.grundpreis:(a.kosten!=null?a.kosten:'')}"
+            placeholder="Automatisch oder manuell" oninput="modBerechneManuel()">
+          <span style="font-size:.75em;color:var(--t3);margin-top:3px">
+            Wird automatisch gefüllt – kannst du aber manuell überschreiben
+          </span>
+        </div>
+        <div class="field">
+          <label>Endpreis für Kunden (€)</label>
+          <input type="number" id="mKosten" step="0.01" min="0"
+            value="${a.kosten!=null?a.kosten:''}"
+            placeholder="Wird automatisch berechnet"
+            style="font-weight:700;font-size:1.05em;border-color:var(--gn);background:#f0fff4">
+        </div>
+      </div>
     </div>
 
     <div class="msec">💬 Nachrichtenverlauf</div>
@@ -1084,40 +1127,147 @@ function modOpen(id){
     </div>
     <p style="font-size:.75em;color:var(--t3)">💡 Nachrichten sind für den Kunden sichtbar. Kunden-Nachrichten erscheinen in lila.</p>
   `;
+
   document.getElementById('modWrap').classList.add('on');
+
+  /* Wenn bereits Grundpreis + Rabatt gespeichert → Rabatt-Info direkt anzeigen */
+  if(a.grundpreis && a.grundpreis !== a.kosten){
+    modBerechneManuel();
+  }
+
   setTimeout(()=>{ const cv=document.getElementById('mChatVerlauf'); if(cv) cv.scrollTop=cv.scrollHeight; },50);
 }
+
+/* ─────────────────────────────────────────────────────────
+   NEU: Automatische Berechnung aus Filament + Gramm
+───────────────────────────────────────────────────────── */
+function modBerechneAuto(){
+  const sel      = document.getElementById('mFilament');
+  const grammEl  = document.getElementById('mGrammEdit');
+  const pausEl   = document.getElementById('mPauschale');
+  const rabattEl = document.getElementById('mRabatt');
+  const grundEl  = document.getElementById('mGrund');
+  const kostenEl = document.getElementById('mKosten');
+  const box      = document.getElementById('mPreisBox');
+  const zeilen   = document.getElementById('mPreisZeilen');
+  const endZeile = document.getElementById('mPreisEndzeile');
+
+  const gramm    = parseFloat(grammEl?.value) || 0;
+  const pausch   = parseFloat(pausEl?.value) || 4.5;
+  const rabatt   = parseFloat(rabattEl?.value) || 0;
+
+  /* Ohne Filament oder Gramm → keine Berechnung, Box ausblenden */
+  if(!sel?.value || !gramm){
+    box.classList.remove('on');
+    /* Grundpreis-Feld wieder editierbar lassen */
+    if(grundEl) grundEl.style.background = '#fff';
+    return;
+  }
+
+  const opt    = sel.options[sel.selectedIndex];
+  const preis  = parseFloat(opt?.dataset?.preis) || 0;
+  const start  = parseFloat(opt?.dataset?.start) || 1000;
+  const matK   = (preis / start) * gramm;
+  const zwischen = matK + pausch;
+  const rabattBtr = zwischen * (rabatt / 100);
+  const endpreis  = zwischen - rabattBtr;
+  const matName   = opt.text.split('(')[0].trim();
+
+  /* Grundpreis befüllen */
+  if(grundEl){
+    grundEl.value = zwischen.toFixed(2);
+    grundEl.style.background = '#f0f6ff';
+  }
+  if(kostenEl) kostenEl.value = endpreis.toFixed(2);
+
+  /* Preisvorschau aufbauen */
+  zeilen.innerHTML = `
+    <div class="mod-preis-zeile">
+      <span>🎨 ${x(matName)} (${gramm} g)</span>
+      <strong>${matK.toFixed(2)} €</strong>
+    </div>
+    <div class="mod-preis-zeile">
+      <span>⚡ Strom &amp; Verschleiß</span>
+      <strong>${pausch.toFixed(2)} €</strong>
+    </div>
+    <div class="mod-preis-zeile total-zeile">
+      <span>Zwischensumme</span>
+      <strong>${zwischen.toFixed(2)} €</strong>
+    </div>`;
+
+  let endHtml = '';
+  if(rabatt > 0){
+    endHtml += `<div class="mod-preis-zeile rabatt-zeile" style="margin-top:6px">
+      <span>🎁 Rabatt (${rabatt}%)</span>
+      <strong>− ${rabattBtr.toFixed(2)} €</strong>
+    </div>`;
+  }
+  endHtml += `<div class="mod-preis-zeile endpreis-zeile" style="margin-top:6px">
+    <span>✅ Endpreis für Kunden</span>
+    <strong style="font-size:1.15em">${endpreis.toFixed(2)} €</strong>
+  </div>`;
+  endZeile.innerHTML = endHtml;
+
+  box.classList.add('on');
+}
+
+/* ─────────────────────────────────────────────────────────
+   Manuelle Überschreibung (Grundpreis direkt eingegeben)
+───────────────────────────────────────────────────────── */
+function modBerechneManuel(){
+  const grundEl  = document.getElementById('mGrund');
+  const rabattEl = document.getElementById('mRabatt');
+  const kostenEl = document.getElementById('mKosten');
+  const box      = document.getElementById('mPreisBox');
+  const zeilen   = document.getElementById('mPreisZeilen');
+  const endZeile = document.getElementById('mPreisEndzeile');
+
+  const grund  = parseFloat(grundEl?.value) || 0;
+  const rabatt = parseFloat(rabattEl?.value) || 0;
+
+  if(!grund){ return; }
+
+  const rabattBtr = grund * (rabatt / 100);
+  const endpreis  = grund - rabattBtr;
+  if(kostenEl) kostenEl.value = endpreis.toFixed(2);
+
+  zeilen.innerHTML = `
+    <div class="mod-preis-zeile">
+      <span>📝 Manueller Grundpreis</span>
+      <strong>${grund.toFixed(2)} €</strong>
+    </div>`;
+
+  let endHtml = '';
+  if(rabatt > 0){
+    endHtml += `<div class="mod-preis-zeile rabatt-zeile" style="margin-top:6px">
+      <span>🎁 Rabatt (${rabatt}%)</span>
+      <strong>− ${rabattBtr.toFixed(2)} €</strong>
+    </div>`;
+  }
+  endHtml += `<div class="mod-preis-zeile endpreis-zeile" style="margin-top:6px">
+    <span>✅ Endpreis für Kunden</span>
+    <strong style="font-size:1.15em">${endpreis.toFixed(2)} €</strong>
+  </div>`;
+  endZeile.innerHTML = endHtml;
+
+  box.classList.add('on');
+}
+
+/* Die alte modBerechne() bleibt als Alias erhalten (Rückwärtskompatibilität) */
+function modBerechne(){ modBerechneManuel(); }
 
 function modClose(){
   document.getElementById('modWrap').classList.remove('on');
   modId=null;
 }
 
-function modBerechne(){
-  const grund  = parseFloat(document.getElementById('mGrund')?.value) || 0;
-  const rabatt = parseFloat(document.getElementById('mRabatt')?.value) || 0;
-  const info   = document.getElementById('mRabattInfo');
-  if(!grund){ return; }
-  const rabattBetrag = grund * (rabatt / 100);
-  const endpreis     = grund - rabattBetrag;
-  document.getElementById('mKosten').value = endpreis.toFixed(2);
-  if(info){
-    if(rabatt > 0){
-      info.style.display = 'block';
-      info.textContent   = `💰 ${rabatt}% Rabatt = -${rabattBetrag.toFixed(2)} € → Endpreis: ${endpreis.toFixed(2)} €`;
-    } else {
-      info.style.display = 'none';
-    }
-  }
-}
-
 async function modSave(){
   if(!modId) return;
-  const status =document.getElementById('mStatus').value;
-  const kv     =document.getElementById('mKosten').value;
-  const kosten =kv!==''?parseFloat(kv):null;
-  const grundVal  = document.getElementById('mGrund')?.value;
-  const rabattVal = document.getElementById('mRabatt')?.value;
+  const status   = document.getElementById('mStatus').value;
+  const kv       = document.getElementById('mKosten').value;
+  const kosten   = kv !== '' ? parseFloat(kv) : null;
+  const grundVal = document.getElementById('mGrund')?.value;
+  const rabattVal= document.getElementById('mRabatt')?.value;
   const grundpreis = grundVal !== '' && grundVal ? parseFloat(grundVal) : null;
   const rabatt_pct = rabattVal ? parseFloat(rabattVal) : 0;
   const akt=anfragen.find(e=>e.id===modId);
@@ -1164,7 +1314,7 @@ async function auftragLoeschen(id, kundenname, projekt){
 }
 
 /* ═══════════════════════════════════════════════════════════
-   KALKULATION
+   KALKULATION (Tab "Neuer Auftrag" – unverändert)
 ═══════════════════════════════════════════════════════════ */
 function berechne(){
   const sid=document.getElementById('jSpu').value;
