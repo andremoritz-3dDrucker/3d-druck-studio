@@ -1077,9 +1077,10 @@ function modOpen(id){
           </span>
         </div>
         <div class="field">
-          <label>Verbrauch (g)</label>
-          <input type="number" id="mGrammEdit" min="1" step="1" placeholder="z.B. 120"
-            value="${vorGramm}" oninput="modBerechneAuto()">
+          <label>Verbrauch (g) ${!vorGramm ? '<span style="background:#fff3e0;color:#c07a00;padding:1px 7px;border-radius:8px;font-size:.85em;font-weight:700;margin-left:4px">⚠ Vom Kunden nicht angegeben – bitte eintragen</span>' : '<span style="background:#e8f5e9;color:#1a6b30;padding:1px 7px;border-radius:8px;font-size:.85em;margin-left:4px">✓ Vom Kunden angegeben</span>'}</label>
+          <input type="number" id="mGrammEdit" min="1" step="1" placeholder="Gramm hier eintragen…"
+            value="${vorGramm}" oninput="modBerechneAuto()"
+            style="${!vorGramm ? 'border-color:#f39c12;background:#fffdf0;' : ''}">
         </div>
         <div class="field">
           <label>Pauschale Strom &amp; Verschleiß (€)</label>
