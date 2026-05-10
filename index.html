@@ -578,7 +578,7 @@ function headerAktualisieren() {
 /* ═══════════  FILAMENTE LADEN  ═══════════ */
 async function ladeFilamente() {
   try {
-    const { data } = await sb.from('FilamentLager').select('id,Material,Hertseller,startGewicht,restGewicht,Preis').order('Material');
+    const { data } = await sb.from('FilamentLager').select('id,Material,Hertseller,startGewicht,restGewicht,Preis,gesperrt').order('Material');
     // Gesperrte und leere Spulen fuer Kunden ausblenden
     filamentDaten = (data || []).filter(f => parseFloat(f.restGewicht) > 0 && !f.gesperrt);
     const opts = '<option value="">— Material &amp; Farbe wählen —</option>' +
