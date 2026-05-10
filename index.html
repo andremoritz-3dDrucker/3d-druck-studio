@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>3D-Druck Studio – Kundenportal</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -13,6 +14,8 @@
   --br:#dde4ee;--t1:#1e2a3a;--t2:#4a5568;--t3:#718096;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px}
+
+/* ── HEADER ── */
 header{background:linear-gradient(135deg,#0d1b2e,#0056b3);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
 .hi{max-width:920px;margin:0 auto;padding:0 16px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .hlogo{display:flex;align-items:center;gap:10px;flex-shrink:0}
@@ -23,13 +26,18 @@ header{background:linear-gradient(135deg,#0d1b2e,#0056b3);color:#fff;position:st
 .nbtn:hover{background:rgba(255,255,255,.22)}
 .nbtn.acc{background:rgba(255,255,255,.22);font-weight:600}
 .nuser{font-size:.8em;opacity:.75;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nbadge{display:inline-flex;align-items:center;justify-content:center;background:var(--rd);color:#fff;width:17px;height:17px;border-radius:50%;font-size:.68em;font-weight:700;margin-left:4px;vertical-align:middle}
+
+/* ── MAIN ── */
 main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .view{display:none}.view.on{display:block}
+
+/* ── CARDS ── */
 .card{background:var(--wh);border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.08);padding:26px;margin-bottom:20px}
 .card-sm{max-width:480px;margin-left:auto;margin-right:auto}
 .card h2{font-size:1.2em;font-weight:700;margin-bottom:4px}
 .card-sub{font-size:.84em;color:var(--t3);margin-bottom:22px}
+
+/* ── FORMS ── */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .fc{grid-column:1/-1}
 .field{display:flex;flex-direction:column;gap:5px}
@@ -39,6 +47,8 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .field input[disabled]{background:#f5f5f5;color:#999;cursor:not-allowed}
 .field textarea{resize:vertical;min-height:80px}
 .sep{font-size:.73em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.07em;margin:20px 0 10px;padding-bottom:6px;border-bottom:1.5px solid #dbeeff}
+
+/* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;width:100%}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .b-bl{background:linear-gradient(135deg,var(--bl),#0073e6);color:#fff;box-shadow:0 2px 8px rgba(0,86,179,.22)}
@@ -49,14 +59,24 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .b-out:hover:not(:disabled){background:var(--bg);border-color:#aab}
 .b-sm{padding:6px 13px;font-size:12px;width:auto}
 .brow{display:flex;gap:10px;margin-top:18px}.brow .btn{flex:1}
+
+/* ── ALERTS ── */
 .alert{padding:11px 15px;border-radius:9px;font-size:.84em;margin-bottom:16px;display:none;line-height:1.5}
 .alert.on{display:block}
 .a-err{background:#fde8ea;border:1px solid #f5c6cb;color:#922}
 .a-ok{background:#e8f5e9;border:1px solid #c3e6cb;color:#155724}
+.a-info{background:#e3f0ff;border:1px solid #b8d4f0;color:var(--bl)}
+
+/* ── BADGES ── */
 .bdg{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75em;font-weight:700;white-space:nowrap}
-.b-neu{background:#e3f0ff;color:var(--bl)}.b-arb{background:#fff8e1;color:#c07a00}
-.b-druck{background:#f3e5f5;color:#6a1b9a}.b-ok{background:#e8f5e9;color:#1a6b30}
-.b-rd{background:#fde8ea;color:var(--rd)}.b-gr{background:#f0f0f0;color:#666}
+.b-neu{background:#e3f0ff;color:var(--bl)}
+.b-arb{background:#fff8e1;color:#c07a00}
+.b-druck{background:#f3e5f5;color:#6a1b9a}
+.b-ok{background:#e8f5e9;color:#1a6b30}
+.b-rd{background:#fde8ea;color:var(--rd)}
+.b-gr{background:#f0f0f0;color:#666}
+
+/* ── HERO ── */
 .hero{text-align:center;padding:32px 16px 24px}
 .hero-icon{width:78px;height:78px;background:linear-gradient(135deg,var(--bl),var(--gn));border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 20px;box-shadow:0 8px 24px rgba(0,86,179,.22)}
 .hero h1{font-size:1.65em;margin-bottom:10px}
@@ -68,11 +88,16 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .oc-icon{font-size:32px;margin-bottom:10px}
 .oc-title{font-size:.96em;font-weight:700;margin-bottom:5px}
 .oc-desc{font-size:.77em;color:var(--t3);line-height:1.55}
+
+/* ── PROFIL BOX ── */
 .pbox{display:flex;align-items:center;gap:15px;background:linear-gradient(135deg,#eef5ff,#eef8f0);border:1px solid #d4e7fb;border-radius:14px;padding:15px 18px;margin-bottom:18px}
 .pavatar{width:48px;height:48px;background:linear-gradient(135deg,var(--bl),var(--gn));border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.05em;color:#fff;font-weight:700;flex-shrink:0}
-.pinfo{flex:1;min-width:0}.pinfo h3{font-size:.97em;margin-bottom:2px}
+.pinfo{flex:1;min-width:0}
+.pinfo h3{font-size:.97em;margin-bottom:2px}
 .pinfo span{font-size:.81em;color:var(--t3);display:block}
 .pactions{display:flex;gap:7px;flex-shrink:0}
+
+/* ── AUFTRAGSKARTEN ── */
 .order-card{border:1.5px solid var(--br);border-radius:13px;padding:16px 18px;margin-bottom:13px;background:var(--wh);transition:box-shadow .2s}
 .order-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
 .order-card.storniert{opacity:.55;background:#fafafa}
@@ -85,12 +110,25 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .oc-val{font-size:.87em;color:var(--t1);line-height:1.4}
 .oc-full{grid-column:1/-1}
 .oc-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f4f8}
+
+/* ── NACHRICHTEN ── */
+.msg-box{background:#eef5ff;border:1px solid #c3d9f8;border-left:3px solid var(--bl);border-radius:9px;padding:10px 14px;margin-top:6px}
+.msg-box-lbl{font-size:.71em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.msg-entry{padding:4px 0;border-bottom:1px dashed #c3d9f8;font-size:.85em;color:var(--t1);line-height:1.55}
+.msg-entry:last-child{border-bottom:none;padding-bottom:0}
+.msg-ts{font-size:.75em;color:var(--t3);margin-bottom:1px}
+
+/* ── STORNO BTN ── */
 .btn-storno{display:inline-block;padding:5px 12px;background:transparent;border:1.5px solid #f5c6cb;color:var(--rd);border-radius:7px;font-size:.77em;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;width:auto}
 .btn-storno:hover{background:#fde8ea;border-color:var(--rd)}
 .btn-storno:disabled{opacity:.35;cursor:not-allowed;border-color:#ddd;color:#bbb}
+
+/* ── PREIS-VORSCHAU ── */
 .preview-box{background:#f0f7ff;border:1px solid #c3d9f8;border-left:3px solid var(--bl);border-radius:9px;padding:12px 15px;margin-top:4px;font-size:.87em;line-height:1.85}
 .preview-lbl{font-size:.71em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
 .preview-warn{font-size:.76em;color:var(--t3);margin-top:4px}
+
+/* ── DATEI UPLOAD ── */
 .upload-area{border:2px dashed var(--br);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:#fafcff}
 .upload-area:hover,.upload-area.drag{border-color:var(--bl);background:#eef5ff}
 .upload-area input[type=file]{display:none}
@@ -99,12 +137,32 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .upload-preview{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
 .upload-chip{display:flex;align-items:center;gap:6px;background:#e3f0ff;border-radius:6px;padding:4px 10px;font-size:.79em;color:var(--bl);font-weight:500}
 .upload-chip button{background:none;border:none;cursor:pointer;color:var(--rd);font-size:13px;padding:0;width:auto;line-height:1}
+
+/* ── BESTÄTIGUNG ── */
 .confirm-wrap{text-align:center;padding:30px 16px}
 .confirm-icon{width:74px;height:74px;background:#e8f5e9;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 18px;box-shadow:0 4px 14px rgba(40,167,69,.15)}
 .confirm-id{background:#f8fafc;border:1.5px dashed #c0c8d4;border-radius:10px;padding:11px 20px;font-family:'Courier New',monospace;font-size:1.1em;letter-spacing:.06em;display:inline-block;margin:10px 0 20px;color:var(--t1)}
+
+/* ── EMPTY ── */
 .empty{text-align:center;padding:40px 16px;color:var(--t3)}
 .empty-icon{font-size:42px;margin-bottom:12px}
 .empty p{font-size:.88em;margin-bottom:16px}
+
+/* ── MULTICOLOR ── */
+.druckmodus-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.dm-option{border:2px solid var(--br);border-radius:10px;padding:13px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;font-size:.9em;font-weight:600;color:var(--t2)}
+.dm-option:hover{border-color:var(--bl);background:#f0f6ff}
+.dm-option.aktiv{border-color:var(--bl);background:#e3f0ff;color:var(--bl)}
+.dm-option input[type=radio]{accent-color:var(--bl);width:16px;height:16px}
+.mc-info{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:9px 13px;font-size:.82em;color:#7a5500;margin-bottom:10px;display:none}
+.mc-info.on{display:block}
+.mc-farbe-wrap{border:1.5px solid var(--br);border-radius:10px;padding:13px 15px;margin-bottom:10px;background:#fafcff}
+.mc-farbe-titel{font-size:.78em;font-weight:700;color:#fff;padding:2px 9px;border-radius:12px;display:inline-block;margin-bottom:10px}
+.mc-add-btn{width:100%;padding:10px;border:2px dashed var(--br);border-radius:9px;background:transparent;color:var(--t3);font-size:.85em;font-weight:600;cursor:pointer;transition:all .2s;margin-top:4px}
+.mc-add-btn:hover{border-color:var(--bl);color:var(--bl);background:#f0f6ff}
+.mc-remove-btn{background:transparent;border:1.5px solid #f5c6cb;color:var(--rd);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;width:auto;transition:all .15s}
+.mc-remove-btn:hover{background:#fde8ea}
+
 /* ── CHAT ── */
 .chat-wrap{border:1.5px solid var(--br);border-radius:12px;overflow:hidden;margin-top:8px}
 .chat-verlauf{max-height:300px;overflow-y:auto;padding:12px;background:#fafcff;display:flex;flex-direction:column;gap:9px}
@@ -121,44 +179,23 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 .chat-send:hover{background:var(--bl2)}
 .chat-send:disabled{opacity:.5;cursor:not-allowed}
 .chat-leer{text-align:center;color:#bbb;font-size:.83em;padding:16px;font-style:italic}
-/* ── NEU: NACHRICHTEN-BADGE PULS ── */
-@keyframes puls{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
-.nbadge.neu{animation:puls .8s ease-in-out 3}
-/* ── NEU: MULTICOLOR ── */
-.mc-slot{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end;background:#f8fbff;border:1.5px solid var(--br);border-radius:10px;padding:12px 14px;margin-bottom:8px;position:relative}
-.mc-slot-nr{position:absolute;top:-9px;left:12px;background:var(--bl);color:#fff;font-size:.68em;font-weight:700;padding:1px 8px;border-radius:10px}
-.mc-gramm{width:100px}
-.mc-del{padding:9px 12px;background:transparent;border:1.5px solid #f5c6cb;color:var(--rd);border-radius:8px;font-size:13px;cursor:pointer;width:auto;flex-shrink:0;transition:all .18s}
-.mc-del:hover{background:#fde8ea}
-.mc-add{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;background:#eef5ff;border:2px dashed var(--bl);border-radius:10px;color:var(--bl);font-size:.87em;font-weight:700;cursor:pointer;transition:all .18s;width:100%;margin-top:4px}
-.mc-add:hover{background:#dbeeff}
-.mc-add:disabled{opacity:.4;cursor:not-allowed}
-.mc-preview{background:#f0f7ff;border:1px solid #c3d9f8;border-left:3px solid var(--bl);border-radius:9px;padding:12px 15px;margin-top:4px;font-size:.87em;line-height:1.9}
-.mc-tag{display:inline-block;padding:2px 9px;border-radius:12px;font-size:.78em;font-weight:700;margin:2px 3px;background:#e3f0ff;color:var(--bl)}
-/* ── MAILBOX ── */
-.mailbox-card{border:1.5px solid var(--br);border-radius:13px;padding:16px 18px;margin-bottom:13px;background:var(--wh);cursor:pointer;transition:box-shadow .2s,border-color .2s}
-.mailbox-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);border-color:var(--bl)}
-.mailbox-card.ungelesen{border-left:4px solid var(--bl);background:#f8fbff}
-.mailbox-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
-.mailbox-projekt{font-size:.97em;font-weight:700;color:var(--t1)}
-.mailbox-datum{font-size:.77em;color:var(--t3)}
-.mailbox-preview{font-size:.84em;color:var(--t3);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 /* ── LADE ── */
 #ladeWrap{position:fixed;inset:0;background:rgba(255,255,255,.84);display:none;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(2px)}
 .lspin{width:26px;height:26px;border:3px solid #d8e2ef;border-top-color:var(--bl);border-radius:50%;animation:spin .65s linear infinite;margin-right:10px}
 .ltxt{font-size:14px;font-weight:600;color:var(--bl)}
 @keyframes spin{to{transform:rotate(360deg)}}
+
 @media(max-width:540px){
   .fg,.optgrid,.oc-meta{grid-template-columns:1fr}
   .fc,.optcard.fw,.oc-full{grid-column:1}
   .pbox{flex-wrap:wrap}.pactions{width:100%}
   .pactions .btn{flex:1}
-  .mc-slot{grid-template-columns:1fr}
-  .mc-gramm{width:100%}
 }
 </style>
 </head>
 <body>
+
 <header>
   <div class="hi">
     <div class="hlogo">
@@ -168,30 +205,45 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
     <nav class="hnav" id="hnav"></nav>
   </div>
 </header>
+
 <div id="ladeWrap"><div class="lspin"></div><span class="ltxt">Bitte warten…</span></div>
+
 <main>
 
-<!-- ══ START ══ -->
+<!-- ══ START ══════════════════════════════════════════ -->
 <div class="view on" id="view-start">
   <div class="hero">
     <div class="hero-icon">🖨️</div>
     <h1>Willkommen im Kundenportal</h1>
     <p>Gib deinen Druckauftrag auf, verfolge den Status und verwalte dein Kundenkonto.</p>
     <div class="optgrid">
-      <div class="optcard" onclick="zeige('view-login')"><div class="oc-icon">🔑</div><div class="oc-title">Anmelden</div><div class="oc-desc">Mit deinem Kundenkonto einloggen.</div></div>
-      <div class="optcard" onclick="zeige('view-register')"><div class="oc-icon">👤</div><div class="oc-title">Registrieren</div><div class="oc-desc">Kostenloses Konto erstellen.</div></div>
-      <div class="optcard fw" onclick="zeige('view-gast')"><div class="oc-icon">📦</div><div class="oc-title">Als Gast bestellen</div><div class="oc-desc">Schnell & ohne Registrierung.</div></div>
+      <div class="optcard" onclick="zeige('view-login')">
+        <div class="oc-icon">🔑</div>
+        <div class="oc-title">Anmelden</div>
+        <div class="oc-desc">Mit deinem Kundenkonto einloggen und alle Aufträge verwalten.</div>
+      </div>
+      <div class="optcard" onclick="zeige('view-register')">
+        <div class="oc-icon">👤</div>
+        <div class="oc-title">Registrieren</div>
+        <div class="oc-desc">Kostenloses Konto mit gespeicherter Adresse & Auftragshistorie.</div>
+      </div>
+      <div class="optcard fw" onclick="zeige('view-gast')">
+        <div class="oc-icon">📦</div>
+        <div class="oc-title">Als Gast bestellen</div>
+        <div class="oc-desc">Schnell & ohne Registrierung – einfach Auftrag aufgeben, kein Konto nötig.</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ══ LOGIN ══ -->
+<!-- ══ LOGIN ═══════════════════════════════════════════ -->
 <div class="view" id="view-login">
   <div class="card card-sm">
-    <h2>Anmelden</h2><p class="card-sub">Mit deinem Kundenkonto einloggen</p>
+    <h2>Anmelden</h2>
+    <p class="card-sub">Mit deinem Kundenkonto einloggen</p>
     <div class="alert a-err" id="loginErr"></div>
     <div class="fg" style="grid-template-columns:1fr">
-      <div class="field"><label>E-Mail</label><input type="email" id="loginEmail" placeholder="deine@email.de" autocomplete="email"></div>
+      <div class="field"><label>E-Mail-Adresse</label><input type="email" id="loginEmail" placeholder="deine@email.de" autocomplete="email"></div>
       <div class="field"><label>Passwort</label><input type="password" id="loginPW" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')anmelden()"></div>
     </div>
     <div class="brow">
@@ -202,134 +254,112 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
   </div>
 </div>
 
-<!-- ══ REGISTRIEREN ══ -->
+<!-- ══ REGISTRIEREN ════════════════════════════════════ -->
 <div class="view" id="view-register">
   <div class="card">
-    <h2>Konto erstellen</h2><p class="card-sub">Einmalig registrieren</p>
+    <h2>Konto erstellen</h2>
+    <p class="card-sub">Einmalig registrieren – Aufträge schnell aufgeben & verfolgen</p>
     <div class="alert a-err" id="regErr"></div>
     <div class="sep">👤 Persönliche Daten</div>
     <div class="fg">
-      <div class="field fc"><label>Vollständiger Name *</label><input type="text" id="regName" placeholder="Max Mustermann"></div>
-      <div class="field"><label>E-Mail *</label><input type="email" id="regEmail" placeholder="deine@email.de"></div>
-      <div class="field"><label>Telefon (optional)</label><input type="tel" id="regTel" placeholder="+49 170 …"></div>
-      <div class="field"><label>Passwort * (min. 8 Zeichen)</label><input type="password" id="regPW" placeholder="••••••••"></div>
-      <div class="field"><label>Passwort wiederholen *</label><input type="password" id="regPW2" placeholder="••••••••"></div>
+      <div class="field fc"><label>Vollständiger Name *</label><input type="text" id="regName" placeholder="Max Mustermann" autocomplete="name"></div>
+      <div class="field"><label>E-Mail-Adresse *</label><input type="email" id="regEmail" placeholder="deine@email.de" autocomplete="email"></div>
+      <div class="field"><label>Telefon (optional)</label><input type="tel" id="regTel" placeholder="+49 170 1234567" autocomplete="tel"></div>
+      <div class="field"><label>Passwort * (min. 8 Zeichen)</label><input type="password" id="regPW" placeholder="••••••••" autocomplete="new-password"></div>
+      <div class="field"><label>Passwort wiederholen *</label><input type="password" id="regPW2" placeholder="••••••••" autocomplete="new-password"></div>
     </div>
     <div class="sep">📍 Lieferadresse (optional)</div>
     <div class="fg">
-      <div class="field fc"><label>Straße &amp; Hausnummer</label><input type="text" id="regAdr" placeholder="Musterstraße 12"></div>
-      <div class="field"><label>PLZ</label><input type="text" id="regPlz" placeholder="12345"></div>
-      <div class="field"><label>Ort</label><input type="text" id="regOrt" placeholder="Musterstadt"></div>
+      <div class="field fc"><label>Straße &amp; Hausnummer</label><input type="text" id="regAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
+      <div class="field"><label>PLZ</label><input type="text" id="regPlz" placeholder="12345" autocomplete="postal-code"></div>
+      <div class="field"><label>Ort / Stadt</label><input type="text" id="regOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
     </div>
     <div class="brow">
       <button class="btn b-out" onclick="zeige('view-start')">← Zurück</button>
       <button class="btn b-bl" id="btnReg" onclick="registrieren()">Konto erstellen</button>
     </div>
+    <p style="text-align:center;margin-top:14px;font-size:.81em;color:var(--t3)">Bereits registriert? <a href="#" onclick="zeige('view-login');return false">Anmelden</a></p>
   </div>
 </div>
 
-<!-- ══ DASHBOARD ══ -->
+<!-- ══ DASHBOARD ═══════════════════════════════════════ -->
 <div class="view" id="view-dashboard">
   <div id="profilBox"></div>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-      <div><h2 style="margin-bottom:3px">Meine Aufträge</h2><p style="font-size:.82em;color:var(--t3)">Alle Bestellungen auf einen Blick</p></div>
+      <div><h2 style="margin-bottom:3px">Meine Aufträge</h2><p style="font-size:.82em;color:var(--t3)">Alle deine Bestellungen auf einen Blick</p></div>
       <button class="btn b-gn b-sm" onclick="zeige('view-bestellung')">+ Neuer Auftrag</button>
     </div>
     <div id="auftragsListe"></div>
   </div>
 </div>
 
-<!-- ══ MAILBOX ══ -->
-<div class="view" id="view-mailbox">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:18px">
-      <div><h2 style="margin-bottom:3px">💬 Meine Nachrichten</h2><p style="font-size:.82em;color:var(--t3)">Kommunikation mit dem Studio</p></div>
-      <button class="btn b-out b-sm" onclick="zeige('view-dashboard')">← Zurück</button>
-    </div>
-    <div id="mailboxListe"></div>
-  </div>
-</div>
-
-<!-- ══ NEUER AUFTRAG (eingeloggt) ══ -->
+<!-- ══ NEUER AUFTRAG (eingeloggt) ══════════════════════ -->
 <div class="view" id="view-bestellung">
   <div class="card">
     <h2>Neuer Druckauftrag</h2>
     <p class="card-sub">Deine gespeicherte Adresse ist bereits vorausgefüllt</p>
     <div class="alert a-err" id="bestellErr"></div>
+
     <div class="sep">🖨️ Auftrag</div>
     <div class="fg">
       <div class="field fc"><label>Projektname / Bezeichnung *</label><input type="text" id="bProjekt" placeholder="z.B. Halterung für Monitor"></div>
 
-      <!-- ▶ Multicolor Toggle -->
       <div class="field fc">
         <label>Druckmodus</label>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <label style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px solid var(--br);border-radius:10px;cursor:pointer;flex:1;min-width:140px;transition:border-color .2s" id="lbl-mono">
-            <input type="radio" name="druckmodus" value="mono" checked onchange="wechselModus(this.value)" style="accent-color:var(--bl);width:16px;height:16px">
-            <span>🎨 Einfarbig</span>
+        <div class="druckmodus-wrap">
+          <label class="dm-option aktiv" id="bDM1" onclick="dmWechseln('b','einfarbig')">
+            <input type="radio" name="bDruckmodus" value="einfarbig" checked> 🎨 Einfarbig
           </label>
-          <label style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px solid var(--br);border-radius:10px;cursor:pointer;flex:1;min-width:140px;transition:border-color .2s" id="lbl-multi">
-            <input type="radio" name="druckmodus" value="multi" onchange="wechselModus(this.value)" style="accent-color:var(--bl);width:16px;height:16px">
-            <span>🌈 Multicolor (bis 4 Farben)</span>
+          <label class="dm-option" id="bDM2" onclick="dmWechseln('b','multicolor')">
+            <input type="radio" name="bDruckmodus" value="multicolor"> 🌈 Multicolor (bis 4 Farben)
           </label>
         </div>
       </div>
 
-      <!-- ▶ EINFARBIG -->
-      <div id="bereich-mono" class="field fc" style="display:block">
-        <div class="fg" style="margin:0">
-          <div class="field">
-            <label>Material &amp; Farbe</label>
-            <select id="bMaterial" onchange="previewCalc()"><option value="">— Auswählen —</option></select>
-          </div>
-          <div class="field">
-            <label>Ca. Gramm</label>
-            <input type="number" id="bGramm" min="1" step="1" placeholder="z.B. 120" oninput="previewCalc()">
-          </div>
-        </div>
-        <div id="bPreviewWrap" style="display:none;margin-top:8px">
-          <div class="preview-box">
-            <div class="preview-lbl">💡 Geschätzte Kosten (unverbindlich)</div>
-            <span id="bPreviewText"></span>
-            <div class="preview-warn">⚠ Endpreis wird vom Studio bestätigt.</div>
-          </div>
+      <!-- Einfarbig -->
+      <div class="field" id="bEinfarbigWrap">
+        <label>Material &amp; Farbe wählen</label>
+        <select id="bMaterial" onchange="previewCalc('b')"><option value="">Lade verfügbare Materialien…</option></select>
+      </div>
+      <div class="field" id="bGrammWrap">
+        <label>Ca. Gramm (geschätzter Verbrauch)</label>
+        <input type="number" id="bGramm" min="1" step="1" placeholder="z.B. 120 g" oninput="previewCalc('b')">
+      </div>
+      <div class="field fc" id="bPreviewWrap" style="display:none">
+        <div class="preview-box">
+          <div class="preview-lbl">💡 Geschätzte Kosten (unverbindlich)</div>
+          <span id="bPreviewText"></span>
+          <div class="preview-warn">⚠ Der endgültige Preis wird vom Studio bestätigt.</div>
         </div>
       </div>
 
-      <!-- ▶ MULTICOLOR -->
-      <div id="bereich-multi" class="fc" style="display:none">
-        <div style="font-size:.78em;color:var(--t3);margin-bottom:10px;line-height:1.6;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:9px 13px">
-          🌈 <strong>Multicolor-Druck:</strong> Wähle bis zu 4 verschiedene Filamente. Jedes Material wird einzeln berechnet.
-        </div>
-        <div id="mcSlots"></div>
-        <button class="mc-add" id="btnMcAdd" onclick="mcAddSlot()">+ Weitere Farbe hinzufügen</button>
-        <div id="mcPreviewWrap" style="display:none;margin-top:10px">
-          <div class="mc-preview">
-            <div class="preview-lbl">🌈 Multicolor Kostenübersicht (unverbindlich)</div>
-            <div id="mcPreviewText"></div>
-            <div class="preview-warn" style="margin-top:6px">⚠ Endpreis wird vom Studio bestätigt.</div>
-          </div>
-        </div>
+      <!-- Multicolor -->
+      <div class="field fc" id="bMulticolorWrap" style="display:none">
+        <div class="mc-info on">🌈 <strong>Multicolor-Druck:</strong> Wähle bis zu 4 verschiedene Filamente. Jedes Material wird einzeln berechnet.</div>
+        <div id="bFarbenContainer"></div>
+        <button type="button" class="mc-add-btn" id="bAddFarbe" onclick="mcFarbeHinzu('b')">+ Weitere Farbe hinzufügen</button>
       </div>
 
-      <div class="field fc"><label>Beschreibung &amp; Anforderungen</label><textarea id="bBeschr" placeholder="z.B. Maße ca. 10×5×3 cm. Besonderheiten: …"></textarea></div>
+      <div class="field fc"><label>Beschreibung &amp; Anforderungen</label><textarea id="bBeschr" placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz. Besonderheiten: …"></textarea></div>
+
       <div class="field fc">
         <label>Bild / Datei anhängen (optional)</label>
         <div class="upload-area" id="bUploadArea" onclick="document.getElementById('bDatei').click()" ondragover="dragOver(event,'bUploadArea')" ondragleave="dragLeave('bUploadArea')" ondrop="dropFile(event,'bDatei','bUploadArea')">
           <input type="file" id="bDatei" accept="image/*,.pdf,.stl,.obj,.step,.stp" multiple onchange="showFiles('bDatei')">
           <div class="upload-icon">📎</div>
-          <div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong><br>Bilder, PDF, STL, OBJ, STEP – max. 10 MB</div>
+          <div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong><br>Bilder, PDF, STL, OBJ, STEP – max. 10 MB pro Datei</div>
         </div>
         <div class="upload-preview" id="bDateiPreview"></div>
       </div>
     </div>
+
     <div class="sep">📍 Lieferadresse</div>
     <div class="fg">
-      <div class="field fc"><label>Straße &amp; Hausnummer *</label><input type="text" id="bAdr" placeholder="Musterstraße 12"></div>
-      <div class="field"><label>PLZ *</label><input type="text" id="bPlz" placeholder="12345"></div>
-      <div class="field"><label>Ort *</label><input type="text" id="bOrt" placeholder="Musterstadt"></div>
-      <div class="field fc"><label>Lieferhinweis (optional)</label><input type="text" id="bHinweis" placeholder="z.B. Selbstabholung bevorzugt"></div>
+      <div class="field fc"><label>Straße &amp; Hausnummer *</label><input type="text" id="bAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
+      <div class="field"><label>PLZ *</label><input type="text" id="bPlz" placeholder="12345" autocomplete="postal-code"></div>
+      <div class="field"><label>Ort / Stadt *</label><input type="text" id="bOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
+      <div class="field fc"><label>Lieferhinweis (optional)</label><input type="text" id="bHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung bevorzugt, …"></div>
     </div>
     <div class="brow">
       <button class="btn b-out" onclick="zeige('view-dashboard')">← Zurück</button>
@@ -338,99 +368,89 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
   </div>
 </div>
 
-<!-- ══ GAST BESTELLUNG ══ -->
+<!-- ══ GAST BESTELLUNG ══════════════════════════════════ -->
 <div class="view" id="view-gast">
   <div class="card">
-    <h2>Als Gast bestellen</h2><p class="card-sub">Kein Konto nötig</p>
+    <h2>Als Gast bestellen</h2>
+    <p class="card-sub">Kein Konto nötig – einfach ausfüllen und absenden</p>
     <div class="alert a-err" id="gastErr"></div>
-    <div class="sep">👤 Kontaktdaten</div>
+
+    <div class="sep">👤 Deine Kontaktdaten</div>
     <div class="fg">
-      <div class="field"><label>Name *</label><input type="text" id="gName" placeholder="Max Mustermann"></div>
-      <div class="field"><label>E-Mail *</label><input type="email" id="gEmail" placeholder="deine@email.de"></div>
-      <div class="field fc"><label>Telefon (optional)</label><input type="tel" id="gTel" placeholder="+49 170 …"></div>
+      <div class="field"><label>Vollständiger Name *</label><input type="text" id="gName" placeholder="Max Mustermann" autocomplete="name"></div>
+      <div class="field"><label>E-Mail-Adresse *</label><input type="email" id="gEmail" placeholder="deine@email.de" autocomplete="email"></div>
+      <div class="field fc"><label>Telefon (optional)</label><input type="tel" id="gTel" placeholder="+49 170 1234567" autocomplete="tel"></div>
     </div>
+
     <div class="sep">🖨️ Auftrag</div>
     <div class="fg">
       <div class="field fc"><label>Projektname *</label><input type="text" id="gProjekt" placeholder="z.B. Halterung für Monitor"></div>
 
-      <!-- ▶ Multicolor Toggle Gast -->
       <div class="field fc">
         <label>Druckmodus</label>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <label style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px solid var(--br);border-radius:10px;cursor:pointer;flex:1;min-width:140px" id="lbl-gmono">
-            <input type="radio" name="gdruckmodus" value="mono" checked onchange="wechselModusGast(this.value)" style="accent-color:var(--bl);width:16px;height:16px">
-            <span>🎨 Einfarbig</span>
+        <div class="druckmodus-wrap">
+          <label class="dm-option aktiv" id="gDM1" onclick="dmWechseln('g','einfarbig')">
+            <input type="radio" name="gDruckmodus" value="einfarbig" checked> 🎨 Einfarbig
           </label>
-          <label style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px solid var(--br);border-radius:10px;cursor:pointer;flex:1;min-width:140px" id="lbl-gmulti">
-            <input type="radio" name="gdruckmodus" value="multi" onchange="wechselModusGast(this.value)" style="accent-color:var(--bl);width:16px;height:16px">
-            <span>🌈 Multicolor (bis 4 Farben)</span>
+          <label class="dm-option" id="gDM2" onclick="dmWechseln('g','multicolor')">
+            <input type="radio" name="gDruckmodus" value="multicolor"> 🌈 Multicolor (bis 4 Farben)
           </label>
         </div>
       </div>
 
-      <!-- ▶ EINFARBIG GAST -->
-      <div id="gbereich-mono" class="fc">
-        <div class="fg" style="margin:0">
-          <div class="field">
-            <label>Material &amp; Farbe</label>
-            <select id="gMaterial" onchange="previewCalcGast()"><option value="">— Auswählen —</option></select>
-          </div>
-          <div class="field">
-            <label>Ca. Gramm</label>
-            <input type="number" id="gGramm" min="1" step="1" placeholder="z.B. 120" oninput="previewCalcGast()">
-          </div>
-        </div>
-        <div id="gPreviewWrap" style="display:none;margin-top:8px">
-          <div class="preview-box">
-            <div class="preview-lbl">💡 Geschätzte Kosten (unverbindlich)</div>
-            <span id="gPreviewText"></span>
-            <div class="preview-warn">⚠ Endpreis wird vom Studio bestätigt.</div>
-          </div>
+      <!-- Einfarbig -->
+      <div class="field" id="gEinfarbigWrap">
+        <label>Material &amp; Farbe wählen</label>
+        <select id="gMaterial" onchange="previewCalc('g')"><option value="">Lade verfügbare Materialien…</option></select>
+      </div>
+      <div class="field" id="gGrammWrap">
+        <label>Ca. Gramm (geschätzter Verbrauch)</label>
+        <input type="number" id="gGramm" min="1" step="1" placeholder="z.B. 120 g" oninput="previewCalc('g')">
+      </div>
+      <div class="field fc" id="gPreviewWrap" style="display:none">
+        <div class="preview-box">
+          <div class="preview-lbl">💡 Geschätzte Kosten (unverbindlich)</div>
+          <span id="gPreviewText"></span>
+          <div class="preview-warn">⚠ Der endgültige Preis wird vom Studio bestätigt.</div>
         </div>
       </div>
 
-      <!-- ▶ MULTICOLOR GAST -->
-      <div id="gbereich-multi" class="fc" style="display:none">
-        <div style="font-size:.78em;color:var(--t3);margin-bottom:10px;line-height:1.6;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:9px 13px">
-          🌈 <strong>Multicolor-Druck:</strong> Bis zu 4 verschiedene Filamente wählbar.
-        </div>
-        <div id="gmcSlots"></div>
-        <button class="mc-add" id="btnGMcAdd" onclick="gmcAddSlot()">+ Weitere Farbe hinzufügen</button>
-        <div id="gmcPreviewWrap" style="display:none;margin-top:10px">
-          <div class="mc-preview">
-            <div class="preview-lbl">🌈 Multicolor Kostenübersicht (unverbindlich)</div>
-            <div id="gmcPreviewText"></div>
-            <div class="preview-warn" style="margin-top:6px">⚠ Endpreis wird vom Studio bestätigt.</div>
-          </div>
-        </div>
+      <!-- Multicolor -->
+      <div class="field fc" id="gMulticolorWrap" style="display:none">
+        <div class="mc-info on">🌈 <strong>Multicolor-Druck:</strong> Wähle bis zu 4 verschiedene Filamente. Jedes Material wird einzeln berechnet.</div>
+        <div id="gFarbenContainer"></div>
+        <button type="button" class="mc-add-btn" id="gAddFarbe" onclick="mcFarbeHinzu('g')">+ Weitere Farbe hinzufügen</button>
       </div>
 
-      <div class="field fc"><label>Beschreibung</label><textarea id="gBeschr" placeholder="z.B. Maße, Besonderheiten…"></textarea></div>
+      <div class="field fc"><label>Beschreibung &amp; Anforderungen</label><textarea id="gBeschr" placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz."></textarea></div>
+
       <div class="field fc">
-        <label>Datei anhängen (optional)</label>
+        <label>Bild / Datei anhängen (optional)</label>
         <div class="upload-area" id="gUploadArea" onclick="document.getElementById('gDatei').click()" ondragover="dragOver(event,'gUploadArea')" ondragleave="dragLeave('gUploadArea')" ondrop="dropFile(event,'gDatei','gUploadArea')">
           <input type="file" id="gDatei" accept="image/*,.pdf,.stl,.obj,.step,.stp" multiple onchange="showFiles('gDatei')">
           <div class="upload-icon">📎</div>
-          <div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong></div>
+          <div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong><br>Bilder, PDF, STL, OBJ, STEP – max. 10 MB pro Datei</div>
         </div>
         <div class="upload-preview" id="gDateiPreview"></div>
       </div>
     </div>
+
     <div class="sep">📍 Lieferadresse</div>
     <div class="fg">
-      <div class="field fc"><label>Straße &amp; Hausnummer *</label><input type="text" id="gAdr" placeholder="Musterstraße 12"></div>
-      <div class="field"><label>PLZ *</label><input type="text" id="gPlz" placeholder="12345"></div>
-      <div class="field"><label>Ort *</label><input type="text" id="gOrt" placeholder="Musterstadt"></div>
-      <div class="field fc"><label>Lieferhinweis (optional)</label><input type="text" id="gHinweis" placeholder="z.B. Selbstabholung"></div>
+      <div class="field fc"><label>Straße &amp; Hausnummer *</label><input type="text" id="gAdr" placeholder="Musterstraße 12" autocomplete="street-address"></div>
+      <div class="field"><label>PLZ *</label><input type="text" id="gPlz" placeholder="12345" autocomplete="postal-code"></div>
+      <div class="field"><label>Ort / Stadt *</label><input type="text" id="gOrt" placeholder="Musterstadt" autocomplete="address-level2"></div>
+      <div class="field fc"><label>Lieferhinweis (optional)</label><input type="text" id="gHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung, …"></div>
     </div>
     <div class="brow">
       <button class="btn b-out" onclick="zeige('view-start')">← Zurück</button>
       <button class="btn b-bl" id="btnGast" onclick="gastSenden()">Auftrag absenden ✓</button>
     </div>
+    <p style="text-align:center;margin-top:14px;font-size:.81em;color:var(--t3)">Bestellungen später verfolgen? <a href="#" onclick="zeige('view-register');return false">Konto erstellen</a></p>
   </div>
 </div>
 
-<!-- ══ BESTÄTIGUNG ══ -->
+<!-- ══ BESTÄTIGUNG ══════════════════════════════════════ -->
 <div class="view" id="view-ok">
   <div class="card">
     <div class="confirm-wrap">
@@ -438,34 +458,35 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
       <h2>Auftrag erfolgreich eingegangen!</h2>
       <p style="color:var(--t3);margin:10px 0 5px;font-size:.87em">Deine Bestellnummer:</p>
       <div class="confirm-id" id="confirmId">—</div>
-      <p style="color:var(--t3);font-size:.84em;max-width:400px;margin:0 auto 24px;line-height:1.65">Wir melden uns zeitnah. Bitte notiere deine Bestellnummer.</p>
+      <p style="color:var(--t3);font-size:.84em;max-width:400px;margin:0 auto 24px;line-height:1.65">Wir melden uns zeitnah mit Bestätigung und Preis. Bitte notiere deine Bestellnummer.</p>
       <div id="confirmBtns"></div>
     </div>
   </div>
 </div>
 
-<!-- ══ PROFIL ══ -->
+<!-- ══ PROFIL BEARBEITEN ════════════════════════════════ -->
 <div class="view" id="view-profil">
   <div class="card">
-    <h2>Profil bearbeiten</h2><p class="card-sub">Deine gespeicherten Daten aktualisieren</p>
+    <h2>Profil bearbeiten</h2>
+    <p class="card-sub">Deine gespeicherten Daten aktualisieren</p>
     <div class="alert a-err" id="profilErr"></div>
-    <div class="alert a-ok" id="profilOk"></div>
+    <div class="alert a-ok"  id="profilOk"></div>
     <div class="sep">👤 Persönliche Daten</div>
     <div class="fg">
-      <div class="field fc"><label>Name *</label><input type="text" id="editName"></div>
+      <div class="field fc"><label>Vollständiger Name *</label><input type="text" id="editName" placeholder="Max Mustermann"></div>
       <div class="field"><label>E-Mail (nicht änderbar)</label><input type="email" id="editEmail" disabled></div>
-      <div class="field"><label>Telefon</label><input type="tel" id="editTel"></div>
+      <div class="field"><label>Telefon</label><input type="tel" id="editTel" placeholder="+49 170 1234567"></div>
     </div>
     <div class="sep">📍 Lieferadresse</div>
     <div class="fg">
-      <div class="field fc"><label>Straße</label><input type="text" id="editAdr"></div>
-      <div class="field"><label>PLZ</label><input type="text" id="editPlz"></div>
-      <div class="field"><label>Ort</label><input type="text" id="editOrt"></div>
+      <div class="field fc"><label>Straße &amp; Hausnummer</label><input type="text" id="editAdr" placeholder="Musterstraße 12"></div>
+      <div class="field"><label>PLZ</label><input type="text" id="editPlz" placeholder="12345"></div>
+      <div class="field"><label>Ort / Stadt</label><input type="text" id="editOrt" placeholder="Musterstadt"></div>
     </div>
     <div class="sep">🔒 Passwort ändern (optional)</div>
     <div class="fg">
-      <div class="field"><label>Neues Passwort</label><input type="password" id="editPW" placeholder="Min. 8 Zeichen"></div>
-      <div class="field"><label>Wiederholen</label><input type="password" id="editPW2" placeholder="••••••••"></div>
+      <div class="field"><label>Neues Passwort (leer = unverändert)</label><input type="password" id="editPW" placeholder="Min. 8 Zeichen"></div>
+      <div class="field"><label>Passwort wiederholen</label><input type="password" id="editPW2" placeholder="••••••••"></div>
     </div>
     <div class="brow">
       <button class="btn b-out" onclick="zeige('view-dashboard')">← Zurück</button>
@@ -475,40 +496,76 @@ main{max-width:920px;margin:0 auto;padding:24px 16px 80px}
 </div>
 
 </main>
+
 <script>
-/* ═══ SUPABASE ═══ */
+/* ═══════════  SUPABASE  ═══════════ */
 const sb = supabase.createClient(
   'https://zasufuyaiturzgohqkky.supabase.co',
   'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj'
 );
 
-/* ═══ STATE ═══ */
-let aktKunde = null;
-let filamentDaten = [];
-let refreshTimer = null;
+/* ═══════════  EMAILJS KONFIGURATION  ═══════════
+   1. emailjs.com → kostenlos registrieren
+   2. Email Service anlegen (z.B. Gmail)
+   3. Template erstellen (Variablen unten benutzen)
+   4. Deine 3 Keys hier eintragen
+═══════════════════════════════════════════════ */
+const EJ_PUBLIC_KEY  = 'qlNobf5erJKSEM2Ax';
+const EJ_SERVICE_ID  = 'service_vn1zc9n';
+const EJ_TEMPLATE_ID = 'template_k5g1gyc';
 
-/* ═══ NAVIGATION ═══ */
+// EmailJS initialisieren
+try { emailjs.init({ publicKey: EJ_PUBLIC_KEY }); } catch(e) {}
+
+async function bestellungEmailSenden(daten) {
+  // Nur senden wenn Keys eingetragen sind
+  if(EJ_PUBLIC_KEY === 'DEIN_PUBLIC_KEY') {
+    console.log('EmailJS: Keys noch nicht eingetragen – E-Mail wird nicht gesendet.');
+    return;
+  }
+  try {
+    await emailjs.send(EJ_SERVICE_ID, EJ_TEMPLATE_ID, {
+      // Diese Variablen kannst du in deinem EmailJS-Template verwenden:
+      bestellnummer:   daten.id,
+      kundename:       daten.name,
+      email:           daten.email || '—',
+      telefon:         daten.telefon || '—',
+      projekt:         daten.projekt,
+      material:        daten.material,
+      gramm:           daten.gramm ? daten.gramm + ' g' : '—',
+      druckmodus:      daten.druckmodus || 'einfarbig',
+      adresse:         daten.adresse,
+      plz_ort:         (daten.plz||'') + ' ' + (daten.ort||''),
+      beschreibung:    daten.beschreibung || '—',
+      admin_link:      window.location.origin,
+      datum:           new Date().toLocaleString('de-DE'),
+    });
+    console.log('E-Mail erfolgreich gesendet!');
+  } catch(err) {
+    // E-Mail Fehler soll Bestellung nicht blockieren
+    console.error('EmailJS Fehler:', err);
+  }
+}
+
+/* ═══════════  STATE  ═══════════ */
+let aktKunde = null;
+let filamentDaten = []; // [{id, Material, Hertseller, startGewicht, Preis}]
+
+/* ═══════════  NAVIGATION  ═══════════ */
 function zeige(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
-  if (id === 'view-bestellung' && aktKunde) { vorausfuellen(); mcInit(); }
-  if (id === 'view-gast') gmcInit();
-  if (id === 'view-profil' && aktKunde) profilLaden();
-  if (id === 'view-mailbox' && aktKunde) ladeMailbox();
-  if (id === 'view-dashboard' && aktKunde) ladeDashboard();
+  if (id === 'view-bestellung' && aktKunde) vorausfuellen();
+  if (id === 'view-profil'    && aktKunde) profilLaden();
 }
 
-/* ═══ HEADER ═══ */
-function headerAktualisieren(ungelesene) {
+function headerAktualisieren() {
   const nav = document.getElementById('hnav');
   if (aktKunde) {
-    const ug = ungelesene || zaehleUngelesene();
-    const badge = ug > 0 ? `<span class="nbadge neu">${ug}</span>` : '';
     nav.innerHTML = `
       <span class="nuser">👤 ${x(aktKunde.name.split(' ')[0])}</span>
       <button class="nbtn" onclick="zeige('view-dashboard')">Meine Aufträge</button>
-      <button class="nbtn" onclick="zeige('view-mailbox')">💬 Nachrichten${badge}</button>
       <button class="nbtn" onclick="zeige('view-profil')">Profil</button>
       <button class="nbtn" onclick="abmelden()">Abmelden</button>`;
   } else {
@@ -518,645 +575,710 @@ function headerAktualisieren(ungelesene) {
   }
 }
 
-function zaehleUngelesene() {
-  return (window._alleAuftraege||[]).filter(a => {
-    let adminMsgs = [];
-    try { if(a.admin_notiz) adminMsgs = JSON.parse(a.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[]; } catch(e){}
-    const gelesen = parseInt(localStorage.getItem('gelesen_'+a.id)||'0');
-    return adminMsgs.length > gelesen;
-  }).length;
-}
-
-/* ═══ AUTO-REFRESH (alle 30 Sek.) ═══ */
-function startRefresh() {
-  stopRefresh();
-  refreshTimer = setInterval(async () => {
-    if (!aktKunde) return;
-    try {
-      const { data } = await sb.from('bestellAnfragen').select('id,admin_notiz,kunden_nachrichten,status,kosten,datum,projekt,material_wunsch,ca_gramm,multicolor_materialien,adresse,plz,ort,liefer_hinweis,datei_urls,rabatt_pct,beschreibung').eq('kunden_id', aktKunde.id).order('erstellt_am',{ascending:false});
-      if (!data) return;
-      const vorher = zaehleUngelesene();
-      window._alleAuftraege = data;
-      const jetzt = zaehleUngelesene();
-      if (jetzt !== vorher) {
-        headerAktualisieren(jetzt);
-        // Dashboard leise aktualisieren wenn sichtbar
-        const dash = document.getElementById('view-dashboard');
-        if (dash?.classList.contains('on')) ladeDashboard(true);
-      }
-    } catch(e) {}
-  }, 30000);
-}
-function stopRefresh() { if (refreshTimer) clearInterval(refreshTimer); }
-
-/* ═══ FILAMENTE LADEN ═══ */
+/* ═══════════  FILAMENTE LADEN  ═══════════ */
 async function ladeFilamente() {
   try {
-    const { data } = await sb.from('FilamentLager').select('id,Material,Hertseller,startGewicht,restGewicht,Preis,gesperrt').order('Material');
-    // Nur nicht gesperrte + verfügbare Filamente
-    filamentDaten = (data||[]).filter(f => !f.gesperrt && parseFloat(f.restGewicht) > 0);
-    const opts = '<option value="">— Auswählen —</option>' +
+    const { data } = await sb.from('FilamentLager').select('id,Material,Hertseller,startGewicht,restGewicht,Preis').order('Material');
+    // Gesperrte und leere Spulen fuer Kunden ausblenden
+    filamentDaten = (data || []).filter(f => parseFloat(f.restGewicht) > 0 && !f.gesperrt);
+    const opts = '<option value="">— Material &amp; Farbe wählen —</option>' +
       filamentDaten.map(f =>
         `<option value="${f.id}" data-preis="${f.Preis}" data-start="${f.startGewicht}">
-          ${x(f.Material)} – ${x(f.Hertseller)} (${parseFloat(f.restGewicht).toFixed(0)} g)
-        </option>`).join('');
+          ${x(f.Material)} – ${x(f.Hertseller)} (${parseFloat(f.restGewicht).toFixed(0)} g verfügbar)
+        </option>`
+      ).join('');
     ['bMaterial','gMaterial'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = opts || '<option value="">Aktuell keine Materialien verfügbar</option>';
+      if (el) el.innerHTML = opts;
     });
-    // Multicolor Dropdowns aktualisieren falls gerendert
-    document.querySelectorAll('.mc-select').forEach(sel => {
-      const curVal = sel.value;
-      sel.innerHTML = opts;
-      sel.value = curVal;
+  } catch(e) {
+    console.error('Filamente laden:', e);
+    ['bMaterial','gMaterial'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<option value="">Fehler beim Laden – bitte neu laden</option>';
     });
-  } catch(e) { console.error('Filamente:', e); }
+  }
 }
 
-/* ═══ PREIS-VORSCHAU (Einfarbig) ═══ */
+
+/* ═══════════  MULTICOLOR LOGIK  ═══════════ */
+const MC_FARBEN = ['#0056b3','#28a745','#e65100','#6a1b9a'];
+const MC_NAMES  = ['Farbe 1','Farbe 2','Farbe 3','Farbe 4'];
 const PAUSCHALE = 4.50;
-function calcPreis(filamentId, gramm) {
-  const f = filamentDaten.find(f => f.id === filamentId);
-  if (!f || !gramm) return null;
-  const preis = parseFloat(f.Preis), start = parseFloat(f.startGewicht)||1000;
-  const mat = (preis/start)*gramm;
-  return { mat, fix: PAUSCHALE, gesamt: mat+PAUSCHALE };
-}
-function previewCalc() {
-  const sel = document.getElementById('bMaterial');
-  const gramm = parseFloat(document.getElementById('bGramm').value)||0;
-  const wrap = document.getElementById('bPreviewWrap');
-  const text = document.getElementById('bPreviewText');
-  const r = calcPreis(sel?.value, gramm);
-  if (!r) { wrap.style.display='none'; return; }
-  const min=(r.gesamt*.85).toFixed(2), max=(r.gesamt*1.15).toFixed(2);
-  text.innerHTML = `Material (${gramm} g): <strong>${r.mat.toFixed(2)} €</strong><br>Pauschale: <strong>${r.fix.toFixed(2)} €</strong><br><span style="font-size:1.05em">Geschätzt: <strong style="color:var(--bl)">${min} – ${max} €</strong></span>`;
-  wrap.style.display='block';
-}
-function previewCalcGast() {
-  const sel = document.getElementById('gMaterial');
-  const gramm = parseFloat(document.getElementById('gGramm').value)||0;
-  const wrap = document.getElementById('gPreviewWrap');
-  const text = document.getElementById('gPreviewText');
-  const r = calcPreis(sel?.value, gramm);
-  if (!r) { wrap.style.display='none'; return; }
-  const min=(r.gesamt*.85).toFixed(2), max=(r.gesamt*1.15).toFixed(2);
-  text.innerHTML = `Material (${gramm} g): <strong>${r.mat.toFixed(2)} €</strong><br>Pauschale: <strong>${r.fix.toFixed(2)} €</strong><br><span style="font-size:1.05em">Geschätzt: <strong style="color:var(--bl)">${min} – ${max} €</strong></span>`;
-  wrap.style.display='block';
+
+function dmWechseln(p, modus){
+  const istMC = modus === 'multicolor';
+  document.getElementById(p+'DM1').classList.toggle('aktiv', !istMC);
+  document.getElementById(p+'DM2').classList.toggle('aktiv',  istMC);
+  document.getElementById(p+'EinfarbigWrap').style.display = istMC ? 'none' : '';
+  document.getElementById(p+'GrammWrap').style.display     = istMC ? 'none' : '';
+  document.getElementById(p+'PreviewWrap').style.display   = 'none';
+  document.getElementById(p+'MulticolorWrap').style.display = istMC ? '' : 'none';
+  if(istMC && document.getElementById(p+'FarbenContainer').children.length === 0){
+    mcFarbeHinzu(p);
+  }
 }
 
-/* ═══ MODUS-WECHSEL ═══ */
-function wechselModus(v) {
-  document.getElementById('bereich-mono').style.display = v==='mono'?'block':'none';
-  document.getElementById('bereich-multi').style.display = v==='multi'?'block':'none';
-  if (v==='multi' && document.querySelectorAll('#mcSlots .mc-slot').length===0) mcAddSlot();
-}
-function wechselModusGast(v) {
-  document.getElementById('gbereich-mono').style.display = v==='mono'?'block':'none';
-  document.getElementById('gbereich-multi').style.display = v==='multi'?'block':'none';
-  if (v==='multi' && document.querySelectorAll('#gmcSlots .mc-slot').length===0) gmcAddSlot();
+function mcFarbeHinzu(p){
+  const container = document.getElementById(p+'FarbenContainer');
+  const idx = container.children.length;
+  if(idx >= 4) return;
+  const addBtn = document.getElementById(p+'AddFarbe');
+  const div = document.createElement('div');
+  div.className = 'mc-farbe-wrap';
+  div.id = p+'Farbe'+idx;
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span class="mc-farbe-titel" style="background:${MC_FARBEN[idx]}">${MC_NAMES[idx]}</span>
+      ${idx > 0 ? `<button type="button" class="mc-remove-btn" onclick="mcFarbeEntfernen('${p}',${idx})">&#10005; Entfernen</button>` : ''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:end">
+      <div class="field">
+        <label>Material &amp; Farbe</label>
+        <select id="${p}MC${idx}Mat" onchange="mcPreviewCalc('${p}')">${mcOptionen()}</select>
+      </div>
+      <div class="field">
+        <label>Ca. Gramm</label>
+        <input type="number" id="${p}MC${idx}Gramm" min="1" step="1" placeholder="g" oninput="mcPreviewCalc('${p}')">
+      </div>
+    </div>`;
+  container.appendChild(div);
+  if(idx >= 3) addBtn.style.display = 'none';
+  mcPreviewCalc(p);
 }
 
-/* ═══ MULTICOLOR SLOTS ═══ */
-const MC_MAX = 4;
-function mcSlotOpts() {
+function mcFarbeEntfernen(p, idx){
+  const container = document.getElementById(p+'FarbenContainer');
+  const el = document.getElementById(p+'Farbe'+idx);
+  if(el) el.remove();
+  Array.from(container.children).forEach((div, i) => {
+    div.id = p+'Farbe'+i;
+    const sel   = div.querySelector('select');
+    const inp   = div.querySelector('input[type=number]');
+    const tit   = div.querySelector('.mc-farbe-titel');
+    const rmBtn = div.querySelector('.mc-remove-btn');
+    if(sel)   sel.id   = p+'MC'+i+'Mat';
+    if(inp)   inp.id   = p+'MC'+i+'Gramm';
+    if(tit)   { tit.textContent = MC_NAMES[i]; tit.style.background = MC_FARBEN[i]; }
+    if(rmBtn) rmBtn.setAttribute('onclick', `mcFarbeEntfernen('${p}',${i})`);
+  });
+  document.getElementById(p+'AddFarbe').style.display = '';
+  mcPreviewCalc(p);
+}
+
+function mcOptionen(){
+  if(!filamentDaten.length) return '<option value="">Lade...</option>';
   return '<option value="">— Filament wählen —</option>' +
     filamentDaten.map(f =>
       `<option value="${f.id}" data-preis="${f.Preis}" data-start="${f.startGewicht}">${x(f.Material)} – ${x(f.Hertseller)} (${parseFloat(f.restGewicht).toFixed(0)} g)</option>`
     ).join('');
 }
-function mcInit() {
-  const c = document.querySelectorAll('#mcSlots .mc-slot').length;
-  if (c === 0) mcAddSlot();
-}
-function gmcInit() {
-  const c = document.querySelectorAll('#gmcSlots .mc-slot').length;
-  if (c === 0) gmcAddSlot();
-}
 
-function mcAddSlot(prefix='b') {
-  const cont = document.getElementById(prefix==='b'?'mcSlots':'gmcSlots');
-  const slots = cont.querySelectorAll('.mc-slot');
-  if (slots.length >= MC_MAX) return;
-  const idx = slots.length + 1;
-  const div = document.createElement('div');
-  div.className = 'mc-slot';
-  div.dataset.idx = idx;
-  div.innerHTML = `
-    <span class="mc-slot-nr">Farbe ${idx}</span>
-    <div class="field" style="margin-top:8px">
-      <label>Material &amp; Farbe</label>
-      <select class="mc-select" onchange="mcCalc('${prefix}')">${mcSlotOpts()}</select>
-    </div>
-    <div class="field mc-gramm" style="margin-top:8px">
-      <label>Ca. Gramm</label>
-      <input type="number" class="mc-gramm-input" min="1" step="1" placeholder="g" oninput="mcCalc('${prefix}')">
-    </div>
-    ${idx>1?`<button class="mc-del" onclick="mcDelSlot(this,'${prefix}')" title="Entfernen">✕</button>`:'<div></div>'}`;
-  cont.appendChild(div);
-  const addBtn = document.getElementById(prefix==='b'?'btnMcAdd':'btnGMcAdd');
-  if (cont.querySelectorAll('.mc-slot').length >= MC_MAX) addBtn.disabled = true;
-}
-function gmcAddSlot() { mcAddSlot('g'); }
-
-function mcDelSlot(btn, prefix='b') {
-  btn.closest('.mc-slot').remove();
-  const addBtn = document.getElementById(prefix==='b'?'btnMcAdd':'btnGMcAdd');
-  addBtn.disabled = false;
-  // Nummern aktualisieren
-  const cont = document.getElementById(prefix==='b'?'mcSlots':'gmcSlots');
-  cont.querySelectorAll('.mc-slot').forEach((s,i)=>{
-    const nr = s.querySelector('.mc-slot-nr');
-    if (nr) nr.textContent = `Farbe ${i+1}`;
+function mcPreviewCalc(p){
+  const container = document.getElementById(p+'FarbenContainer');
+  const wrap      = document.getElementById(p+'PreviewWrap');
+  const text      = document.getElementById(p+'PreviewText');
+  if(!container||!wrap||!text) return;
+  let total = PAUSCHALE, lines = [], filled = 0;
+  Array.from(container.children).forEach((div, i) => {
+    const sel   = document.getElementById(p+'MC'+i+'Mat');
+    const grInp = document.getElementById(p+'MC'+i+'Gramm');
+    if(!sel||!grInp) return;
+    const opt   = sel.options[sel.selectedIndex];
+    const gramm = parseFloat(grInp.value)||0;
+    const preis = parseFloat(opt?.dataset?.preis)||0;
+    const start = parseFloat(opt?.dataset?.start)||1000;
+    if(gramm&&preis&&sel.value){ const mk=(preis/start)*gramm; total+=mk; lines.push(`${MC_NAMES[i]} (${gramm}g): <strong>${mk.toFixed(2)} €</strong>`); filled++; }
   });
-  mcCalc(prefix);
+  if(!filled){ wrap.style.display='none'; return; }
+  const min=(total*0.85).toFixed(2), max=(total*1.15).toFixed(2);
+  text.innerHTML = lines.join('<br>') +
+    `<br>Strom &amp; Verschleiß: <strong>${PAUSCHALE.toFixed(2)} €</strong><br>` +
+    `<span style="font-size:1.05em">Geschätzter Preis: <strong style="color:var(--bl)">${min} – ${max} €</strong></span>`;
+  wrap.style.display = 'block';
 }
 
-function mcGetSlots(prefix='b') {
-  const cont = document.getElementById(prefix==='b'?'mcSlots':'gmcSlots');
-  return Array.from(cont.querySelectorAll('.mc-slot')).map(s => ({
-    filamentId: s.querySelector('.mc-select')?.value||'',
-    gramm: parseFloat(s.querySelector('.mc-gramm-input')?.value)||0
-  }));
-}
-
-function mcCalc(prefix='b') {
-  const slots = mcGetSlots(prefix);
-  const previewWrap = document.getElementById(prefix==='b'?'mcPreviewWrap':'gmcPreviewWrap');
-  const previewText = document.getElementById(prefix==='b'?'mcPreviewText':'gmcPreviewText');
-  let total = 0, lines = [], valid = false;
-  slots.forEach((s,i) => {
-    const f = filamentDaten.find(f=>f.id===s.filamentId);
-    if (!f || !s.gramm) return;
-    valid = true;
-    const mat = (parseFloat(f.Preis)/parseFloat(f.startGewicht))*s.gramm;
-    total += mat;
-    lines.push(`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #dde4ee">
-      <span><span class="mc-tag">Farbe ${i+1}</span> ${x(f.Material)} · ${s.gramm} g</span>
-      <strong>${mat.toFixed(2)} €</strong>
-    </div>`);
+function mcGetFarben(p){
+  const container = document.getElementById(p+'FarbenContainer');
+  if(!container) return null;
+  const farben = [];
+  Array.from(container.children).forEach((div, i) => {
+    const sel   = document.getElementById(p+'MC'+i+'Mat');
+    const grInp = document.getElementById(p+'MC'+i+'Gramm');
+    if(!sel||!grInp||!sel.value) return;
+    const opt = sel.options[sel.selectedIndex];
+    farben.push({ filament_id: sel.value, material: opt?.text?.split('(')[0].trim()||'', gramm: parseFloat(grInp.value)||0 });
   });
-  if (!valid) { previewWrap.style.display='none'; return; }
-  const gesamt = total + PAUSCHALE;
-  const min=(gesamt*.85).toFixed(2), max=(gesamt*1.15).toFixed(2);
-  previewText.innerHTML = lines.join('') +
-    `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #dde4ee"><span>Pauschale Strom/Verschleiß</span><strong>${PAUSCHALE.toFixed(2)} €</strong></div>` +
-    `<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:1.05em"><span>Gesamtschätzung:</span><strong style="color:var(--bl)">${min} – ${max} €</strong></div>`;
-  previewWrap.style.display='block';
+  return farben.length ? farben : null;
 }
 
-/* ═══ DATEI UPLOAD ═══ */
+function mcReset(p){
+  const c2 = document.getElementById(p+'FarbenContainer');
+  if(c2) c2.innerHTML = '';
+  const btn = document.getElementById(p+'AddFarbe');
+  if(btn) btn.style.display = '';
+  dmWechseln(p, 'einfarbig');
+}
+
+/* ═══════════  PREIS-VORSCHAU  ═══════════ */
+function previewCalc(p) {
+  const sel   = document.getElementById(p + 'Material');
+  const gramm = parseFloat(document.getElementById(p + 'Gramm').value) || 0;
+  const wrap  = document.getElementById(p + 'PreviewWrap');
+  const text  = document.getElementById(p + 'PreviewText');
+  if (!sel || !wrap || !text) return;
+  const opt = sel.options[sel.selectedIndex];
+  const preis = parseFloat(opt?.dataset?.preis) || 0;
+  const start = parseFloat(opt?.dataset?.start) || 1000;
+  if (!gramm || !preis || !sel.value) { wrap.style.display = 'none'; return; }
+  const PAUSCHALE = 4.50;
+  const matKosten = (preis / start) * gramm;
+  const gesamt    = matKosten + PAUSCHALE;
+  const min = (gesamt * 0.85).toFixed(2);
+  const max = (gesamt * 1.15).toFixed(2);
+  text.innerHTML =
+    `Material (${gramm} g): <strong>${matKosten.toFixed(2)} €</strong><br>` +
+    `Strom &amp; Verschleiß: <strong>${PAUSCHALE.toFixed(2)} €</strong><br>` +
+    `<span style="font-size:1.05em">Geschätzter Preis: <strong style="color:var(--bl)">${min} – ${max} €</strong></span>`;
+  wrap.style.display = 'block';
+}
+
+/* ═══════════  DATEI UPLOAD LOGIK  ═══════════ */
 function showFiles(inputId) {
-  const input = document.getElementById(inputId);
-  const preview = document.getElementById(inputId+'Preview');
+  const input   = document.getElementById(inputId);
+  const preview = document.getElementById(inputId + 'Preview');
   if (!preview) return;
   preview.innerHTML = '';
-  Array.from(input.files).forEach((f,i)=>{
-    const chip = document.createElement('div'); chip.className='upload-chip';
-    chip.innerHTML = `${f.type.startsWith('image/')?'🖼️':'📄'} ${x(f.name)} <button onclick="removeFile('${inputId}',${i})">✕</button>`;
+  Array.from(input.files).forEach((f, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'upload-chip';
+    const icon = f.type.startsWith('image/') ? '🖼️' : '📄';
+    chip.innerHTML = `${icon} ${x(f.name)} <button onclick="removeFile('${inputId}',${i})">✕</button>`;
     preview.appendChild(chip);
   });
 }
+
 function removeFile(inputId, idx) {
-  const input = document.getElementById(inputId), dt = new DataTransfer();
-  Array.from(input.files).forEach((f,i)=>{ if(i!==idx) dt.items.add(f); });
-  input.files=dt.files; showFiles(inputId);
+  const input = document.getElementById(inputId);
+  const dt    = new DataTransfer();
+  Array.from(input.files).forEach((f, i) => { if (i !== idx) dt.items.add(f); });
+  input.files = dt.files;
+  showFiles(inputId);
 }
-function dragOver(e,a){e.preventDefault();document.getElementById(a).classList.add('drag');}
-function dragLeave(a){document.getElementById(a).classList.remove('drag');}
-function dropFile(e,inputId,areaId){
-  e.preventDefault(); dragLeave(areaId);
-  const input=document.getElementById(inputId), dt=new DataTransfer();
-  Array.from(input.files).forEach(f=>dt.items.add(f));
-  Array.from(e.dataTransfer.files).forEach(f=>dt.items.add(f));
-  input.files=dt.files; showFiles(inputId);
+
+function dragOver(e, areaId) {
+  e.preventDefault();
+  document.getElementById(areaId).classList.add('drag');
 }
+function dragLeave(areaId) {
+  document.getElementById(areaId).classList.remove('drag');
+}
+function dropFile(e, inputId, areaId) {
+  e.preventDefault();
+  dragLeave(areaId);
+  const input = document.getElementById(inputId);
+  const dt    = new DataTransfer();
+  Array.from(input.files).forEach(f => dt.items.add(f));
+  Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+  input.files = dt.files;
+  showFiles(inputId);
+}
+
 async function hochladen(inputId, orderId) {
-  const input=document.getElementById(inputId);
-  if (!input||!input.files.length) return [];
-  const urls=[];
+  const input = document.getElementById(inputId);
+  if (!input || !input.files.length) return [];
+  const urls = [];
   for (const file of input.files) {
-    if (file.size>10*1024*1024){alert(`"${file.name}" > 10 MB`);continue;}
-    const pfad=`bestellungen/${orderId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-    const {error}=await sb.storage.from('kundendateien').upload(pfad,file,{upsert:true});
-    if(error){console.error(error);continue;}
-    const {data:ud}=sb.storage.from('kundendateien').getPublicUrl(pfad);
-    if(ud?.publicUrl) urls.push(ud.publicUrl);
+    if (file.size > 10 * 1024 * 1024) { alert(`Datei "${file.name}" ist größer als 10 MB und wird übersprungen.`); continue; }
+    const pfad = `bestellungen/${orderId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const { data, error } = await sb.storage.from('kundendateien').upload(pfad, file, { upsert: true });
+    if (error) { console.error('Upload Fehler:', error); continue; }
+    const { data: urlData } = sb.storage.from('kundendateien').getPublicUrl(pfad);
+    if (urlData?.publicUrl) urls.push(urlData.publicUrl);
   }
   return urls;
 }
 
-/* ═══ SESSION ═══ */
-function sessionSave(k){localStorage.setItem('ks',JSON.stringify(k));}
-function sessionLoad(){try{return JSON.parse(localStorage.getItem('ks'));}catch{return null;}}
-function sessionClear(){localStorage.removeItem('ks');}
-async function sha256(s){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+/* ═══════════  SESSION  ═══════════ */
+function sessionSave(k)  { localStorage.setItem('ks', JSON.stringify(k)); }
+function sessionLoad()   { try { return JSON.parse(localStorage.getItem('ks')); } catch{ return null; } }
+function sessionClear()  { localStorage.removeItem('ks'); }
+
+/* ═══════════  HASH  ═══════════ */
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-/* ═══ AUTH ═══ */
-async function anmelden(){
+/* ═══════════  AUTH  ═══════════ */
+async function anmelden() {
   alertClear('loginErr');
-  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pw=document.getElementById('loginPW').value;
-  if(!email||!pw){alertShow('loginErr','❌ Bitte E-Mail und Passwort eingeben.');return;}
-  btnSet('btnLogin',true);laden(true);
-  try{
-    const hash=await sha256(pw);
-    const{data}=await sb.from('kunden').select('*').eq('email',email).eq('passwort_hash',hash).limit(1);
-    if(!data?.length){alertShow('loginErr','❌ E-Mail oder Passwort falsch.');return;}
-    aktKunde=data[0];sessionSave(aktKunde);
-    document.getElementById('loginEmail').value='';document.getElementById('loginPW').value='';
-    await ladeDashboard();headerAktualisieren();zeige('view-dashboard');
-    startRefresh();
-  }catch(e){alertShow('loginErr','❌ Fehler: '+(e?.message||e));}
-  finally{btnSet('btnLogin',false);laden(false);}
-}
-async function registrieren(){
-  alertClear('regErr');
-  const name=document.getElementById('regName').value.trim();
-  const email=document.getElementById('regEmail').value.trim().toLowerCase();
-  const tel=document.getElementById('regTel').value.trim();
-  const pw=document.getElementById('regPW').value;
-  const pw2=document.getElementById('regPW2').value;
-  const adr=document.getElementById('regAdr').value.trim();
-  const plz=document.getElementById('regPlz').value.trim();
-  const ort=document.getElementById('regOrt').value.trim();
-  if(!name||!email||!pw){alertShow('regErr','❌ Bitte alle Pflichtfelder ausfüllen.');return;}
-  if(!validEmail(email)){alertShow('regErr','❌ Ungültige E-Mail.');return;}
-  if(pw.length<8){alertShow('regErr','❌ Passwort min. 8 Zeichen.');return;}
-  if(pw!==pw2){alertShow('regErr','❌ Passwörter stimmen nicht überein.');return;}
-  btnSet('btnReg',true);laden(true);
-  try{
-    const{data:check}=await sb.from('kunden').select('id').eq('email',email).limit(1);
-    if(check?.length){alertShow('regErr','❌ E-Mail bereits registriert.');return;}
-    const hash=await sha256(pw);
-    const k={id:'k_'+Date.now(),name,email,passwort_hash:hash,telefon:tel,adresse:adr,plz,ort,erstellt:new Date().toLocaleDateString('de-DE')};
-    const{error}=await sb.from('kunden').insert([k]);
-    if(error)throw error;
-    aktKunde=k;sessionSave(k);
-    await ladeDashboard();headerAktualisieren();zeige('view-dashboard');startRefresh();
-  }catch(e){alertShow('regErr','❌ Fehler: '+(e?.message||e));}
-  finally{btnSet('btnReg',false);laden(false);}
-}
-function abmelden(){
-  if(confirm('Wirklich abmelden?')){aktKunde=null;sessionClear();stopRefresh();headerAktualisieren();zeige('view-start');}
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pw    = document.getElementById('loginPW').value;
+  if (!email || !pw) { alertShow('loginErr','❌ Bitte E-Mail und Passwort eingeben.'); return; }
+  btnSet('btnLogin', true);
+  laden(true);
+  try {
+    const hash = await sha256(pw);
+    const { data } = await sb.from('kunden').select('*').eq('email',email).eq('passwort_hash',hash).limit(1);
+    if (!data?.length) { alertShow('loginErr','❌ E-Mail oder Passwort falsch.'); return; }
+    aktKunde = data[0];
+    sessionSave(aktKunde);
+    headerAktualisieren();
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPW').value    = '';
+    await ladeDashboard();
+    zeige('view-dashboard');
+  } catch(e) { alertShow('loginErr','❌ Verbindungsfehler: ' + (e?.message||e)); }
+  finally { btnSet('btnLogin',false); laden(false); }
 }
 
-/* ═══ DASHBOARD ═══ */
-async function ladeDashboard(leise=false) {
-  if(!aktKunde)return;
-  const ini=aktKunde.name.trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  const adrZ=aktKunde.adresse
-    ?`<span>📍 ${x(aktKunde.adresse)}, ${x(aktKunde.plz)} ${x(aktKunde.ort)}</span>`
-    :`<span style="color:#b0bcc8">Noch keine Adresse hinterlegt</span>`;
-  document.getElementById('profilBox').innerHTML=`
+async function registrieren() {
+  alertClear('regErr');
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const tel   = document.getElementById('regTel').value.trim();
+  const pw    = document.getElementById('regPW').value;
+  const pw2   = document.getElementById('regPW2').value;
+  const adr   = document.getElementById('regAdr').value.trim();
+  const plz   = document.getElementById('regPlz').value.trim();
+  const ort   = document.getElementById('regOrt').value.trim();
+  if (!name||!email||!pw) { alertShow('regErr','❌ Bitte alle Pflichtfelder (*) ausfüllen.'); return; }
+  if (!validEmail(email))  { alertShow('regErr','❌ Bitte eine gültige E-Mail angeben.'); return; }
+  if (pw.length < 8)       { alertShow('regErr','❌ Passwort muss mind. 8 Zeichen haben.'); return; }
+  if (pw !== pw2)          { alertShow('regErr','❌ Passwörter stimmen nicht überein.'); return; }
+  btnSet('btnReg',true); laden(true);
+  try {
+    const { data: check } = await sb.from('kunden').select('id').eq('email',email).limit(1);
+    if (check?.length) { alertShow('regErr','❌ E-Mail bereits registriert.'); return; }
+    const hash = await sha256(pw);
+    const k = { id:'k_'+Date.now(), name, email, passwort_hash:hash, telefon:tel, adresse:adr, plz, ort, erstellt:new Date().toLocaleDateString('de-DE') };
+    const { error } = await sb.from('kunden').insert([k]);
+    if (error) throw error;
+    aktKunde = k; sessionSave(k); headerAktualisieren();
+    await ladeDashboard(); zeige('view-dashboard');
+  } catch(e) { alertShow('regErr','❌ Fehler: ' + (e?.message||e)); }
+  finally { btnSet('btnReg',false); laden(false); }
+}
+
+function abmelden() {
+  if (confirm('Wirklich abmelden?')) {
+    aktKunde = null; sessionClear(); headerAktualisieren(); zeige('view-start');
+  }
+}
+
+/* ═══════════  DASHBOARD  ═══════════ */
+async function ladeDashboard() {
+  if (!aktKunde) return;
+  const ini = aktKunde.name.trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const adrZ = aktKunde.adresse
+    ? `<span>📍 ${x(aktKunde.adresse)}, ${x(aktKunde.plz)} ${x(aktKunde.ort)}</span>`
+    : `<span style="color:#b0bcc8">Noch keine Adresse hinterlegt</span>`;
+  document.getElementById('profilBox').innerHTML = `
     <div class="pbox">
       <div class="pavatar">${ini}</div>
-      <div class="pinfo"><h3>${x(aktKunde.name)}</h3><span>${x(aktKunde.email)}</span>${adrZ}</div>
+      <div class="pinfo">
+        <h3>${x(aktKunde.name)}</h3>
+        <span>${x(aktKunde.email)}${aktKunde.telefon?' · '+x(aktKunde.telefon):''}</span>
+        ${adrZ}
+      </div>
       <div class="pactions">
         <button class="btn b-out b-sm" onclick="zeige('view-profil')">✏ Profil</button>
-        <button class="btn b-bl b-sm" onclick="zeige('view-mailbox')">💬 Nachrichten</button>
       </div>
     </div>`;
-  if(!leise)laden(true);
-  try{
-    const{data}=await sb.from('bestellAnfragen').select('*').eq('kunden_id',aktKunde.id).order('erstellt_am',{ascending:false});
-    window._alleAuftraege=data||[];
-    headerAktualisieren();
-    const liste=document.getElementById('auftragsListe');
-    if(!data?.length){
-      liste.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><p>Noch keine Aufträge.</p><button class="btn b-bl b-sm" onclick="zeige('view-bestellung')">Ersten Auftrag aufgeben</button></div>`;
+  laden(true);
+  try {
+    const { data } = await sb.from('bestellAnfragen').select('*').eq('kunden_id',aktKunde.id).order('erstellt_am',{ascending:false});
+    const liste = document.getElementById('auftragsListe');
+    if (!data?.length) {
+      liste.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>Noch keine Aufträge vorhanden.</p><button class="btn b-bl b-sm" onclick="zeige('view-bestellung')">Ersten Auftrag aufgeben</button></div>`;
       return;
     }
-    liste.innerHTML=data.map(a=>auftragsKarteHtml(a)).join('');
-  }catch(e){console.error(e);}
-  finally{
-    if(!leise)laden(false);
-    setTimeout(()=>document.querySelectorAll('.chat-verlauf').forEach(v=>{v.scrollTop=v.scrollHeight;}),50);
-  }
-}
+    liste.innerHTML = data.map(a => {
+      // Nachrichten parsen
+      let msgs = [];
+      try { if(a.admin_notiz){ const p=JSON.parse(a.admin_notiz); msgs=Array.isArray(p)?p:[{text:a.admin_notiz,ts:''}]; } }
+      catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
 
-/* ═══ AUFTRAGS-KARTE ═══ */
-function auftragsKarteHtml(a) {
-  let adminMsgs=[],kundenMsgs=[];
-  try{if(a.admin_notiz){const p=JSON.parse(a.admin_notiz);adminMsgs=Array.isArray(p)?p:[{text:a.admin_notiz,ts:''}];}}catch(e){}
-  try{if(a.kunden_nachrichten){const p=JSON.parse(a.kunden_nachrichten);kundenMsgs=Array.isArray(p)?p:[];}}catch(e){}
-  const alle=[...adminMsgs.map(m=>({...m,von:'admin'})),...kundenMsgs.map(m=>({...m,von:'kunde'}))].sort((a,b)=>new Date(a.ts||0)-new Date(b.ts||0));
-  const chatHtml=alle.length
-    ?alle.map(m=>`<div class="chat-msg ${m.von}"><div class="chat-meta ${m.von}">${m.von==='admin'?'🖨️ Studio':'👤 Du'} · ${x(m.ts||'')}</div><div class="chat-text">${x(m.text)}</div></div>`).join('')
-    :`<div class="chat-leer">Noch keine Nachrichten</div>`;
+      // Kunden-Nachrichten parsen
+      let kundenMsgs=[];
+      try{ if(a.kunden_nachrichten){ const p=JSON.parse(a.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
+      catch(e){ kundenMsgs=[]; }
 
-  // Multicolor anzeigen
-  let materialHtml = '';
-  if (a.multicolor_materialien) {
-    try {
-      const mc = JSON.parse(a.multicolor_materialien);
-      if (Array.isArray(mc) && mc.length > 0) {
-        materialHtml = mc.map((m,i)=>`<div style="font-size:.83em"><span class="mc-tag">Farbe ${i+1}</span> ${x(m.material)} · ${m.gramm} g</div>`).join('');
-      }
-    } catch(e){}
-  }
-  const materialBlock = materialHtml
-    ? `<div class="oc-item oc-full"><div class="oc-lbl">🌈 Multicolor</div><div class="oc-val">${materialHtml}</div></div>`
-    : `<div class="oc-item"><div class="oc-lbl">Material</div><div class="oc-val">${x(a.material_wunsch)||'—'}${a.ca_gramm?`<br><span style="font-size:.83em;color:var(--t3)">ca. ${a.ca_gramm} g</span>`:''}</div></div>`;
+      // Alle Nachrichten zusammenführen
+      const alleNachrichten=[
+        ...msgs.map(m=>({...m,von:'admin'})),
+        ...kundenMsgs.map(m=>({...m,von:'kunde'}))
+      ].sort((aa,bb)=>new Date(aa.ts||0)-new Date(bb.ts||0));
 
-  const preis=a.kosten!=null?`<strong style="color:var(--gn);font-size:1.05em">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#b0bcc8">Ausstehend</span>`;
-  const storno=a.status==='Anfrage eingegangen'
-    ?`<button class="btn-storno" onclick="stornieren('${a.id}','${x(a.projekt)}')">✕ Stornieren</button>`
-    :`<button class="btn-storno" disabled>✕ Stornieren</button>`;
-  const dateien=a.datei_urls?`<div class="oc-item oc-full"><div class="oc-lbl">📎 Dateien</div><div class="oc-val">${JSON.parse(a.datei_urls||'[]').map((u,i)=>`<a href="${x(u)}" target="_blank" style="color:var(--bl);margin-right:10px">Datei ${i+1}</a>`).join('')}</div></div>`:'' ;
+      const chatMsgsHtml = alleNachrichten.length
+        ? alleNachrichten.map(m=>{
+            const istAdmin=m.von==='admin';
+            return `<div class="chat-msg ${istAdmin?'admin':'kunde'}">
+              <div class="chat-meta ${istAdmin?'admin':'kunde'}">${istAdmin?'🖨️ Studio':'👤 Du'} · ${x(m.ts||'')}</div>
+              <div class="chat-text">${x(m.text)}</div>
+            </div>`;
+          }).join('')
+        : `<div class="chat-leer">Noch keine Nachrichten – schreib uns!</div>`;
 
-  return `<div class="order-card ${a.status==='Storniert'?'storniert':''}">
-    <div class="oc-head">
-      <div><div class="oc-projekt">${x(a.projekt)}</div>${a.beschreibung?`<div style="font-size:.82em;color:var(--t3);margin-top:2px">${x(a.beschreibung.slice(0,80))}${a.beschreibung.length>80?'…':''}</div>`:''}</div>
-      <div><div class="oc-datum">${x(a.datum)}</div><div style="text-align:right;margin-top:4px">${bdg(a.status)}</div></div>
-    </div>
-    <div class="oc-meta">
-      ${materialBlock}
-      <div class="oc-item"><div class="oc-lbl">Kosten</div><div class="oc-val">${preis}${a.rabatt_pct>0?`<br><span style="font-size:.78em;color:var(--gn)">inkl. ${a.rabatt_pct}% Rabatt</span>`:''}</div></div>
-      <div class="oc-item oc-full"><div class="oc-lbl">Lieferadresse</div><div class="oc-val">${a.adresse?`${x(a.adresse)}, ${x(a.plz)} ${x(a.ort)}`:'—'}${a.liefer_hinweis?`<br><span style="color:var(--or);font-size:.83em">💬 ${x(a.liefer_hinweis)}</span>`:''}</div></div>
-      ${dateien}
-    </div>
-    <div style="margin-top:10px">
-      <div style="font-size:.76em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">💬 Nachrichten</div>
-      <div class="chat-wrap">
-        <div class="chat-verlauf" id="cv_${a.id}">${chatHtml}</div>
-        <div class="chat-input-wrap">
-          <textarea class="chat-input" id="ci_${a.id}" placeholder="Nachricht ans Studio…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();nachrichtSenden('${a.id}')}"></textarea>
-          <button class="chat-send" id="cs_${a.id}" onclick="nachrichtSenden('${a.id}')">Senden ➤</button>
+      const nachrichtenHtml = `
+        <div style="margin-top:10px">
+          <div style="font-size:.76em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">💬 Nachrichten</div>
+          <div class="chat-wrap">
+            <div class="chat-verlauf" id="cv_${a.id}">${chatMsgsHtml}</div>
+            <div class="chat-input-wrap">
+              <textarea class="chat-input" id="ci_${a.id}" placeholder="Nachricht schreiben…" rows="1"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();nachrichtSenden('${a.id}')}"></textarea>
+              <button class="chat-send" id="cs_${a.id}" onclick="nachrichtSenden('${a.id}')">Senden ➤</button>
+            </div>
+          </div>
+        </div>`;
+
+      const kannStorno = a.status === 'Anfrage eingegangen';
+      const storno = kannStorno
+        ? `<button class="btn-storno" onclick="stornieren('${a.id}','${x(a.projekt)}')">✕ Stornieren</button>`
+        : `<button class="btn-storno" disabled title="Storno nicht mehr möglich – Auftrag in Bearbeitung">✕ Stornieren</button>`;
+
+      const preis = a.kosten != null
+        ? `<strong style="color:var(--gn);font-size:1.05em">${parseFloat(a.kosten).toFixed(2)} €</strong>`
+        : `<span style="color:#b0bcc8">Ausstehend</span>`;
+
+      const dateien = a.datei_urls ? (() => {
+        try {
+          const urls = JSON.parse(a.datei_urls);
+          if (!Array.isArray(urls) || !urls.length) return '';
+          return `<div class="oc-item oc-full">
+            <div class="oc-lbl">📎 Angehängte Dateien</div>
+            <div class="oc-val">${urls.map((u,i)=>`<a href="${x(u)}" target="_blank" style="color:var(--bl);margin-right:10px">Datei ${i+1}</a>`).join('')}</div>
+          </div>`;
+        } catch{ return ''; }
+      })() : '';
+
+      return `<div class="order-card ${a.status==='Storniert'?'storniert':''}">
+        <div class="oc-head">
+          <div>
+            <div class="oc-projekt">${x(a.projekt)}</div>
+            ${a.beschreibung?`<div style="font-size:.82em;color:var(--t3);margin-top:2px">${x(a.beschreibung.slice(0,80))}${a.beschreibung.length>80?'…':''}</div>`:''}
+          </div>
+          <div>
+            <div class="oc-datum">${x(a.datum)}</div>
+            <div style="text-align:right;margin-top:4px">${bdg(a.status)}</div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="oc-actions">
-      <div style="font-size:.77em;color:var(--t3)">Nr: <code>${x(a.id)}</code></div>
-      ${storno}
-    </div>
-  </div>`;
-}
-
-/* ═══ MAILBOX ═══ */
-async function ladeMailbox() {
-  if(!aktKunde)return;
-  laden(true);
-  try{
-    const{data}=await sb.from('bestellAnfragen').select('*').eq('kunden_id',aktKunde.id).order('erstellt_am',{ascending:false});
-    const liste=document.getElementById('mailboxListe');
-    if(!data?.length){liste.innerHTML=`<div class="empty"><div class="empty-icon">💬</div><p>Noch keine Nachrichten.</p></div>`;return;}
-    liste.innerHTML=data.map(a=>{
-      let adminMsgs=[],kundenMsgs=[];
-      try{if(a.admin_notiz){const p=JSON.parse(a.admin_notiz);adminMsgs=Array.isArray(p)?p:[];}}catch(e){}
-      try{if(a.kunden_nachrichten){const p=JSON.parse(a.kunden_nachrichten);kundenMsgs=Array.isArray(p)?p:[];}}catch(e){}
-      const alle=[...adminMsgs.map(m=>({...m,von:'admin'})),...kundenMsgs.map(m=>({...m,von:'kunde'}))].sort((a,b)=>new Date(a.ts||0)-new Date(b.ts||0));
-      const letzte=alle[alle.length-1];
-      const ungelesen=adminMsgs.length>parseInt(localStorage.getItem('gelesen_'+a.id)||'0');
-      const vorschau=letzte?`${letzte.von==='admin'?'🖨️ Studio:':'👤 Du:'} ${x(letzte.text.slice(0,80))}${letzte.text.length>80?'…':''}`:'Noch keine Nachrichten';
-      return `<div class="mailbox-card ${ungelesen?'ungelesen':''}" onclick="mailboxOeffnen('${a.id}')">
-        <div class="mailbox-head">
-          <span class="mailbox-projekt">${ungelesen?'🔵 ':''}<strong>${x(a.projekt)}</strong></span>
-          <span class="mailbox-datum">${x(a.datum)} ${bdg(a.status)}</span>
+        <div class="oc-meta">
+          <div class="oc-item">
+            <div class="oc-lbl">Material</div>
+            <div class="oc-val">${(() => {
+              if(a.druckmodus==='multicolor'&&a.multicolor_farben){
+                try{
+                  const farben=JSON.parse(a.multicolor_farben);
+                  return '<span style="font-size:.8em">🌈 Multicolor</span><br>'+
+                    farben.map((f,i)=>`<span style="font-size:.78em;color:${['#0056b3','#28a745','#e65100','#6a1b9a'][i]||'#333'};font-weight:600">● ${x(f.material)} (${f.gramm}g)</span>`).join('<br>');
+                }catch(e){ return 'Multicolor'; }
+              }
+              return x(a.material_wunsch)||'—';
+            })()}${a.ca_gramm&&a.druckmodus!=='multicolor'?`<br><span style="font-size:.83em;color:var(--t3)">ca. ${a.ca_gramm} g</span>`:''}</div>
+          </div>
+          <div class="oc-item">
+            <div class="oc-lbl">Kosten</div>
+            <div class="oc-val">${preis}${a.rabatt_pct>0?`<br><span style="font-size:.78em;color:var(--gn)">inkl. ${a.rabatt_pct}% Rabatt</span>`:''}</div>
+          </div>
+          <div class="oc-item oc-full">
+            <div class="oc-lbl">Lieferadresse</div>
+            <div class="oc-val">${a.adresse?`${x(a.adresse)}, ${x(a.plz)} ${x(a.ort)}`:'—'}${a.liefer_hinweis?`<br><span style="color:var(--or);font-size:.83em">💬 ${x(a.liefer_hinweis)}</span>`:''}</div>
+          </div>
+          ${dateien}
         </div>
-        <div class="mailbox-preview">${vorschau}</div>
-        <div style="font-size:.76em;color:var(--t3);margin-top:4px">${alle.length} Nachricht${alle.length!==1?'en':''} · Nr: <code>${x(a.id)}</code></div>
+        ${nachrichtenHtml}
+        <div class="oc-actions">
+          <div style="font-size:.77em;color:var(--t3)">Bestellnr: <code>${x(a.id)}</code></div>
+          ${storno}
+        </div>
       </div>`;
     }).join('');
-  }catch(e){console.error(e);}
-  finally{laden(false);}
-}
-function mailboxOeffnen(orderId) {
-  const a=(window._alleAuftraege||[]).find(e=>e.id===orderId);
-  if(a){let msgs=[];try{if(a.admin_notiz){const p=JSON.parse(a.admin_notiz);msgs=Array.isArray(p)?p:[];}}catch(e){}localStorage.setItem('gelesen_'+orderId,msgs.length.toString());}
-  zeige('view-dashboard');
-  setTimeout(()=>{const el=document.getElementById('cv_'+orderId);if(el)el.closest('.order-card').scrollIntoView({behavior:'smooth',block:'center'});},300);
-  headerAktualisieren();
-}
-
-/* ═══ NACHRICHTEN SENDEN ═══ */
-async function nachrichtSenden(orderId) {
-  if(!aktKunde)return;
-  const input=document.getElementById('ci_'+orderId);
-  const sendBtn=document.getElementById('cs_'+orderId);
-  const text=input?.value?.trim();
-  if(!text)return;
-  sendBtn.disabled=true;
-  try{
-    const{data}=await sb.from('bestellAnfragen').select('kunden_nachrichten').eq('id',orderId).single();
-    let msgs=[];
-    try{if(data?.kunden_nachrichten){const p=JSON.parse(data.kunden_nachrichten);msgs=Array.isArray(p)?p:[];}}catch(e){}
-    msgs.push({text,ts:new Date().toLocaleString('de-DE'),von:'kunde',name:aktKunde.name});
-    const{error}=await sb.from('bestellAnfragen').update({kunden_nachrichten:JSON.stringify(msgs)}).eq('id',orderId);
-    if(error)throw error;
-    input.value='';
-    const verlauf=document.getElementById('cv_'+orderId);
-    if(verlauf){
-      const leer=verlauf.querySelector('.chat-leer');if(leer)leer.remove();
-      const div=document.createElement('div');div.className='chat-msg kunde';
-      div.innerHTML=`<div class="chat-meta kunde">👤 Du · ${new Date().toLocaleString('de-DE')}</div><div class="chat-text">${x(text)}</div>`;
-      verlauf.appendChild(div);verlauf.scrollTop=verlauf.scrollHeight;
-    }
-    const idx=(window._alleAuftraege||[]).findIndex(e=>e.id===orderId);
-    if(idx>-1)window._alleAuftraege[idx].kunden_nachrichten=JSON.stringify(msgs);
-  }catch(e){alert('❌ Fehler: '+(e?.message||e));}
-  finally{sendBtn.disabled=false;}
-}
-
-/* ═══ STORNIEREN ═══ */
-async function stornieren(id,proj){
-  if(!confirm(`Auftrag "${proj}" wirklich stornieren?`))return;
-  laden(true);
-  try{await sb.from('bestellAnfragen').update({status:'Storniert'}).eq('id',id).eq('status','Anfrage eingegangen');await ladeDashboard();}
-  catch(e){alert('❌ Storno fehlgeschlagen: '+(e?.message||e));}
-  finally{laden(false);}
-}
-
-/* ═══ VORAUSFÜLLEN ═══ */
-function vorausfuellen(){
-  if(!aktKunde)return;
-  document.getElementById('bAdr').value=aktKunde.adresse||'';
-  document.getElementById('bPlz').value=aktKunde.plz||'';
-  document.getElementById('bOrt').value=aktKunde.ort||'';
-  document.getElementById('bHinweis').value='';
-  alertClear('bestellErr');
-  // Modus zurücksetzen
-  document.querySelector('input[name="druckmodus"][value="mono"]').checked=true;
-  wechselModus('mono');
-}
-
-/* ═══ BESTELLUNG EINGELOGGT ═══ */
-async function bestellungSenden(){
-  if(!aktKunde){zeige('view-login');return;}
-  alertClear('bestellErr');
-  const projekt=document.getElementById('bProjekt').value.trim();
-  const adr=document.getElementById('bAdr').value.trim();
-  const plz=document.getElementById('bPlz').value.trim();
-  const ort=document.getElementById('bOrt').value.trim();
-  const desc=document.getElementById('bBeschr').value.trim();
-  const hinweis=document.getElementById('bHinweis').value.trim();
-  if(!projekt||!adr||!plz||!ort){alertShow('bestellErr','❌ Bitte alle Pflichtfelder ausfüllen.');return;}
-
-  // Modus
-  const modus=document.querySelector('input[name="druckmodus"]:checked')?.value||'mono';
-  let material_wunsch='',ca_gramm=null,multicolor=null,geschaetzt=0;
-
-  if(modus==='mono'){
-    const sel=document.getElementById('bMaterial');
-    material_wunsch=sel.options[sel.selectedIndex]?.text?.split('(')[0].trim()||'Keine Präferenz';
-    ca_gramm=parseFloat(document.getElementById('bGramm').value)||null;
-    const r=calcPreis(sel.value,ca_gramm);
-    if(r) geschaetzt=r.gesamt;
-  } else {
-    const slots=mcGetSlots('b');
-    if(!slots.some(s=>s.filamentId&&s.gramm>0)){alertShow('bestellErr','❌ Bitte mindestens eine Farbe mit Gramm ausfüllen.');return;}
-    multicolor=slots.filter(s=>s.filamentId&&s.gramm>0).map((s,i)=>{
-      const f=filamentDaten.find(f=>f.id===s.filamentId);
-      return {farbe:i+1,material:f?f.Material:'',hertseller:f?f.Hertseller:'',filamentId:s.filamentId,gramm:s.gramm};
-    });
-    material_wunsch='Multicolor ('+multicolor.length+' Farben)';
-    ca_gramm=multicolor.reduce((s,m)=>s+m.gramm,0);
-    multicolor.forEach(m=>{const r=calcPreis(m.filamentId,m.gramm);if(r)geschaetzt+=r.gesamt;});
+  } catch(e) { console.error('Dashboard:', e); }
+  finally {
+    laden(false);
+    // Chat-Verläufe nach unten scrollen
+    setTimeout(()=>{
+      document.querySelectorAll('.chat-verlauf').forEach(v=>{ v.scrollTop=v.scrollHeight; });
+    }, 50);
   }
-
-  btnSet('btnBestell',true);laden(true);
-  const orderId=genId();
-  try{
-    const dateiUrls=await hochladen('bDatei',orderId);
-    const payload={
-      id:orderId,kunden_id:aktKunde.id,gastname:null,gast_email:null,telefon:aktKunde.telefon||'',
-      projekt,beschreibung:desc,material_wunsch,ca_gramm,
-      multicolor_materialien:multicolor?JSON.stringify(multicolor):null,
-      adresse:adr,plz,ort,liefer_hinweis:hinweis,
-      status:'Anfrage eingegangen',datum:new Date().toLocaleDateString('de-DE'),
-      kosten:null,datei_urls:dateiUrls.length?JSON.stringify(dateiUrls):null
-    };
-    const{error}=await sb.from('bestellAnfragen').insert([payload]);
-    if(error)throw error;
-    if(adr!==aktKunde.adresse||plz!==aktKunde.plz||ort!==aktKunde.ort){
-      await sb.from('kunden').update({adresse:adr,plz,ort}).eq('id',aktKunde.id);
-      aktKunde={...aktKunde,adresse:adr,plz,ort};sessionSave(aktKunde);
-    }
-    ['bProjekt','bBeschr','bHinweis','bGramm'].forEach(id=>{document.getElementById(id).value='';});
-    document.getElementById('bDatei').value='';document.getElementById('bDateiPreview').innerHTML='';
-    document.getElementById('bMaterial').selectedIndex=0;document.getElementById('bPreviewWrap').style.display='none';
-    document.getElementById('mcSlots').innerHTML='';
-    document.getElementById('mcPreviewWrap').style.display='none';
-    document.getElementById('btnMcAdd').disabled=false;
-    document.getElementById('confirmId').textContent=orderId;
-    document.getElementById('confirmBtns').innerHTML=`<button class="btn b-bl b-sm" onclick="ladeDashboard().then(()=>zeige('view-dashboard'))">Meine Aufträge ansehen →</button>`;
-    zeige('view-ok');
-  }catch(e){alertShow('bestellErr','❌ Fehler: '+(e?.message||e));}
-  finally{btnSet('btnBestell',false);laden(false);}
 }
 
-/* ═══ GAST BESTELLUNG ═══ */
-async function gastSenden(){
-  alertClear('gastErr');
-  const name=document.getElementById('gName').value.trim();
-  const email=document.getElementById('gEmail').value.trim();
-  const tel=document.getElementById('gTel').value.trim();
-  const projekt=document.getElementById('gProjekt').value.trim();
-  const desc=document.getElementById('gBeschr').value.trim();
-  const adr=document.getElementById('gAdr').value.trim();
-  const plz=document.getElementById('gPlz').value.trim();
-  const ort=document.getElementById('gOrt').value.trim();
-  const hinweis=document.getElementById('gHinweis').value.trim();
-  if(!name||!email||!projekt||!adr||!plz||!ort){alertShow('gastErr','❌ Bitte alle Pflichtfelder ausfüllen.');return;}
-  if(!validEmail(email)){alertShow('gastErr','❌ Ungültige E-Mail.');return;}
+/* ═══════════  VORAUSFÜLLEN  ═══════════ */
+function vorausfuellen() {
+  if (!aktKunde) return;
+  document.getElementById('bAdr').value    = aktKunde.adresse || '';
+  document.getElementById('bPlz').value    = aktKunde.plz     || '';
+  document.getElementById('bOrt').value    = aktKunde.ort     || '';
+  document.getElementById('bHinweis').value = '';
+  alertClear('bestellErr');
+}
 
-  const modus=document.querySelector('input[name="gdruckmodus"]:checked')?.value||'mono';
-  let material_wunsch='',ca_gramm=null,multicolor=null;
-  if(modus==='mono'){
-    const sel=document.getElementById('gMaterial');
-    material_wunsch=sel.options[sel.selectedIndex]?.text?.split('(')[0].trim()||'Keine Präferenz';
-    ca_gramm=parseFloat(document.getElementById('gGramm').value)||null;
-  } else {
-    const slots=mcGetSlots('g');
-    if(!slots.some(s=>s.filamentId&&s.gramm>0)){alertShow('gastErr','❌ Bitte mindestens eine Farbe mit Gramm ausfüllen.');return;}
-    multicolor=slots.filter(s=>s.filamentId&&s.gramm>0).map((s,i)=>{
-      const f=filamentDaten.find(f=>f.id===s.filamentId);
-      return {farbe:i+1,material:f?f.Material:'',hertseller:f?f.Hertseller:'',filamentId:s.filamentId,gramm:s.gramm};
-    });
-    material_wunsch='Multicolor ('+multicolor.length+' Farben)';
-    ca_gramm=multicolor.reduce((s,m)=>s+m.gramm,0);
-  }
-
-  btnSet('btnGast',true);laden(true);
-  const orderId=genId();
-  try{
-    const dateiUrls=await hochladen('gDatei',orderId);
-    const{error}=await sb.from('bestellAnfragen').insert([{
-      id:orderId,kunden_id:null,gastname:name,gast_email:email,telefon:tel,
-      projekt,beschreibung:desc,material_wunsch,ca_gramm,
-      multicolor_materialien:multicolor?JSON.stringify(multicolor):null,
-      adresse:adr,plz,ort,liefer_hinweis:hinweis,
-      status:'Anfrage eingegangen',datum:new Date().toLocaleDateString('de-DE'),
-      kosten:null,datei_urls:dateiUrls.length?JSON.stringify(dateiUrls):null
+/* ═══════════  BESTELLUNG EINGELOGGT  ═══════════ */
+async function bestellungSenden() {
+  if (!aktKunde) { zeige('view-login'); return; }
+  alertClear('bestellErr');
+  const projekt = document.getElementById('bProjekt').value.trim();
+  const istMC   = document.getElementById('bDM2')?.classList.contains('aktiv');
+  const mat     = istMC ? 'multicolor' : document.getElementById('bMaterial').value;
+  const matTxt  = istMC ? 'Multicolor-Druck' : (document.getElementById('bMaterial').options[document.getElementById('bMaterial').selectedIndex]?.text || mat);
+  const gramm   = istMC ? null : (parseFloat(document.getElementById('bGramm').value) || null);
+  const mcFarben = istMC ? mcGetFarben('b') : null;
+  const desc    = document.getElementById('bBeschr').value.trim();
+  const adr     = document.getElementById('bAdr').value.trim();
+  const plz     = document.getElementById('bPlz').value.trim();
+  const ort     = document.getElementById('bOrt').value.trim();
+  const hinweis = document.getElementById('bHinweis').value.trim();
+  if (!projekt || !adr || !plz || !ort) { alertShow('bestellErr','❌ Bitte alle Pflichtfelder (*) ausfüllen.'); return; }
+  btnSet('btnBestell',true); laden(true);
+  const orderId = genId();
+  try {
+    const dateiUrls = await hochladen('bDatei', orderId);
+    const { error } = await sb.from('bestellAnfragen').insert([{
+      id:orderId, kunden_id:aktKunde.id,
+      gastname:null, gast_email:null,
+      telefon:aktKunde.telefon||'',
+      projekt, beschreibung:desc,
+      druckmodus:      istMC ? 'multicolor' : 'einfarbig',
+      material_wunsch: istMC ? 'Multicolor-Druck' : (mat ? matTxt.split('(')[0].trim() : 'Keine Präferenz'),
+      ca_gramm:        gramm,
+      multicolor_farben: mcFarben ? JSON.stringify(mcFarben) : null,
+      adresse:adr, plz, ort, liefer_hinweis:hinweis,
+      status:'Anfrage eingegangen',
+      datum:new Date().toLocaleDateString('de-DE'),
+      kosten:null,
+      datei_urls: dateiUrls.length ? JSON.stringify(dateiUrls) : null
     }]);
-    if(error)throw error;
-    ['gName','gEmail','gTel','gProjekt','gBeschr','gAdr','gPlz','gOrt','gHinweis','gGramm'].forEach(id=>{document.getElementById(id).value='';});
-    document.getElementById('gDatei').value='';document.getElementById('gDateiPreview').innerHTML='';
-    document.getElementById('gMaterial').selectedIndex=0;document.getElementById('gPreviewWrap').style.display='none';
-    document.getElementById('gmcSlots').innerHTML='';document.getElementById('gmcPreviewWrap').style.display='none';
-    document.getElementById('btnGMcAdd').disabled=false;
-    document.getElementById('confirmId').textContent=orderId;
-    document.getElementById('confirmBtns').innerHTML=`<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn b-out b-sm" onclick="zeige('view-start')">Zur Startseite</button><button class="btn b-bl b-sm" onclick="zeige('view-register')">Konto erstellen →</button></div>`;
+    if (error) throw error;
+    // Adresse im Profil aktualisieren
+    if (adr !== aktKunde.adresse || plz !== aktKunde.plz || ort !== aktKunde.ort) {
+      await sb.from('kunden').update({adresse:adr,plz,ort}).eq('id',aktKunde.id);
+      aktKunde = {...aktKunde,adresse:adr,plz,ort}; sessionSave(aktKunde);
+    }
+    ['bProjekt','bBeschr','bHinweis','bGramm'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('bDatei').value='';
+    document.getElementById('bDateiPreview').innerHTML='';
+    document.getElementById('bMaterial').selectedIndex=0;
+    document.getElementById('bPreviewWrap').style.display='none';
+    mcReset('b');
+    // E-Mail Benachrichtigung an Admin
+    bestellungEmailSenden({
+      id:          orderId,
+      name:        aktKunde.name,
+      email:       aktKunde.email,
+      telefon:     aktKunde.telefon || '—',
+      projekt:     projekt,
+      material:    istMC ? 'Multicolor-Druck' : (matTxt.split('(')[0].trim()),
+      gramm:       gramm,
+      druckmodus:  istMC ? 'multicolor' : 'einfarbig',
+      adresse:     adr,
+      plz:         plz,
+      ort:         ort,
+      beschreibung: desc
+    });
+
+    document.getElementById('confirmId').textContent = orderId;
+    document.getElementById('confirmBtns').innerHTML = `<button class="btn b-bl b-sm" onclick="ladeDashboard().then(()=>zeige('view-dashboard'))">Meine Aufträge ansehen →</button>`;
     zeige('view-ok');
-  }catch(e){alertShow('gastErr','❌ Fehler: '+(e?.message||e));}
-  finally{btnSet('btnGast',false);laden(false);}
+  } catch(e) { alertShow('bestellErr','❌ Fehler: ' + (e?.message||e)); }
+  finally { btnSet('btnBestell',false); laden(false); }
 }
 
-/* ═══ PROFIL ═══ */
-function profilLaden(){
-  if(!aktKunde)return;
-  document.getElementById('editName').value=aktKunde.name||'';
-  document.getElementById('editEmail').value=aktKunde.email||'';
-  document.getElementById('editTel').value=aktKunde.telefon||'';
-  document.getElementById('editAdr').value=aktKunde.adresse||'';
-  document.getElementById('editPlz').value=aktKunde.plz||'';
-  document.getElementById('editOrt').value=aktKunde.ort||'';
-  document.getElementById('editPW').value='';document.getElementById('editPW2').value='';
-  alertClear('profilErr');alertClear('profilOk');
+/* ═══════════  GAST BESTELLUNG  ═══════════ */
+async function gastSenden() {
+  alertClear('gastErr');
+  const name    = document.getElementById('gName').value.trim();
+  const email   = document.getElementById('gEmail').value.trim();
+  const tel     = document.getElementById('gTel').value.trim();
+  const projekt = document.getElementById('gProjekt').value.trim();
+  const istMC   = document.getElementById('gDM2')?.classList.contains('aktiv');
+  const mat     = istMC ? 'multicolor' : document.getElementById('gMaterial').value;
+  const matTxt  = istMC ? 'Multicolor-Druck' : (document.getElementById('gMaterial').options[document.getElementById('gMaterial').selectedIndex]?.text || mat);
+  const gramm   = istMC ? null : (parseFloat(document.getElementById('gGramm').value) || null);
+  const mcFarben = istMC ? mcGetFarben('g') : null;
+  const desc    = document.getElementById('gBeschr').value.trim();
+  const adr     = document.getElementById('gAdr').value.trim();
+  const plz     = document.getElementById('gPlz').value.trim();
+  const ort     = document.getElementById('gOrt').value.trim();
+  const hinweis = document.getElementById('gHinweis').value.trim();
+  if (!name||!email||!projekt||!adr||!plz||!ort) { alertShow('gastErr','❌ Bitte alle Pflichtfelder (*) ausfüllen.'); return; }
+  if (!validEmail(email)) { alertShow('gastErr','❌ Bitte eine gültige E-Mail angeben.'); return; }
+  btnSet('btnGast',true); laden(true);
+  const orderId = genId();
+  try {
+    const dateiUrls = await hochladen('gDatei', orderId);
+    const { error } = await sb.from('bestellAnfragen').insert([{
+      id:orderId, kunden_id:null,
+      gastname:name, gast_email:email, telefon:tel,
+      projekt, beschreibung:desc,
+      druckmodus:      istMC ? 'multicolor' : 'einfarbig',
+      material_wunsch: istMC ? 'Multicolor-Druck' : (mat ? matTxt.split('(')[0].trim() : 'Keine Präferenz'),
+      ca_gramm:        gramm,
+      multicolor_farben: mcFarben ? JSON.stringify(mcFarben) : null,
+      adresse:adr, plz, ort, liefer_hinweis:hinweis,
+      status:'Anfrage eingegangen',
+      datum:new Date().toLocaleDateString('de-DE'),
+      kosten:null,
+      datei_urls: dateiUrls.length ? JSON.stringify(dateiUrls) : null
+    }]);
+    if (error) throw error;
+    ['gName','gEmail','gTel','gProjekt','gBeschr','gAdr','gPlz','gOrt','gHinweis','gGramm'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('gDatei').value='';
+    document.getElementById('gDateiPreview').innerHTML='';
+    document.getElementById('gMaterial').selectedIndex=0;
+    document.getElementById('gPreviewWrap').style.display='none';
+    mcReset('g');
+    // E-Mail Benachrichtigung an Admin
+    bestellungEmailSenden({
+      id:          orderId,
+      name:        name,
+      email:       email,
+      telefon:     tel || '—',
+      projekt:     projekt,
+      material:    istMC ? 'Multicolor-Druck' : (matTxt.split('(')[0].trim()),
+      gramm:       gramm,
+      druckmodus:  istMC ? 'multicolor' : 'einfarbig',
+      adresse:     adr,
+      plz:         plz,
+      ort:         ort,
+      beschreibung: desc
+    });
+
+    document.getElementById('confirmId').textContent = orderId;
+    document.getElementById('confirmBtns').innerHTML = `
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn b-out b-sm" onclick="zeige('view-start')">Zur Startseite</button>
+        <button class="btn b-bl b-sm" onclick="zeige('view-register')">Konto erstellen →</button>
+      </div>`;
+    zeige('view-ok');
+  } catch(e) { alertShow('gastErr','❌ Fehler: ' + (e?.message||e)); }
+  finally { btnSet('btnGast',false); laden(false); }
 }
-async function profilSpeichern(){
-  alertClear('profilErr');alertClear('profilOk');
-  const name=document.getElementById('editName').value.trim();
-  const tel=document.getElementById('editTel').value.trim();
-  const adr=document.getElementById('editAdr').value.trim();
-  const plz=document.getElementById('editPlz').value.trim();
-  const ort=document.getElementById('editOrt').value.trim();
-  const pw=document.getElementById('editPW').value;
-  const pw2=document.getElementById('editPW2').value;
-  if(!name){alertShow('profilErr','❌ Name erforderlich.');return;}
-  if(pw&&pw.length<8){alertShow('profilErr','❌ Passwort min. 8 Zeichen.');return;}
-  if(pw&&pw!==pw2){alertShow('profilErr','❌ Passwörter stimmen nicht überein.');return;}
-  btnSet('btnProfil',true);laden(true);
-  try{
-    const upd={name,telefon:tel,adresse:adr,plz,ort};
-    if(pw)upd.passwort_hash=await sha256(pw);
-    const{error}=await sb.from('kunden').update(upd).eq('id',aktKunde.id);
-    if(error)throw error;
-    aktKunde={...aktKunde,...upd};sessionSave(aktKunde);headerAktualisieren();
+
+/* ═══════════  STORNIEREN  ═══════════ */
+async function nachrichtSenden(orderId) {
+  if (!aktKunde) return;
+  const input  = document.getElementById('ci_' + orderId);
+  const sendBtn = document.getElementById('cs_' + orderId);
+  const text   = input?.value?.trim();
+  if (!text) return;
+
+  sendBtn.disabled = true;
+  try {
+    // Bestehende Kunden-Nachrichten laden
+    const { data } = await sb.from('bestellAnfragen')
+      .select('kunden_nachrichten')
+      .eq('id', orderId)
+      .single();
+
+    let msgs = [];
+    try { if(data?.kunden_nachrichten) msgs = JSON.parse(data.kunden_nachrichten); if(!Array.isArray(msgs)) msgs=[]; }
+    catch(e){ msgs=[]; }
+
+    msgs.push({
+      text,
+      ts:   new Date().toLocaleString('de-DE'),
+      von:  'kunde',
+      name: aktKunde.name
+    });
+
+    const { error } = await sb.from('bestellAnfragen')
+      .update({ kunden_nachrichten: JSON.stringify(msgs) })
+      .eq('id', orderId);
+
+    if (error) throw error;
+
+    // Lokal sofort anzeigen
+    input.value = '';
+    const verlauf = document.getElementById('cv_' + orderId);
+    if (verlauf) {
+      const leer = verlauf.querySelector('.chat-leer');
+      if (leer) leer.remove();
+      const div = document.createElement('div');
+      div.className = 'chat-msg kunde';
+      div.innerHTML = `<div class="chat-meta kunde">👤 Du · ${new Date().toLocaleString('de-DE')}</div><div class="chat-text">${x(text)}</div>`;
+      verlauf.appendChild(div);
+      verlauf.scrollTop = verlauf.scrollHeight;
+    }
+  } catch(e) {
+    alert('❌ Nachricht konnte nicht gesendet werden: ' + (e?.message||e));
+  } finally {
+    sendBtn.disabled = false;
+  }
+}
+
+async function stornieren(id, proj) {
+  if (!confirm(`Auftrag "${proj}" wirklich stornieren?\n\nNur möglich wenn noch nicht bearbeitet.`)) return;
+  laden(true);
+  try {
+    const { error } = await sb.from('bestellAnfragen').update({status:'Storniert'}).eq('id',id).eq('status','Anfrage eingegangen');
+    if (error) throw error;
+    await ladeDashboard();
+  } catch(e) { alert('❌ Storno fehlgeschlagen: ' + (e?.message||e)); }
+  finally { laden(false); }
+}
+
+/* ═══════════  PROFIL  ═══════════ */
+function profilLaden() {
+  if (!aktKunde) return;
+  document.getElementById('editName').value  = aktKunde.name    ||'';
+  document.getElementById('editEmail').value = aktKunde.email   ||'';
+  document.getElementById('editTel').value   = aktKunde.telefon ||'';
+  document.getElementById('editAdr').value   = aktKunde.adresse ||'';
+  document.getElementById('editPlz').value   = aktKunde.plz     ||'';
+  document.getElementById('editOrt').value   = aktKunde.ort     ||'';
+  document.getElementById('editPW').value    = '';
+  document.getElementById('editPW2').value   = '';
+  alertClear('profilErr'); alertClear('profilOk');
+}
+
+async function profilSpeichern() {
+  alertClear('profilErr'); alertClear('profilOk');
+  const name = document.getElementById('editName').value.trim();
+  const tel  = document.getElementById('editTel').value.trim();
+  const adr  = document.getElementById('editAdr').value.trim();
+  const plz  = document.getElementById('editPlz').value.trim();
+  const ort  = document.getElementById('editOrt').value.trim();
+  const pw   = document.getElementById('editPW').value;
+  const pw2  = document.getElementById('editPW2').value;
+  if (!name) { alertShow('profilErr','❌ Bitte einen Namen eingeben.'); return; }
+  if (pw && pw.length < 8) { alertShow('profilErr','❌ Neues Passwort mind. 8 Zeichen.'); return; }
+  if (pw && pw !== pw2)    { alertShow('profilErr','❌ Passwörter stimmen nicht überein.'); return; }
+  btnSet('btnProfil',true); laden(true);
+  try {
+    const upd = {name, telefon:tel, adresse:adr, plz, ort};
+    if (pw) upd.passwort_hash = await sha256(pw);
+    const { error } = await sb.from('kunden').update(upd).eq('id',aktKunde.id);
+    if (error) throw error;
+    aktKunde = {...aktKunde,...upd}; sessionSave(aktKunde); headerAktualisieren();
     alertShow('profilOk','✓ Profil gespeichert!');
-    document.getElementById('editPW').value='';document.getElementById('editPW2').value='';
-  }catch(e){alertShow('profilErr','❌ Fehler: '+(e?.message||e));}
-  finally{btnSet('btnProfil',false);laden(false);}
+    document.getElementById('editPW').value = ''; document.getElementById('editPW2').value = '';
+  } catch(e) { alertShow('profilErr','❌ Fehler: ' + (e?.message||e)); }
+  finally { btnSet('btnProfil',false); laden(false); }
 }
 
-/* ═══ HILFSFUNKTIONEN ═══ */
-function laden(an){document.getElementById('ladeWrap').style.display=an?'flex':'none';}
-function btnSet(id,dis){const e=document.getElementById(id);if(e)e.disabled=dis;}
-function alertShow(id,txt){const e=document.getElementById(id);if(e){e.textContent=txt;e.classList.add('on');}}
-function alertClear(id){const e=document.getElementById(id);if(e){e.textContent='';e.classList.remove('on');}}
-function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
-function genId(){return 'B-'+Date.now().toString().slice(-8).toUpperCase();}
-function x(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
-function bdg(st){const m={'Anfrage eingegangen':'b-neu','In Bearbeitung':'b-arb','Im Druck':'b-druck','Qualitätsprüfung':'b-arb','Versandbereit':'b-ok','Abgeschlossen':'b-ok','Storniert':'b-rd'};return `<span class="bdg ${m[st]||'b-gr'}">${x(st)}</span>`;}
+/* ═══════════  HILFSFUNKTIONEN  ═══════════ */
+function laden(an)          { document.getElementById('ladeWrap').style.display = an?'flex':'none'; }
+function btnSet(id,dis)     { const e=document.getElementById(id); if(e) e.disabled=dis; }
+function alertShow(id,txt)  { const e=document.getElementById(id); if(e){e.textContent=txt;e.classList.add('on');} }
+function alertClear(id)     { const e=document.getElementById(id); if(e){e.textContent='';e.classList.remove('on');} }
+function validEmail(e)      { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function genId()            { return 'B-' + Date.now().toString().slice(-8).toUpperCase(); }
+function x(s)               { return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 
-/* ═══ INIT ═══ */
-window.addEventListener('DOMContentLoaded',async()=>{
-  const k=sessionLoad();
-  if(k){aktKunde=k;await ladeFilamente();await ladeDashboard();headerAktualisieren();zeige('view-dashboard');startRefresh();}
-  else{headerAktualisieren();await ladeFilamente();}
+function bdg(st) {
+  const m={'Anfrage eingegangen':'b-neu','In Bearbeitung':'b-arb','Im Druck':'b-druck','Qualitätsprüfung':'b-arb','Versandbereit':'b-ok','Abgeschlossen':'b-ok','Storniert':'b-rd'};
+  return `<span class="bdg ${m[st]||'b-gr'}">${x(st)}</span>`;
+}
+
+/* ═══════════  INIT  ═══════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  const s = sessionLoad();
+  if (s) { aktKunde = s; headerAktualisieren(); ladeDashboard(); zeige('view-dashboard'); }
+  else   { headerAktualisieren(); }
+  ladeFilamente();
 });
 </script>
 </body>
