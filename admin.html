@@ -1365,28 +1365,16 @@ function modBerechne(){
 
 async function modSave(){
   if(!modId) return;
-  const status =document.getElementById('mStatus').value;
-  const kosten = kosten_neu;
-  const neueMsg=document.getElementById('mNeueNachricht').value.trim();
-
-  // Nachrichten-Array aufbauen
-  const a=anfragen.find(e=>e.id===modId);
-  let msgs=[];
-  try{ if(a.admin_notiz) msgs=JSON.parse(a.admin_notiz); if(!Array.isArray(msgs)) msgs=[{text:a.admin_notiz,ts:''}]; }
-  catch(e){ if(a.admin_notiz) msgs=[{text:a.admin_notiz,ts:''}]; }
-
-  if(neueMsg){
-    msgs.push({text:neueMsg, ts:new Date().toLocaleString('de-DE')});
-  }
+  const status = document.getElementById('mStatus').value;
 
   const rabattVal  = document.getElementById('mRabatt')?.value;
   const kostenVal  = document.getElementById('mKosten')?.value;
   const rabatt_pct = rabattVal ? parseFloat(rabattVal) : 0;
-  const kosten_neu = kostenVal ? parseFloat(kostenVal) : null;
+  const kosten     = kostenVal ? parseFloat(kostenVal) : null;
   // Grundpreis rückrechnen
-  const grundpreis = (kosten_neu!=null && rabatt_pct>0)
-    ? kosten_neu / (1 - rabatt_pct/100)
-    : kosten_neu;
+  const grundpreis = (kosten!=null && rabatt_pct>0)
+    ? kosten / (1 - rabatt_pct/100)
+    : kosten;
 
   // Admin-Nachrichten aktualisieren
   const akt=anfragen.find(e=>e.id===modId);
