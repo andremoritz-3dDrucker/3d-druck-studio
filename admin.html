@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -342,11 +343,11 @@ tr:hover td{background:#fafcff}
           <thead>
             <tr>
               <th>Datum</th><th>Bestellnr.</th><th>Kunde / Kontakt</th>
-              <th>Projekt</th><th>Material</th><th>Lieferadresse</th>
+              <th>Projekt</th><th>Verfahren</th><th>Material</th><th>Lieferadresse</th>
               <th>Status</th><th>Preis</th><th>Aktionen</th>
             </tr>
           </thead>
-          <tbody id="tAnfragen"><tr><td colspan="9" class="emp">Lade…</td></tr></tbody>
+          <tbody id="tAnfragen"><tr><td colspan="10" class="emp">Lade…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -356,8 +357,16 @@ tr:hover td{background:#fafcff}
   <div class="panel" id="p-lager">
     <div class="card-row">
       <div class="card">
-        <div class="chead"><h2>🧵 Neue Spule hinzufügen</h2></div>
+        <div class="chead"><h2>🧵 Neues Material hinzufügen</h2></div>
         <div class="fgrid">
+          <div class="field fcol">
+            <label>Verfahren</label>
+            <select id="lVerfahren" onchange="lagerVerfahrenWechsel()">
+              <option value="Drucken">🖨️ 3D-Druck (Filament)</option>
+              <option value="Lasern">🔥 Lasern (Platten/Bögen)</option>
+              <option value="Plottern">✂️ Plottern (Folie/Rolle)</option>
+            </select>
+          </div>
           <div class="field">
             <label>Hersteller</label>
             <input type="text" id="lHer" placeholder="z.B. Anycubic">
@@ -368,62 +377,10 @@ tr:hover td{background:#fafcff}
           </div>
           <div class="field">
             <label>Material-Typ</label>
-            <select id="lMat">
-              <optgroup label="── PLA Varianten ──">
-                <option>PLA</option>
-                <option>PLA+</option>
-                <option>PLA Silk</option>
-                <option>PLA Matt</option>
-                <option>PLA High Speed</option>
-                <option>XPLA</option>
-                <option>PLA-CF (Carbon)</option>
-                <option>PLA Wood Fill</option>
-                <option>PLA Metal Fill</option>
-                <option>PLA Marble</option>
-              </optgroup>
-              <optgroup label="── PETG Varianten ──">
-                <option>PETG</option>
-                <option>PETG-CF (Carbon)</option>
-                <option>PETG-GF (Glasfaser)</option>
-              </optgroup>
-              <optgroup label="── Nylon / PA ──">
-                <option>Nylon PA6</option>
-                <option>Nylon PA12</option>
-                <option>Nylon PA-CF (Carbon)</option>
-                <option>Nylon PA-GF (Glasfaser)</option>
-              </optgroup>
-              <optgroup label="── Technische Filamente ──">
-                <option>ABS</option>
-                <option>ABS-CF (Carbon)</option>
-                <option>ASA</option>
-                <option>ASA-CF (Carbon)</option>
-                <option>PC (Polycarbonat)</option>
-                <option>PC-CF (Carbon)</option>
-                <option>PP (Polypropylen)</option>
-                <option>HIPS</option>
-                <option>POM (Delrin)</option>
-              </optgroup>
-              <optgroup label="── Glasfaser (GF) ──">
-                <option>GF-PLA (Glasfaser)</option>
-                <option>GF-PETG (Glasfaser)</option>
-                <option>GF-PA12 (Glasfaser)</option>
-                <option>GF30-PA (30% Glasfaser)</option>
-              </optgroup>
-              <optgroup label="── Flexibel ──">
-                <option>TPU 95A</option>
-                <option>TPU 87A (weich)</option>
-                <option>TPE</option>
-                <option>TPC</option>
-              </optgroup>
-              <optgroup label="── Spezialmaterialien ──">
-                <option>Resin (Standard)</option>
-                <option>Resin (ABS-Like)</option>
-                <option>Resin (Water Washable)</option>
-              </optgroup>
-            </select>
+            <select id="lMat"></select>
           </div>
           <div class="field">
-            <label>Startgewicht (g)</label>
+            <label id="lGewLabel">Startgewicht (g)</label>
             <input type="number" id="lGew" value="1000" min="1">
           </div>
           <div class="field fcol">
@@ -432,16 +389,24 @@ tr:hover td{background:#fafcff}
           </div>
         </div>
         <div class="brow">
-          <button class="btn b-bl" onclick="filamentAdd()">+ Spule hinzufügen</button>
+          <button class="btn b-bl" onclick="filamentAdd()">+ Material hinzufügen</button>
         </div>
       </div>
 
       <div class="card">
         <div class="chead"><h2>📦 Aktueller Bestand</h2></div>
+        <div class="fbar" style="margin-bottom:14px">
+          <select id="lFilterVerfahren" onchange="renderLager()">
+            <option value="">— Alle Verfahren —</option>
+            <option value="Drucken">🖨️ 3D-Druck</option>
+            <option value="Lasern">🔥 Lasern</option>
+            <option value="Plottern">✂️ Plottern</option>
+          </select>
+        </div>
         <div class="twrap">
           <table>
-            <thead><tr><th>Material</th><th>Hersteller</th><th>Rest (g)</th><th>Preis €</th><th>Status</th><th>Aktionen</th></tr></thead>
-            <tbody id="tLager"><tr><td colspan="5" class="emp">Lade…</td></tr></tbody>
+            <thead><tr><th>Verfahren</th><th>Material</th><th>Hersteller</th><th>Rest</th><th>Preis €</th><th>Status</th><th>Aktionen</th></tr></thead>
+            <tbody id="tLager"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -458,7 +423,7 @@ tr:hover td{background:#fafcff}
       <div class="twrap">
         <table>
           <thead>
-            <tr><th>Datum</th><th>Projekt</th><th>Kunde</th><th>Material</th><th>Gramm</th><th>Preis</th><th>Aktionen</th></tr>
+            <tr><th>Datum</th><th>Projekt</th><th>Kunde</th><th>Material</th><th>Menge</th><th>Preis</th><th>Aktionen</th></tr>
           </thead>
           <tbody id="tHistorie"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
         </table>
@@ -480,8 +445,19 @@ tr:hover td{background:#fafcff}
             <label>Auftraggeber (Name)</label>
             <input type="text" id="jKun" placeholder="Max Mustermann">
           </div>
-          <!-- Druckmodus -->
+
+          <!-- Verfahren -->
           <div class="field fcol">
+            <label>Verfahren</label>
+            <select id="jVerfahren" onchange="jVerfahrenWechsel()">
+              <option value="Drucken">🖨️ 3D-Druck</option>
+              <option value="Lasern">🔥 Lasern</option>
+              <option value="Plottern">✂️ Plottern</option>
+            </select>
+          </div>
+
+          <!-- Druckmodus (nur bei 3D-Druck relevant) -->
+          <div class="field fcol" id="jDruckmodusBlock">
             <label>Druckmodus</label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px">
               <label id="jDM1" onclick="jDmWechseln('einfarbig')"
@@ -498,13 +474,13 @@ tr:hover td{background:#fafcff}
           <!-- Einfarbig Felder -->
           <div id="jEinfarbigBlock" style="display:contents">
             <div class="field fcol">
-              <label>Verwendetes Filament</label>
-              <select id="jSpu" onchange="berechne()"><option value="">— Spule wählen —</option></select>
+              <label>Verwendetes Material</label>
+              <select id="jSpu" onchange="berechne()"><option value="">— Material wählen —</option></select>
             </div>
             <div class="field">
-              <label>Verbrauch (g)</label>
+              <label id="jGraLabel">Verbrauch (g)</label>
               <input type="number" id="jGra" placeholder="z.B. 125" step="any" oninput="berechne()">
-              <span class="warn" id="warnGew">⚠ Mehr als Restgewicht!</span>
+              <span class="warn" id="warnGew">⚠ Mehr als Restbestand!</span>
             </div>
           </div>
 
@@ -515,4 +491,1288 @@ tr:hover td{background:#fafcff}
             </div>
             <div id="jFarbenContainer"></div>
             <button type="button" id="jAddFarbe" onclick="jMcHinzu()"
-              style="width:100%;padding:10px;border:2px dashed var(--br);border-radius:9px;background:transparent;color:var(--t3);font-size:.85em;font-weight:600;cursor:pointer;margin-top:4px;transit
+              style="width:100%;padding:10px;border:2px dashed var(--br);border-radius:9px;background:transparent;color:var(--t3);font-size:.85em;font-weight:600;cursor:pointer;margin-top:4px;transition:all .2s"
+              onmouseover="this.style.borderColor='var(--bl)';this.style.color='var(--bl)'"
+              onmouseout="this.style.borderColor='var(--br)';this.style.color='var(--t3)'">
+              + Weitere Farbe hinzufügen
+            </button>
+          </div>
+
+          <div class="field">
+            <label>Rabatt (%)</label>
+            <input type="number" id="jDis" value="0" min="0" max="100" oninput="berechne()">
+          </div>
+          <div class="field">
+            <label>Verschleiß / Strom (€ fest)</label>
+            <input type="number" id="jFix" value="4.50" step="0.01" oninput="berechne()">
+          </div>
+        </div>
+
+        <div class="kbox" id="jKbox">
+          <span id="jMcKosten"></span>
+          Material: <span id="kMat">0,00</span> €<br>
+          Verschleiß/Strom: <span id="kFix">4,50</span> €<br>
+          Zwischensumme: <span id="kZwi">4,50</span> €<br>
+          Rabatt: <span id="kRab" style="color:var(--gn)">- 0,00</span> €<br>
+          <span class="ktotal">Endpreis: <span id="kEnd">4,50</span> €</span>
+        </div>
+        <div class="brow">
+          <button class="btn b-gn" id="btnBuchen" onclick="auftragBuchen()">✓ Auftrag buchen &amp; speichern</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="chead"><h2>💡 Preisinfo</h2></div>
+        <div style="font-size:.88em;color:var(--t2);line-height:1.8">
+          <p><strong>Formel:</strong></p>
+          <p>Materialkosten = (€ / Startmenge) × Verbrauch</p>
+          <p>+ Pauschale für Strom &amp; Verschleiß</p>
+          <p>− Rabatt auf die Gesamtsumme</p>
+          <p style="color:var(--t3);font-size:.85em;margin-top:6px">Die Einheit (Gramm / Blatt / laufender Meter) richtet sich automatisch nach dem gewählten Verfahren bzw. Material.</p>
+          <br>
+          <p style="color:var(--t3);font-size:.9em">Der Endpreis wird in der Auftragshistorie gespeichert und kann dort nachträglich geändert werden.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── TAB 5: KUNDENLISTE ────────────────────────── -->
+  <div class="panel" id="p-kunden">
+    <div class="card">
+      <div class="chead">
+        <h2>👥 Kundenliste</h2>
+        <button class="btn b-bl bsm" onclick="ladeKunden()">↻ Aktualisieren</button>
+      </div>
+      <div class="fbar" style="margin-bottom:16px">
+        <input type="text" id="kundenSuche" placeholder="🔍 Name, E-Mail, Ort suchen…" oninput="filterKunden()">
+      </div>
+      <div id="kundenStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>E-Mail</th>
+              <th>Telefon</th>
+              <th>Adresse</th>
+              <th>Dabei seit</th>
+              <th>Aufträge</th>
+              <th>Kontakt</th>
+            </tr>
+          </thead>
+          <tbody id="tKunden"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
+        </table>
+      </div>
+      <p style="font-size:.75em;color:var(--t3);margin-top:12px">
+        * Nur registrierte Kunden – Gast-Bestellungen erscheinen in den Bestellanfragen mit E-Mail.
+      </p>
+    </div>
+  </div>
+
+</div><!-- /#wrap -->
+
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   PASSWORT (Base64)  →  Kx9m-Druck#2025
+═══════════════════════════════════════════════════════════ */
+const _P = atob('S3g5bS1EcnVjayMyMDI1');
+
+function login(){
+  const v=document.getElementById('pw').value, e=document.getElementById('lerr'), i=document.getElementById('pw');
+  if(v===_P){
+    sessionStorage.setItem('adm','1');
+    document.getElementById('loginWrap').classList.add('fade');
+    setTimeout(()=>{document.getElementById('loginWrap').style.display='none';startAdmin();},400);
+  } else {
+    e.classList.add('on'); i.classList.add('shake'); i.value='';
+    setTimeout(()=>i.classList.remove('shake'),400); i.focus();
+  }
+}
+function togglePw(){ const e=document.getElementById('pw'); e.type=e.type==='password'?'text':'password'; }
+function logout(){ if(confirm('Wirklich abmelden?')){ sessionStorage.removeItem('adm'); location.reload(); } }
+
+/* ═══════════════════════════════════════════════════════════
+   SUPABASE
+═══════════════════════════════════════════════════════════ */
+const SB = supabase.createClient(
+  'https://zasufuyaiturzgohqkky.supabase.co',
+  'sb_publishable_8XYWszB4Vs9nAntw3rFlvA_c4MuUyOj'
+);
+
+/* ═══════════  EMAILJS – STATUS-BENACHRICHTIGUNG  ═══════════ */
+const EJ_PUBLIC_KEY      = 'qlNobf5erJKSEM2Ax';
+const EJ_SERVICE_ID      = 'service_vn1zc9n';
+const EJ_STATUS_TEMPLATE = 'template_xrd00wu';
+
+try { emailjs.init({ publicKey: EJ_PUBLIC_KEY }); } catch(e) {}
+
+// Passende Statusnachricht je Status
+const STATUS_NACHRICHTEN = {
+  'In Bearbeitung':   'Wir haben deine Anfrage erhalten und bereiten deinen Auftrag vor.',
+  'Im Druck':         'Dein Auftrag wird gerade gedruckt. Wir melden uns wenn er fertig ist.',
+  'Qualitätsprüfung': 'Der Druck ist abgeschlossen und wird gerade auf Qualität geprüft.',
+  'Versandbereit':    'Dein Auftrag ist fertig und bereit zur Abholung oder zum Versand!',
+  'Abgeschlossen':    'Dein Auftrag wurde erfolgreich abgeschlossen. Vielen Dank!',
+  'Storniert':        'Dein Auftrag wurde leider storniert. Bei Fragen melde dich gerne.'
+};
+
+async function statusEmailSenden(anfrage, neuerStatus){
+  // Nur senden wenn sich der Status wirklich geändert hat
+  if(anfrage.status === neuerStatus) return;
+  // Nur für relevante Status
+  if(!STATUS_NACHRICHTEN[neuerStatus]) return;
+
+  // Kunden-E-Mail ermitteln
+  let kundenEmail = anfrage.gast_email || '';
+  let kundenName  = anfrage.gastname  || 'Kunde';
+
+  // Bei Kundenkonto: E-Mail aus kunden-Tabelle laden
+  if(!kundenEmail && anfrage.kunden_id){
+    try {
+      const { data: kd } = await SB.from('kunden')
+        .select('email,name')
+        .eq('id', anfrage.kunden_id)
+        .single();
+      if(kd){ kundenEmail = kd.email; kundenName = kd.name; }
+    } catch(e){ console.error('Kunden-Email:', e); }
+  }
+
+  if(!kundenEmail){
+    console.log('Keine E-Mail-Adresse – Status-Mail wird nicht gesendet.');
+    return;
+  }
+
+  try {
+    await emailjs.send(EJ_SERVICE_ID, EJ_STATUS_TEMPLATE, {
+      kunden_email:    kundenEmail,
+      kunden_name:     kundenName,
+      bestellnummer:   anfrage.id,
+      projekt:         anfrage.projekt,
+      status:          neuerStatus,
+      status_nachricht: STATUS_NACHRICHTEN[neuerStatus] || '',
+      datum:           new Date().toLocaleString('de-DE'),
+    });
+
+    // In Supabase protokollieren
+    await SB.from('bestellAnfragen')
+      .update({ letzter_email_status: neuerStatus })
+      .eq('id', anfrage.id);
+
+    await SB.from('status_emails').insert([{
+      id:           'se_' + Date.now(),
+      bestell_id:   anfrage.id,
+      kunden_email: kundenEmail,
+      status:       neuerStatus
+    }]);
+
+    console.log('Status-E-Mail gesendet an:', kundenEmail);
+  } catch(err){
+    console.error('Status-E-Mail Fehler:', err);
+    // Fehler bei E-Mail soll Speichern nicht blockieren
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   START
+═══════════════════════════════════════════════════════════ */
+function startAdmin(){
+  ['topbar','nav','wrap'].forEach(id=>document.getElementById(id).style.display=id==='topbar'?'flex':id==='nav'?'flex':'block');
+  lagerVerfahrenWechsel();
+  jVerfahrenWechsel();
+  ladeDaten(); ladeAnfragen(); ladePostfach(); ladeKunden();
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  if(sessionStorage.getItem('adm')==='1'){
+    document.getElementById('loginWrap').style.display='none';
+    startAdmin();
+  } else document.getElementById('pw').focus();
+});
+
+/* ═══════════════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════════════ */
+function tab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   VERFAHREN / MATERIAL-TYPEN / EINHEITEN
+═══════════════════════════════════════════════════════════ */
+// Einheit je Verfahren (Standardwert für neue Einträge)
+const VERFAHREN_EINHEIT = { 'Drucken':'g', 'Lasern':'Blatt', 'Plottern':'m' };
+const VERFAHREN_LABEL   = { 'Drucken':'🖨️ 3D-Druck', 'Lasern':'🔥 Lasern', 'Plottern':'✂️ Plottern' };
+const EINHEIT_LABEL     = { 'g':'g', 'Blatt':'Blatt', 'm':'lfm' };
+
+// Material-Typ-Optionen je Verfahren für das "Neues Material hinzufügen"-Formular
+const MATERIAL_TYP_OPTIONEN = {
+  'Drucken': [
+    { gruppe:'PLA Varianten', opts:['PLA','PLA+','PLA Silk','PLA Matt','PLA High Speed','XPLA','PLA-CF (Carbon)','PLA Wood Fill','PLA Metal Fill','PLA Marble'] },
+    { gruppe:'PETG Varianten', opts:['PETG','PETG-CF (Carbon)','PETG-GF (Glasfaser)'] },
+    { gruppe:'Nylon / PA', opts:['Nylon PA6','Nylon PA12','Nylon PA-CF (Carbon)','Nylon PA-GF (Glasfaser)'] },
+    { gruppe:'Technische Filamente', opts:['ABS','ABS-CF (Carbon)','ASA','ASA-CF (Carbon)','PC (Polycarbonat)','PC-CF (Carbon)','PP (Polypropylen)','HIPS','POM (Delrin)'] },
+    { gruppe:'Glasfaser (GF)', opts:['GF-PLA (Glasfaser)','GF-PETG (Glasfaser)','GF-PA12 (Glasfaser)','GF30-PA (30% Glasfaser)'] },
+    { gruppe:'Flexibel', opts:['TPU 95A','TPU 87A (weich)','TPE','TPC'] },
+    { gruppe:'Spezialmaterialien', opts:['Resin (Standard)','Resin (ABS-Like)','Resin (Water Washable)','PET','PPA (Polyphthalamid)','PPS (Polyphenylensulfid)','PAHT','PLA Aero'] }
+  ],
+  'Lasern': [
+    { gruppe:'Laser-Material', opts:['Holz (Sperrholz)','Leder','Kork','Pappe / Karton','Acryl (dunkel)','Edelstahl','Aluminium'] }
+  ],
+  'Plottern': [
+    { gruppe:'Plotter-Material', opts:['Vinylfolie','Hitzetransfer-Vinylfolie'] }
+  ]
+};
+
+function materialTypOptionenBauen(selectEl, verfahren){
+  const gruppen = MATERIAL_TYP_OPTIONEN[verfahren] || MATERIAL_TYP_OPTIONEN['Drucken'];
+  selectEl.innerHTML = gruppen.map(g =>
+    `<optgroup label="── ${g.gruppe} ──">${g.opts.map(o=>`<option>${o}</option>`).join('')}</optgroup>`
+  ).join('');
+}
+
+// "Neues Material hinzufügen"-Karte an gewähltes Verfahren anpassen
+function lagerVerfahrenWechsel(){
+  const verfahren = document.getElementById('lVerfahren').value;
+  materialTypOptionenBauen(document.getElementById('lMat'), verfahren);
+  const einheit = VERFAHREN_EINHEIT[verfahren];
+  const label = document.getElementById('lGewLabel');
+  const gewFeld = document.getElementById('lGew');
+  if(verfahren==='Drucken'){ label.textContent='Startgewicht (g)'; gewFeld.value = gewFeld.value||1000; }
+  else if(verfahren==='Lasern'){ label.textContent='Anzahl Blätter'; gewFeld.value = 1; }
+  else { label.textContent='Länge auf Rolle (m)'; gewFeld.value = 10; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DATEN (Filament + Historie)
+═══════════════════════════════════════════════════════════ */
+// Filamentlager wird direkt aus Supabase geladen
+
+let lager=[], historie=[], anfragen=[];
+let aktKosten=0, modId=null;
+
+async function ladeDaten(){
+  laden(true);
+  try{
+    let {data:ld}=await SB.from('FilamentLager').select('*').order('Material',{ascending:true});
+    lager=ld||[];
+
+    let {data:hd}=await SB.from('auftragsHistorie').select('*');
+    historie=(hd||[]).sort((a,b)=>b.id.localeCompare(a.id));
+
+    renderLager(); renderHistorie(); renderFilamentDropdown();
+    document.getElementById('onlineStatus').textContent='🟢 Online';
+  }catch(e){
+    document.getElementById('onlineStatus').textContent='🔴 Fehler';
+    console.error('ladeDaten Fehler:', e);
+    alert('❌ Datenbankfehler: ' + (e.message||e) + '\n\nMöglicherweise muss das RLS-Fix-Script in Supabase ausgeführt werden.');
+  }
+  finally{ laden(false); }
+}
+
+/* ─── LAGER ──────────────────────────────────────── */
+function lagerEinheit(f){ return f.einheit || VERFAHREN_EINHEIT[f.verfahren||'Drucken'] || 'g'; }
+
+function renderLager(){
+  const tb=document.getElementById('tLager');
+  const filter = document.getElementById('lFilterVerfahren')?.value || '';
+  const liste = filter ? lager.filter(f=>(f.verfahren||'Drucken')===filter) : lager;
+  if(!liste.length){ tb.innerHTML=`<tr><td colspan="7" class="emp">📭 Kein Material in dieser Kategorie – bitte oben hinzufügen.</td></tr>`; return; }
+  tb.innerHTML=liste.map(f=>{
+    const verfahren=f.verfahren||'Drucken';
+    const einheit=lagerEinheit(f);
+    const r=parseFloat(f.restGewicht);
+    const rZeigen = isNaN(r) ? '—' : `${r.toFixed(einheit==='g'?0:2)} ${EINHEIT_LABEL[einheit]||einheit}`;
+    const gesperrt=f.gesperrt||false;
+    const rowStyle=gesperrt?'opacity:.5;background:#fff8f8;':'';
+    const restStyle=(!isNaN(r)&&r<(einheit==='g'?100:1)&&!gesperrt)?'color:var(--rd);font-weight:700':'';
+    const statusBdg=gesperrt
+      ?`<span class="bdg" style="background:#fde8ea;color:var(--rd)">🔒 Gesperrt${f.sperr_grund?` – ${x(f.sperr_grund)}`:''}</span>`
+      :(isNaN(r)||r<=0
+        ?`<span class="bdg" style="background:#fde8ea;color:var(--rd)">⚠ Leer</span>`
+        :(r<(einheit==='g'?100:1)
+          ?`<span class="bdg" style="background:#fff3e0;color:var(--or)">⚠ Gering</span>`
+          :`<span class="bdg" style="background:#e8f5e9;color:var(--gn)">✓ Verfügbar</span>`));
+    const sperrBtn=gesperrt
+      ?`<button class="btn b-gn bsm" onclick="filamentSperren('${f.id}',false)" title="Wieder freigeben">🔓 Freigeben</button>`
+      :`<button class="btn b-or bsm" onclick="filamentSperren('${f.id}',true)" title="Für Kunden sperren">🔒 Sperren</button>`;
+    return `<tr style="${rowStyle}">
+      <td style="font-size:.82em">${VERFAHREN_LABEL[verfahren]||verfahren}</td>
+      <td>${x(f.Material)}</td>
+      <td style="font-size:.82em;color:var(--t3)">${x(f.Hertseller)||'—'}</td>
+      <td style="${restStyle}">${rZeigen}</td>
+      <td>${f.Preis!=null&&f.Preis!==''?parseFloat(f.Preis).toFixed(2)+' €':'—'}</td>
+      <td>${statusBdg}</td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap">
+        ${sperrBtn}
+        ${verfahren==='Drucken'?`<button class="btn bsm" style="background:#8e44ad" onclick="filamentPrivat('${f.id}','${x(f.Material).replace(/'/g,'')}',${isNaN(r)?0:r})">&#127968; Privat</button>`:''}
+        <button class="btn b-rd bsm" onclick="filamentDel('${f.id}')">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function filamentSperren(id, sperren){
+  laden(true);
+  try{
+    const grund = sperren ? prompt('Grund für Sperrung (optional):', '') : null;
+    const { error } = await SB.from('FilamentLager')
+      .update({ gesperrt: sperren, sperr_grund: grund||'' })
+      .eq('id', id);
+    if(error) throw error;
+    await ladeDaten();
+  }catch(e){ alert('Fehler: '+(e.message||e)); laden(false); }
+}
+
+async function filamentPrivat(id, material, restGewicht){
+  const grammStr = prompt(
+    'Gramm fuer Privatgebrauch ausbuchen:\n(' + material + ', noch ' + restGewicht.toFixed(0) + 'g vorhanden)',
+    ''
+  );
+  if(grammStr === null) return;
+  const gramm = parseFloat(grammStr);
+  if(!gramm || gramm <= 0){ alert('Bitte eine gueltige Grammzahl eingeben.'); return; }
+  if(gramm > restGewicht){ alert('Nicht genug Filament! Verfuegbar: ' + restGewicht.toFixed(0) + 'g'); return; }
+
+  const grund = prompt('Grund (optional):', 'Privatgebrauch') || 'Privatgebrauch';
+
+  laden(true);
+  try{
+    const neuesRest = restGewicht - gramm;
+    await SB.from('FilamentLager').update({ restGewicht: neuesRest.toString() }).eq('id', id);
+    // In Auftragshistorie eintragen
+    await SB.from('auftragsHistorie').insert([{
+      id: 'priv_' + Date.now(),
+      spuled: id,
+      erledigt: true,
+      datum: new Date().toLocaleDateString('de-DE'),
+      projekt: grund,
+      kunde: 'Privatgebrauch',
+      material: material,
+      verbrauchG: gramm,
+      kosten: 0
+    }]);
+    await ladeDaten();
+  }catch(e){
+    alert('Fehler: ' + (e.message||e));
+    laden(false);
+  }
+}
+
+async function filamentAdd(){
+  const verfahren=document.getElementById('lVerfahren').value;
+  const her=document.getElementById('lHer').value.trim();
+  const farbe=document.getElementById('lFarbe').value.trim();
+  const mat=document.getElementById('lMat').value;
+  const gew=parseFloat(document.getElementById('lGew').value)||0;
+  const pre=parseFloat(document.getElementById('lPre').value)||0;
+  const einheit = VERFAHREN_EINHEIT[verfahren] || 'g';
+  if(verfahren==='Drucken' && !her){ alert('Bitte Hersteller angeben!'); return; }
+  if(!farbe){ alert('Bitte eine Bezeichnung/Farbe angeben!'); return; }
+  if(!gew){ alert('Bitte eine gültige Menge eingeben!'); return; }
+  laden(true);
+  try {
+    const { error } = await SB.from('FilamentLager').insert([{
+      id:'s_'+Date.now(), Hertseller:her||null,
+      Material:`${mat} (${farbe})`,
+      startGewicht:gew.toString(), restGewicht:gew.toString(), Preis:pre.toString(),
+      verfahren, einheit, gesperrt:false, sperr_grund:''
+    }]);
+    if(error) throw error;
+    document.getElementById('lHer').value='';
+    document.getElementById('lFarbe').value='';
+    document.getElementById('lPre').value='';
+    lagerVerfahrenWechsel();
+    await ladeDaten();
+  } catch(e) {
+    console.error('Material speichern fehlgeschlagen:', e);
+    alert('❌ Fehler beim Speichern: ' + (e.message || e) + '\n\nBitte das SQL-Fix-Script in Supabase ausführen!');
+    laden(false);
+  }
+}
+
+async function filamentDel(id){
+  if(confirm('Eintrag wirklich löschen?')){ laden(true); await SB.from('FilamentLager').delete().eq('id',id); await ladeDaten(); }
+}
+
+function renderFilamentDropdown(){
+  const dd=document.getElementById('jSpu');
+  if(!dd) return;
+  const verfahren = document.getElementById('jVerfahren')?.value || 'Drucken';
+  dd.innerHTML='<option value="">— Material wählen —</option>';
+  lager.filter(f=>(f.verfahren||'Drucken')===verfahren).forEach(f=>{
+    const einheit=lagerEinheit(f);
+    const r=parseFloat(f.restGewicht);
+    // Gesperrte Einträge nicht anzeigen
+    if(f.gesperrt) return;
+    const tag=isNaN(r)?'':(r<=0?' ⚠ LEER':(r<(einheit==='g'?100:1)?' ⚠ gering':''));
+    const restTxt = isNaN(r)?'':` (${r.toFixed(einheit==='g'?0:2)} ${EINHEIT_LABEL[einheit]||einheit})`;
+    dd.innerHTML+=`<option value="${f.id}" data-einheit="${einheit}">${x(f.Material)}${f.Hertseller?' | '+x(f.Hertseller):''}${restTxt}${tag}</option>`;
+  });
+}
+
+/* ─── AUFTRAGSHISTORIE ────────────────────────────── */
+function renderHistorie(){
+  const tb=document.getElementById('tHistorie');
+  if(!historie.length){ tb.innerHTML=`<tr><td colspan="7" class="emp">Noch keine Aufträge.</td></tr>`; return; }
+  tb.innerHTML=historie.map(h=>
+    `<tr>
+      <td style="font-size:.83em;white-space:nowrap">${x(h.datum)}</td>
+      <td><strong>${x(h.projekt)}</strong></td>
+      <td>${x(h.kunde)}</td>
+      <td style="font-size:.83em">${x(h.material)}</td>
+      <td>${h.verbrauchG}</td>
+      <td><strong style="color:var(--gn)">${parseFloat(h.kosten||0).toFixed(2)} €</strong></td>
+      <td style="display:flex;gap:5px">
+        <button class="btn b-or bsm" onclick="historiePreisAendern('${h.id}','${h.kosten}')">✏ Preis</button>
+        <button class="btn b-rd bsm" onclick="historieDel('${h.id}',${h.verbrauchG},'${h.spuled||''}')">✕</button>
+      </td>
+    </tr>`
+  ).join('');
+}
+
+async function historiePreisAendern(id, alt){
+  const n=prompt('Neuer Preis (€):', alt);
+  if(n===null) return;
+  laden(true);
+  await SB.from('auftragsHistorie').update({kosten:parseFloat(n)||0}).eq('id',id);
+  await ladeDaten();
+}
+
+async function historieDel(id, g, spuId){
+  if(!confirm(`Auftrag löschen?\n${g} wird zurückgebucht.`)) return;
+  laden(true);
+  if(spuId){ const s=lager.find(f=>f.id===spuId); if(s){ const nr=parseFloat(s.restGewicht)+g; await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',spuId); } }
+  await SB.from('auftragsHistorie').delete().eq('id',id);
+  await ladeDaten();
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   POSTFACH – ADMIN
+═══════════════════════════════════════════════════════════ */
+// Postfach liest direkt aus bestellAnfragen (kunden_nachrichten + admin_notiz)
+let postfachDaten=[], aktivePfId=null;
+
+function pfAlleNachrichten(eintrag){
+  // Admin-Nachrichten
+  let adminMsgs=[];
+  try{ if(eintrag.admin_notiz){ const p=JSON.parse(eintrag.admin_notiz); adminMsgs=Array.isArray(p)?p:[{text:eintrag.admin_notiz,ts:'',von:'admin'}]; } }
+  catch(e){ if(eintrag.admin_notiz) adminMsgs=[{text:eintrag.admin_notiz,ts:'',von:'admin'}]; }
+  // Kunden-Nachrichten
+  let kundenMsgs=[];
+  try{ if(eintrag.kunden_nachrichten){ const p=JSON.parse(eintrag.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
+  catch(e){ kundenMsgs=[]; }
+  // Zusammenfuehren & sortieren
+  return [...adminMsgs.map(m=>({...m,von:'admin'})),...kundenMsgs.map(m=>({...m,von:'kunde'}))]
+    .sort((a,b)=>new Date(a.ts||0)-new Date(b.ts||0));
+}
+
+function pfHatUngeleseneKundenMsg(eintrag){
+  // Ungelesen = Kunden-Nachricht vorhanden UND gelesen_admin nicht gesetzt
+  let kundenMsgs=[];
+  try{ if(eintrag.kunden_nachrichten){ const p=JSON.parse(eintrag.kunden_nachrichten); kundenMsgs=Array.isArray(p)?p:[]; } }
+  catch(e){ kundenMsgs=[]; }
+  return kundenMsgs.length>0 && !eintrag.gelesen_admin;
+}
+
+async function ladePostfach(){
+  try{
+    // Alle Bestellungen mit mindestens einer Nachricht laden
+    const {data}=await SB.from('bestellAnfragen')
+      .select('id,datum,projekt,kunde,gastname,gast_email,kunden_id,admin_notiz,kunden_nachrichten,gelesen_admin,status,erstellt_am')
+      .order('erstellt_am',{ascending:false});
+
+    // Nur Eintraege mit Nachrichten anzeigen
+    postfachDaten=(data||[]).filter(e=>{
+      const haNachrichten = e.admin_notiz || e.kunden_nachrichten;
+      return haNachrichten;
+    });
+
+    filterPost();
+    const ungelesen=postfachDaten.filter(p=>pfHatUngeleseneKundenMsg(p)).length;
+    const nb=document.getElementById('nbPost');
+    if(nb){nb.textContent=ungelesen;nb.style.display=ungelesen>0?'inline-flex':'none';}
+  }catch(e){console.error('Postfach laden:',e);}
+}
+
+function filterPost(){
+  const suche=(document.getElementById('pfSuche')?.value||'').toLowerCase();
+  const fil=document.getElementById('pfFilter')?.value||'';
+  const liste=postfachDaten.filter(p=>{
+    const name=p.gastname||p.kunde||'';
+    const email=p.gast_email||'';
+    const ms=!suche||[name,email,p.projekt||''].some(s=>s.toLowerCase().includes(suche));
+    const ung=pfHatUngeleseneKundenMsg(p);
+    const mf=!fil||(fil==='unread'&&ung)||(fil==='read'&&!ung);
+    return ms&&mf;
+  });
+  const el=document.getElementById('pfListe');
+  if(!el) return;
+  if(!liste.length){
+    el.innerHTML='<div style="text-align:center;color:#bbb;padding:30px;font-size:.84em">Keine Nachrichten vorhanden</div>';
+    return;
+  }
+  el.innerHTML=liste.map(p=>{
+    const alleNachrichten=pfAlleNachrichten(p);
+    const letzte=alleNachrichten[alleNachrichten.length-1];
+    const vorschau=letzte?letzte.text.slice(0,55)+(letzte.text.length>55?'...':''):'';
+    const aktiv=aktivePfId===p.id?'background:#e3f0ff;':'';
+    const ung=pfHatUngeleseneKundenMsg(p);
+    const dat=p.datum||'';
+    const name=p.gastname||p.kunde||'Gast';
+    return `<div onclick="pfOeffnen('${p.id}')"
+      style="padding:13px 16px;border-bottom:1px solid #f0f4f8;cursor:pointer;transition:background .15s;${aktiv}${ung?'border-left:3px solid var(--bl);':'border-left:3px solid transparent;'}"
+      onmouseover="this.style.background='#f0f6ff'"
+      onmouseout="this.style.background='${aktiv?'#e3f0ff':''}'">
+      <div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:3px">
+        <div style="font-weight:${ung?700:500};font-size:.9em;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          ${ung?'&#128309; ':''}${x(name)}
+        </div>
+        <div style="font-size:.72em;color:var(--t3);white-space:nowrap">${x(dat)}</div>
+      </div>
+      <div style="font-size:.82em;font-weight:${ung?600:400};color:${ung?'var(--bl)':'var(--t2)'};margin-bottom:2px">
+        &#128204; ${x(p.projekt||'Kein Betreff')}
+      </div>
+      <div style="font-size:.79em;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x(vorschau)}</div>
+    </div>`;
+  }).join('');
+}
+
+async function pfOeffnen(id){
+  aktivePfId=id; filterPost();
+  const p=postfachDaten.find(e=>e.id===id); if(!p) return;
+  const name=p.gastname||p.kunde||'Gast';
+  const email=p.gast_email||'';
+
+  // Header
+  document.getElementById('pfChatHeader').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-weight:700;font-size:1em;color:var(--t1)">${x(name)}</div>
+        ${email?`<div style="font-size:.82em;color:var(--t3)"><a href="mailto:${x(email)}">${x(email)}</a></div>`:''}
+        <div style="font-size:.84em;color:var(--t2);margin-top:2px;font-weight:600">&#128204; ${x(p.projekt||'Kein Betreff')}</div>
+        <div style="font-size:.78em;color:var(--t3);margin-top:2px">${badgeHtml(p.status)}</div>
+      </div>
+      <button class="btn b-bl bsm" onclick="tab('p-anfragen',document.querySelector('.ntab:nth-child(2))');modOpen('${p.id}')"
+        style="font-size:11px">&#128196; Zur Bestellung</button>
+    </div>`;
+
+  // Verlauf rendern
+  const alleNachrichten=pfAlleNachrichten(p);
+  const verlauf=document.getElementById('pfChatVerlauf');
+  verlauf.style.display='flex';
+  verlauf.style.flexDirection='column';
+  verlauf.style.gap='10px';
+
+  if(alleNachrichten.length){
+    verlauf.innerHTML=alleNachrichten.map(m=>{
+      const isA=m.von==='admin';
+      const bg=isA?'#e3f0ff':'#f3e5f5';
+      const col=isA?'#0056b3':'#6a1b9a';
+      const align=isA?'align-self:flex-end':'align-self:flex-start';
+      return `<div style="padding:9px 13px;border-radius:10px;max-width:85%;background:${bg};border-left:3px solid ${col};${align}">
+        <div style="font-size:.71em;font-weight:700;color:${col};margin-bottom:3px">
+          ${isA?'&#128100; Du (Admin)':'&#128100; '+x(m.von_name||name)} &middot; ${x(m.ts||'')}
+        </div>
+        <div style="font-size:.88em;color:#1e2a3a;white-space:pre-wrap;line-height:1.55">${x(m.text)}</div>
+      </div>`;
+    }).join('');
+  } else {
+    verlauf.innerHTML='<div style="text-align:center;color:#bbb;font-size:.84em;padding:20px">Noch keine Nachrichten – schreibe die erste!</div>';
+  }
+
+  document.getElementById('pfChatInput').style.display='block';
+  document.getElementById('pfAntwortText').value='';
+  setTimeout(()=>{verlauf.scrollTop=verlauf.scrollHeight;},50);
+
+  // Als gelesen markieren wenn Kunden-Nachrichten vorhanden
+  if(pfHatUngeleseneKundenMsg(p)){
+    await SB.from('bestellAnfragen').update({gelesen_admin:true}).eq('id',id);
+    p.gelesen_admin=true;
+    const ung=postfachDaten.filter(pp=>pfHatUngeleseneKundenMsg(pp)).length;
+    const nb=document.getElementById('nbPost');
+    if(nb){nb.textContent=ung;nb.style.display=ung>0?'inline-flex':'none';}
+    filterPost();
+  }
+}
+
+async function pfAntworten(){
+  if(!aktivePfId) return;
+  const ta=document.getElementById('pfAntwortText');
+  const text=ta.value.trim(); if(!text) return;
+  ta.disabled=true;
+
+  const p=postfachDaten.find(e=>e.id===aktivePfId);
+  // Admin-Nachrichten aus admin_notiz laden
+  let adminMsgs=[];
+  try{ if(p.admin_notiz){ const parsed=JSON.parse(p.admin_notiz); adminMsgs=Array.isArray(parsed)?parsed:[{text:p.admin_notiz,ts:'',von:'admin'}]; } }
+  catch(e){ if(p.admin_notiz) adminMsgs=[{text:p.admin_notiz,ts:'',von:'admin'}]; }
+
+  adminMsgs.push({text,von:'admin',von_name:'Studio',ts:new Date().toLocaleString('de-DE')});
+
+  try{
+    await SB.from('bestellAnfragen')
+      .update({admin_notiz:JSON.stringify(adminMsgs),gelesen_admin:true})
+      .eq('id',aktivePfId);
+    p.admin_notiz=JSON.stringify(adminMsgs);
+    p.gelesen_admin=true;
+    ta.value='';
+    filterPost();
+    pfOeffnen(aktivePfId);
+  }catch(e){alert('Fehler beim Senden: '+(e.message||e));}
+  finally{ta.disabled=false;ta.focus();}
+}
+
+async function pfArchivieren(id){
+  if(!confirm('Konversation archivieren? (Bestellung bleibt erhalten)')) return;
+  // Nachrichten loeschen (nicht Bestellung)
+  await SB.from('bestellAnfragen').update({admin_notiz:null,kunden_nachrichten:null}).eq('id',id);
+  postfachDaten=postfachDaten.filter(p=>p.id!==id);
+  aktivePfId=null;
+  document.getElementById('pfChatHeader').innerHTML='<div style="color:#bbb;font-size:.9em;text-align:center;padding:20px 0">Konversation auswaehlen</div>';
+  document.getElementById('pfChatVerlauf').innerHTML='';
+  document.getElementById('pfChatInput').style.display='none';
+  filterPost();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   KUNDENANFRAGEN
+═══════════════════════════════════════════════════════════ */
+async function ladeAnfragen(){
+  try{
+    const {data}=await SB.from('bestellAnfragen').select('*').order('erstellt_am',{ascending:false});
+    anfragen=data||[];
+    filterAnfragen(); statsUpdate();
+  }catch(e){ console.error('Anfragen:',e); }
+}
+
+function statsUpdate(){
+  const neu   =anfragen.filter(a=>a.status==='Anfrage eingegangen'||a.status==='In Bearbeitung').length;
+  const druck =anfragen.filter(a=>a.status==='Im Druck'||a.status==='Qualitätsprüfung').length;
+  const abge  =anfragen.filter(a=>a.status==='Abgeschlossen').length;
+  const umsatz=anfragen.reduce((s,a)=>s+parseFloat(a.kosten||0),0);
+  document.getElementById('sAlle').textContent  =anfragen.length;
+  document.getElementById('sNeu').textContent   =neu;
+  document.getElementById('sDruck').textContent =druck;
+  document.getElementById('sAbge').textContent  =abge;
+  document.getElementById('sUmsatz').textContent=umsatz.toFixed(2)+' €';
+  const nb=document.getElementById('nbAnfragen');
+  nb.textContent=neu; nb.style.display=neu>0?'inline-flex':'none';
+}
+
+function filterAnfragen(){
+  const sf=document.getElementById('fStatus').value;
+  const su=document.getElementById('fSuche').value.toLowerCase();
+  const list=anfragen.filter(a=>{
+    const ms=!sf||a.status===sf;
+    const mx=!su||`${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
+    return ms&&mx;
+  });
+  const tb=document.getElementById('tAnfragen');
+  if(!list.length){ tb.innerHTML=`<tr><td colspan="10" class="emp">Keine Einträge gefunden.</td></tr>`; return; }
+  tb.innerHTML=list.map(a=>{
+    const name=a.gastname
+      ?`${x(a.gastname)}<br><span style="font-size:.78em;color:var(--t3)">(Gast) ${a.gast_email?`<a href="mailto:${x(a.gast_email)}">${x(a.gast_email)}</a>`:''}</span>`
+      :`<span style="color:var(--bl);font-weight:600">🔑 Kundenkonto</span>`;
+    const adr=a.adresse?`<span style="font-size:.82em">${x(a.adresse)}<br>${x(a.plz)} ${x(a.ort)}</span>`:`<span style="color:#ccc">—</span>`;
+    const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
+    const hasMsg=a.admin_notiz&&a.admin_notiz.trim().length>0;
+    // Kundenname: Gast oder aus Kundenkonto
+    const kundenname = a.gastname || a.kunde || '(Kundenkonto)';
+    return `<tr>
+      <td style="font-size:.81em;color:var(--t3);white-space:nowrap">${x(a.datum)}</td>
+      <td style="font-family:monospace;font-size:.79em">${x(a.id)}</td>
+      <td>
+        <div style="font-weight:600;font-size:.9em">${x(kundenname)}</div>
+        ${a.gast_email?`<div style="font-size:.77em;color:var(--t3)"><a href="mailto:${x(a.gast_email)}">${x(a.gast_email)}</a></div>`:''}
+        ${!a.gastname?`<span style="font-size:.75em;background:#e3f0ff;color:var(--bl);padding:1px 6px;border-radius:4px;font-weight:600">Konto</span>`:`<span style="font-size:.75em;background:#f3e5f5;color:#6a1b9a;padding:1px 6px;border-radius:4px;font-weight:600">Gast</span>`}
+      </td>
+      <td><strong>${x(a.projekt)}</strong>${a.beschreibung?`<div style="font-size:.78em;color:#999;margin-top:2px">${x(a.beschreibung.slice(0,50))}${a.beschreibung.length>50?'…':''}</div>`:''}</td>
+      <td style="font-size:.82em">${VERFAHREN_LABEL[a.verfahren||'Drucken']||a.verfahren||'—'}</td>
+      <td style="font-size:.83em">${x(a.material_wunsch)}${a.ca_gramm?`<br><span style="color:var(--t3);font-size:.82em">ca. ${a.ca_gramm} g</span>`:''}</td>
+      <td>${adr}</td>
+      <td>${badge(a.status)}</td>
+      <td>${pr}</td>
+      <td style="min-width:110px">
+        <button class="btn b-bl bsm" style="margin-bottom:4px;width:100%" onclick="modOpen('${a.id}')">✏ Bearbeiten</button>
+        ${a.status!=='Abgeschlossen'&&a.status!=='Storniert'?`<button class="btn b-gn bsm" style="margin-bottom:4px;width:100%" onclick="auftragAbschliessen('${a.id}')">✓ Fertig</button>`:''}
+        <button class="btn b-rd bsm" style="width:100%" onclick="auftragLoeschen('${a.id}','${x(kundenname).replace(/'/g,'')}','${x(a.projekt).replace(/'/g,'')}')">🗑 Löschen</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ─── AUFTRAG ABSCHLIESSEN ────────────────────────── */
+async function auftragAbschliessen(id){
+  const a=anfragen.find(x=>x.id===id);
+  if(!a) return;
+  if(a.kosten==null){ alert('Bitte zuerst einen Preis festlegen (✏ Bearbeiten)!'); return; }
+  if(!confirm(`Auftrag "${a.projekt}" als abgeschlossen markieren?\nWird in die Auftragshistorie verschoben.`)) return;
+  laden(true);
+  try{
+    // In Historie übernehmen
+    await SB.from('auftragsHistorie').insert([{
+      id:'job_'+Date.now(),
+      spuled:null,
+      erledigt:true,
+      datum:a.datum||new Date().toLocaleDateString('de-DE'),
+      projekt:a.projekt,
+      kunde:a.gastname||'(Kundenkonto)',
+      material:a.material_wunsch||'Unbekannt',
+      verbrauchG:0,
+      kosten:parseFloat(a.kosten)||0
+    }]);
+    // Status auf Abgeschlossen + E-Mail senden
+    await SB.from('bestellAnfragen').update({status:'Abgeschlossen'}).eq('id',id);
+    statusEmailSenden({...a, id}, 'Abgeschlossen');
+    await ladeDaten(); await ladeAnfragen();
+  }catch(e){ alert('Fehler!'); console.error(e); }
+  finally{ laden(false); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL – ANFRAGE BEARBEITEN (Status + Preis + Nachricht)
+═══════════════════════════════════════════════════════════ */
+function modOpen(id){
+  const a=anfragen.find(e=>e.id===id);
+  if(!a) return;
+  modId=id;
+  document.getElementById('modTitle').textContent=`Anfrage: ${a.id}`;
+
+  // Admin-Nachrichten laden
+  let adminMsgs=[];
+  try{ if(a.admin_notiz) adminMsgs=JSON.parse(a.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[{text:a.admin_notiz,ts:'',von:'admin'}]; }
+  catch(e){ if(a.admin_notiz) adminMsgs=[{text:a.admin_notiz,ts:'',von:'admin'}]; }
+
+  // Kunden-Nachrichten laden
+  let kundenMsgs=[];
+  try{ if(a.kunden_nachrichten) kundenMsgs=JSON.parse(a.kunden_nachrichten); if(!Array.isArray(kundenMsgs)) kundenMsgs=[]; }
+  catch(e){ kundenMsgs=[]; }
+
+  // Alle zusammenführen & nach Zeitstempel sortieren
+  const alleNachrichten=[
+    ...adminMsgs.map(m=>({...m,von:'admin'})),
+    ...kundenMsgs.map(m=>({...m,von:'kunde'}))
+  ].sort((a,b)=>new Date(a.ts||0)-new Date(b.ts||0));
+
+  const chatHtml = alleNachrichten.length
+    ? alleNachrichten.map(m=>{
+        const istAdmin = m.von==='admin';
+        const bg    = istAdmin ? '#e3f0ff' : '#f3e5f5';
+        const col   = istAdmin ? '#0056b3' : '#6a1b9a';
+        const label = istAdmin ? '👤 Du (Admin)' : `🙋 Kunde${m.name?' – '+x(m.name):''}`;
+        return `<div style="margin-bottom:10px;padding:8px 11px;background:${bg};border-radius:8px;border-left:3px solid ${col}">
+          <div style="font-size:.71em;font-weight:700;color:${col};margin-bottom:3px">${label} · ${x(m.ts||'—')}</div>
+          <div style="font-size:.87em;color:#1e2a3a;white-space:pre-wrap">${x(m.text)}</div>
+        </div>`;
+      }).join('')
+    : `<div style="text-align:center;color:#bbb;font-size:.84em;padding:12px">Noch keine Nachrichten.</div>`;
+
+  const verfahrenAnfrage = a.verfahren || 'Drucken';
+  const materialOptionenModal = lager.filter(f=>!f.gesperrt && (f.verfahren||'Drucken')===verfahrenAnfrage);
+
+  document.getElementById('modBody').innerHTML=`
+    <div class="msec">📋 Auftragsdetails</div>
+    <div class="igrid">
+      <div class="iitem"><div class="ilbl">Eingegangen</div><div class="ival">${x(a.datum)}</div></div>
+      <div class="iitem"><div class="ilbl">Bestellnummer</div><div class="ival" style="font-family:monospace;font-size:.82em">${x(a.id)}</div></div>
+      <div class="iitem"><div class="ilbl">Kunde / Gast</div><div class="ival">${x(a.gastname||'(Kundenkonto)')}</div></div>
+      <div class="iitem"><div class="ilbl">E-Mail</div><div class="ival">${a.gast_email?`<a href="mailto:${x(a.gast_email)}">${x(a.gast_email)}</a>`:'—'}</div></div>
+      <div class="iitem"><div class="ilbl">Telefon</div><div class="ival">${x(a.telefon||'—')}</div></div>
+      <div class="iitem"><div class="ilbl">Verfahren</div><div class="ival">${VERFAHREN_LABEL[verfahrenAnfrage]||verfahrenAnfrage}</div></div>
+      <div class="iitem"><div class="ilbl">Material-Wunsch</div><div class="ival">${x(a.material_wunsch)}</div></div>
+      <div class="iitem full"><div class="ilbl">Projekt / Beschreibung</div><div class="ival"><strong>${x(a.projekt)}</strong>${a.beschreibung?'<br>'+x(a.beschreibung):''}</div></div>
+    </div>
+
+    <div class="msec">📍 Lieferadresse</div>
+    <div class="igrid">
+      <div class="iitem full"><div class="ilbl">Adresse</div><div class="ival">
+        ${a.adresse?`${x(a.adresse)}, ${x(a.plz)} ${x(a.ort)}`:'Keine Adresse angegeben'}
+        ${a.liefer_hinweis?`<br><span style="color:var(--or);font-size:.85em">💬 ${x(a.liefer_hinweis)}</span>`:''}
+      </div></div>
+    </div>
+
+    <div class="msec">⚙️ Status &amp; Preis ändern</div>
+    <div class="fgrid">
+      <div class="field">
+        <label>Auftragsstatus</label>
+        <select id="mStatus">
+          <option ${a.status==='Anfrage eingegangen'?'selected':''}>Anfrage eingegangen</option>
+          <option ${a.status==='In Bearbeitung'?'selected':''}>In Bearbeitung</option>
+          <option ${a.status==='Im Druck'?'selected':''}>Im Druck</option>
+          <option ${a.status==='Qualitätsprüfung'?'selected':''}>Qualitätsprüfung</option>
+          <option ${a.status==='Versandbereit'?'selected':''}>Versandbereit</option>
+          <option ${a.status==='Abgeschlossen'?'selected':''}>Abgeschlossen</option>
+          <option ${a.status==='Storniert'?'selected':''}>Storniert</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Verwendetes Material (für Kalkulation)</label>
+        <select id="mFilament" onchange="modBerechne()" style="font-size:13px">
+          <option value="">— Material wählen (optional) —</option>
+          ${materialOptionenModal.map(f=>`<option value="${f.id}"
+            data-preis="${f.Preis}" data-start="${f.startGewicht}" data-einheit="${lagerEinheit(f)}"
+            ${a.material_wunsch&&x(f.Material).toLowerCase().includes(a.material_wunsch.toLowerCase())?'selected':''}>
+            ${x(f.Material)}${f.Hertseller?' | '+x(f.Hertseller):''}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label id="mGrammLabel">Verbrauch – anpassen falls nötig</label>
+        <input type="number" id="mGramm" step="any" min="0"
+          value="${a.ca_gramm!=null?a.ca_gramm:''}"
+          placeholder="Menge eingeben"
+          oninput="modBerechne()">
+      </div>
+      <div class="field">
+        <label>Rabatt (%)</label>
+        <input type="number" id="mRabatt" step="1" min="0" max="100"
+          value="${a.rabatt_pct!=null?a.rabatt_pct:0}"
+          oninput="modBerechne()">
+      </div>
+      <div class="field">
+        <label>Endpreis für Kunden (€)</label>
+        <input type="number" id="mKosten" step="0.01" min="0"
+          value="${a.kosten!=null?a.kosten:''}"
+          placeholder="Wird automatisch berechnet">
+      </div>
+    </div>
+
+    <div id="mKalkulationBox" style="background:#f0f7ff;border:1px solid #c8dff8;border-left:4px solid var(--bl);border-radius:9px;padding:12px 16px;margin-top:6px;font-size:.87em;line-height:1.9;display:none">
+      <div style="font-size:.72em;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">🧮 Automatische Kalkulation</div>
+      <span id="mKalkulationText"></span>
+    </div>
+
+    <div class="msec">💬 Nachrichtenverlauf</div>
+    <div id="mChatVerlauf" style="max-height:260px;overflow-y:auto;border:1.5px solid var(--br);border-radius:10px;padding:10px 13px;background:#fafcff;margin-bottom:10px">${chatHtml}</div>
+    <div class="field" style="margin-bottom:6px">
+      <label>Deine Antwort / Nachricht an Kunden</label>
+      <textarea id="mNeueNachricht" placeholder="z.B. Ihr Auftrag ist im Druck. Fertigstellung ca. Freitag…" style="min-height:70px"></textarea>
+    </div>
+    <p style="font-size:.75em;color:var(--t3)">💡 Nachrichten sind für den Kunden sichtbar. Kunden-Nachrichten erscheinen in blau.</p>
+  `;
+  document.getElementById('modWrap').classList.add('on');
+  modBerechne();
+}
+
+function modClose(){
+  document.getElementById('modWrap').classList.remove('on');
+  modId=null;
+}
+
+function modBerechne(){
+  const PAUSCHALE = 4.50;
+  const filSel = document.getElementById('mFilament');
+  const gramm  = parseFloat(document.getElementById('mGramm')?.value) || 0;
+  const rabatt = parseFloat(document.getElementById('mRabatt')?.value) || 0;
+  const kBox   = document.getElementById('mKalkulationBox');
+  const kText  = document.getElementById('mKalkulationText');
+  const kostenFeld = document.getElementById('mKosten');
+  const gLabel = document.getElementById('mGrammLabel');
+
+  let grundpreis = 0;
+  let kalkuliert = false;
+  const einheit = filSel?.options[filSel.selectedIndex]?.dataset?.einheit || 'g';
+  if(gLabel) gLabel.textContent = `Verbrauch (${EINHEIT_LABEL[einheit]||einheit}) – anpassen falls nötig`;
+
+  if(filSel && filSel.value && gramm > 0){
+    const opt   = filSel.options[filSel.selectedIndex];
+    const preis = parseFloat(opt?.dataset?.preis) || 0;
+    const start = parseFloat(opt?.dataset?.start) || 1000;
+    const matKosten = (preis / start) * gramm;
+    grundpreis = matKosten + PAUSCHALE;
+    kalkuliert = true;
+
+    if(kBox && kText){
+      const rabattBetrag = grundpreis * (rabatt/100);
+      const endpreis     = grundpreis - rabattBetrag;
+      kText.innerHTML =
+        `Material (${gramm} ${EINHEIT_LABEL[einheit]||einheit} × ${(preis/start).toFixed(4)} €/${EINHEIT_LABEL[einheit]||einheit}): <strong>${matKosten.toFixed(2)} €</strong><br>` +
+        `Strom &amp; Verschleiß: <strong>${PAUSCHALE.toFixed(2)} €</strong><br>` +
+        `Grundpreis: <strong>${grundpreis.toFixed(2)} €</strong><br>` +
+        (rabatt > 0
+          ? `Rabatt (${rabatt}%): <strong style="color:var(--gn)">- ${rabattBetrag.toFixed(2)} €</strong><br>`
+          : '') +
+        `<span style="font-size:1.05em;font-weight:700;color:var(--rd)">Endpreis: ${endpreis.toFixed(2)} €</span>`;
+      kBox.style.display = 'block';
+      if(kostenFeld) kostenFeld.value = endpreis.toFixed(2);
+    }
+  } else if(kBox) {
+    kBox.style.display = 'none';
+    // Wenn kein Filament: nur Rabatt auf manuell eingetragenen Preis
+    const manPreis = parseFloat(kostenFeld?.value) || 0;
+    if(manPreis && rabatt > 0){
+      const rabattBetrag = manPreis * (rabatt/100);
+      const endpreis     = manPreis - rabattBetrag;
+      kostenFeld.value   = endpreis.toFixed(2);
+    }
+  }
+}
+
+async function modSave(){
+  if(!modId) return;
+  const status = document.getElementById('mStatus').value;
+
+  const rabattVal  = document.getElementById('mRabatt')?.value;
+  const kostenVal  = document.getElementById('mKosten')?.value;
+  const rabatt_pct = rabattVal ? parseFloat(rabattVal) : 0;
+  const kosten     = kostenVal ? parseFloat(kostenVal) : null;
+  // Grundpreis rückrechnen
+  const grundpreis = (kosten!=null && rabatt_pct>0)
+    ? kosten / (1 - rabatt_pct/100)
+    : kosten;
+
+  // Admin-Nachrichten aktualisieren
+  const akt=anfragen.find(e=>e.id===modId);
+  let adminMsgs=[];
+  try{ if(akt.admin_notiz) adminMsgs=JSON.parse(akt.admin_notiz); if(!Array.isArray(adminMsgs)) adminMsgs=[{text:akt.admin_notiz,ts:'',von:'admin'}]; }
+  catch(err2){ if(akt.admin_notiz) adminMsgs=[{text:akt.admin_notiz,ts:'',von:'admin'}]; }
+
+  const neueNachricht = document.getElementById('mNeueNachricht').value.trim();
+  if(neueNachricht){
+    adminMsgs.push({ text:neueNachricht, ts:new Date().toLocaleString('de-DE'), von:'admin' });
+  }
+
+  // Status-E-Mail senden wenn Status geändert
+  const altAnfrage = anfragen.find(e=>e.id===modId);
+  if(altAnfrage && altAnfrage.status !== status){
+    statusEmailSenden(altAnfrage, status); // async, blockiert nicht
+  }
+
+  laden(true);
+  try{
+    await SB.from('bestellAnfragen').update({
+      status, kosten, grundpreis, rabatt_pct,
+      admin_notiz: adminMsgs.length ? JSON.stringify(adminMsgs) : null
+    }).eq('id',modId);
+
+    const idx2=anfragen.findIndex(e=>e.id===modId);
+    if(idx2>-1) anfragen[idx2]={...anfragen[idx2],status,kosten,grundpreis,rabatt_pct,admin_notiz:adminMsgs.length?JSON.stringify(adminMsgs):null};
+    filterAnfragen(); statsUpdate(); modClose();
+  }catch(e){ alert('Fehler beim Speichern!'); console.error(e); }
+  finally{ laden(false); }
+}
+
+// Modal schließen beim Klick außerhalb
+document.getElementById('modWrap').addEventListener('click',function(e){ if(e.target===this) modClose(); });
+
+async function auftragLoeschen(id, kundenname, projekt){
+  if(!confirm(`Auftrag wirklich löschen?
+
+Kunde: ${kundenname}
+Projekt: ${projekt}
+
+Dieser Vorgang kann nicht rückgängig gemacht werden!`)) return;
+  laden(true);
+  try{
+    const { error } = await SB.from('bestellAnfragen').delete().eq('id', id);
+    if(error) throw error;
+    anfragen = anfragen.filter(a => a.id !== id);
+    filterAnfragen();
+    statsUpdate();
+    // Auch im Postfach entfernen falls vorhanden
+    postfachDaten = postfachDaten.filter(p => p.id !== id);
+    if(aktivePfId === id){
+      aktivePfId = null;
+      document.getElementById('pfChatHeader').innerHTML='<div style="color:#bbb;font-size:.9em;text-align:center;padding:20px 0">Konversation auswaehlen</div>';
+      document.getElementById('pfChatVerlauf').innerHTML='';
+      document.getElementById('pfChatInput').style.display='none';
+    }
+    filterPost();
+  }catch(e){ alert('Fehler beim Löschen: '+(e.message||e)); }
+  finally{ laden(false); }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   NEUER AUFTRAG – VERFAHREN
+═══════════════════════════════════════════════════════════ */
+function jVerfahrenWechsel(){
+  const verfahren = document.getElementById('jVerfahren').value;
+  const istDruck = verfahren === 'Drucken';
+  document.getElementById('jDruckmodusBlock').style.display = istDruck ? '' : 'none';
+  // Multicolor nur bei 3D-Druck sinnvoll – bei Lasern/Plottern zurück auf Einfarbig-Block
+  if(!istDruck){
+    document.getElementById('jEinfarbigBlock').style.display = 'contents';
+    document.getElementById('jMulticolorBlock').style.display = 'none';
+  }
+  renderFilamentDropdown();
+  berechne();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MULTICOLOR – ADMIN
+═══════════════════════════════════════════════════════════ */
+const J_MC_FARBEN = ['#0056b3','#28a745','#e65100','#6a1b9a'];
+const J_MC_NAMES  = ['Farbe 1','Farbe 2','Farbe 3','Farbe 4'];
+
+function jDmWechseln(modus){
+  const istMC = modus === 'multicolor';
+  const dm1 = document.getElementById('jDM1');
+  const dm2 = document.getElementById('jDM2');
+  if(dm1){ dm1.style.borderColor=istMC?'var(--br)':'var(--bl)'; dm1.style.background=istMC?'':'#e3f0ff'; dm1.style.color=istMC?'var(--t2)':'var(--bl)'; }
+  if(dm2){ dm2.style.borderColor=istMC?'var(--bl)':'var(--br)'; dm2.style.background=istMC?'#e3f0ff':''; dm2.style.color=istMC?'var(--bl)':'var(--t2)'; }
+  document.getElementById('jEinfarbigBlock').style.display = istMC ? 'none' : 'contents';
+  document.getElementById('jMulticolorBlock').style.display = istMC ? '' : 'none';
+  if(istMC && document.getElementById('jFarbenContainer').children.length === 0) jMcHinzu();
+  berechne();
+}
+
+function jMcHinzu(){
+  const container = document.getElementById('jFarbenContainer');
+  const idx = container.children.length;
+  if(idx >= 4) return;
+  const addBtn = document.getElementById('jAddFarbe');
+  const div = document.createElement('div');
+  div.id = 'jFarbe'+idx;
+  div.style.cssText = 'border:1.5px solid var(--br);border-radius:10px;padding:13px 15px;margin-bottom:10px;background:#fafcff';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="background:${J_MC_FARBEN[idx]};color:#fff;padding:2px 10px;border-radius:12px;font-size:.78em;font-weight:700">${J_MC_NAMES[idx]}</span>
+      ${idx>0?`<button type="button" onclick="jMcEntfernen(${idx})" style="background:transparent;border:1.5px solid #f5c6cb;color:var(--rd);border-radius:7px;padding:4px 10px;font-size:12px;cursor:pointer;width:auto">&#10005; Entfernen</button>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 120px;gap:10px;align-items:end">
+      <div class="field">
+        <label>Filament / Spule</label>
+        <select id="jMC${idx}Spu" onchange="berechne()">${jMcOptionen()}</select>
+      </div>
+      <div class="field">
+        <label>Verbrauch (g)</label>
+        <input type="number" id="jMC${idx}Gra" placeholder="g" step="any" oninput="berechne()">
+      </div>
+    </div>`;
+  container.appendChild(div);
+  if(idx >= 3) addBtn.style.display = 'none';
+  berechne();
+}
+
+function jMcEntfernen(idx){
+  const container = document.getElementById('jFarbenContainer');
+  const el = document.getElementById('jFarbe'+idx);
+  if(el) el.remove();
+  Array.from(container.children).forEach((div, i) => {
+    div.id = 'jFarbe'+i;
+    const sel = div.querySelector('select');
+    const inp = div.querySelector('input[type=number]');
+    const tit = div.querySelector('span[style*="border-radius:12px"]');
+    const btn = div.querySelector('button');
+    if(sel) sel.id = 'jMC'+i+'Spu';
+    if(inp) inp.id = 'jMC'+i+'Gra';
+    if(tit){ tit.textContent=J_MC_NAMES[i]; tit.style.background=J_MC_FARBEN[i]; }
+    if(btn) btn.setAttribute('onclick',`jMcEntfernen(${i})`);
+  });
+  document.getElementById('jAddFarbe').style.display = '';
+  berechne();
+}
+
+function jMcOptionen(){
+  return '<option value="">— Spule wählen —</option>' +
+    lager.filter(f=>!f.gesperrt && (f.verfahren||'Drucken')==='Drucken').map(f => {
+      const r = parseFloat(f.restGewicht);
+      const tag = r<=0?' ⚠ LEER':r<100?' ⚠ gering':'';
+      return `<option value="${f.id}">${x(f.Material)} | ${x(f.Hertseller)} (${r.toFixed(0)} g)${tag}</option>`;
+    }).join('');
+}
+
+function jIstMulticolor(){
+  return document.getElementById('jDM2')?.style.borderColor?.includes('var(--bl)') ||
+         document.getElementById('jMulticolorBlock')?.style.display !== 'none';
+}
+
+function jMcGetFarben(){
+  const container = document.getElementById('jFarbenContainer');
+  const farben = [];
+  Array.from(container.children).forEach((div, i) => {
+    const sel = document.getElementById('jMC'+i+'Spu');
+    const inp = document.getElementById('jMC'+i+'Gra');
+    if(!sel||!inp||!sel.value) return;
+    const s = lager.find(f=>f.id===sel.value);
+    farben.push({ filament_id: sel.value, material: s?x(s.Material):'', gramm: parseFloat(inp.value)||0 });
+  });
+  return farben;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   KALKULATION (Manueller Auftrag)
+═══════════════════════════════════════════════════════════ */
+function berechne(){
+  const sid=document.getElementById('jSpu').value;
+  const g=parseFloat(document.getElementById('jGra').value)||0;
+  const dis=parseFloat(document.getElementById('jDis').value)||0;
+  const fix=parseFloat(document.getElementById('jFix').value)||4.5;
+  const w=document.getElementById('warnGew');
+  const gLabel=document.getElementById('jGraLabel');
+  let mat=0;
+  let einheit='g';
+  if(sid){
+    const s=lager.find(f=>f.id===sid);
+    if(s){
+      einheit=lagerEinheit(s);
+      mat=(parseFloat(s.Preis)/parseFloat(s.startGewicht))*g;
+      w.style.display=g>parseFloat(s.restGewicht)?'block':'none';
+    }
+  } else w.style.display='none';
+  if(gLabel) gLabel.textContent = `Verbrauch (${EINHEIT_LABEL[einheit]||einheit})`;
+  const zwi=mat+fix, rab=zwi*(dis/100);
+  aktKosten=zwi-rab;
+  document.getElementById('kMat').textContent=mat.toFixed(2).replace('.',',');
+  document.getElementById('kFix').textContent=fix.toFixed(2).replace('.',',');
+  document.getElementById('kZwi').textContent=zwi.toFixed(2).replace('.',',');
+  document.getElementById('kRab').textContent='- '+(rab.toFixed(2).replace('.',','));
+  document.getElementById('kEnd').textContent=aktKosten.toFixed(2).replace('.',',');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MANUELLEN AUFTRAG BUCHEN
+═══════════════════════════════════════════════════════════ */
+async function auftragBuchen(){
+  const sid=document.getElementById('jSpu').value;
+  const g=parseFloat(document.getElementById('jGra').value)||0;
+  const pro=document.getElementById('jPro').value.trim();
+  const kun=document.getElementById('jKun').value.trim();
+  if(!sid||!g||!pro||!kun){ alert('Bitte Projekt, Kunde, Material und Menge angeben!'); return; }
+  const s=lager.find(f=>f.id===sid); if(!s) return;
+  document.getElementById('btnBuchen').disabled=true;
+  laden(true);
+  try{
+    await SB.from('auftragsHistorie').insert([{
+      id:'job_'+Date.now(), spuled:sid, erledigt:false,
+      datum:new Date().toLocaleDateString('de-DE'),
+      projekt:pro, kunde:kun, material:s.Material,
+      verbrauchG:g, kosten:aktKosten
+    }]);
+    const nr=parseFloat(s.restGewicht)-g;
+    await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',sid);
+    ['jPro','jKun','jGra'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('jDis').value='0';
+    if(nr<=0) alert('⚠ ACHTUNG: Dieser Posten ist jetzt leer!');
+    await ladeDaten();
+  }catch(e){ alert('Fehler beim Buchen!'); console.error(e); }
+  finally{ document.getElementById('btnBuchen').disabled=false; laden(false); }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   KUNDENLISTE
+═══════════════════════════════════════════════════════════ */
+let kundenDaten = [];
+
+async function ladeKunden(){
+  try{
+    // Kunden laden
+    const { data: kd } = await SB.from('kunden')
+      .select('id,name,email,telefon,adresse,plz,ort,erstellt')
+      .order('erstellt_am', { ascending: false });
+
+    // Bestellzahlen pro Kunde laden
+    const { data: bd } = await SB.from('bestellAnfragen')
+      .select('kunden_id')
+      .not('kunden_id', 'is', null);
+
+    const bestellZahl = {};
+    (bd||[]).forEach(b => {
+      bestellZahl[b.kunden_id] = (bestellZahl[b.kunden_id]||0) + 1;
+    });
+
+    kundenDaten = (kd||[]).map(k => ({...k, anzahlBestellungen: bestellZahl[k.id]||0}));
+
+    // Stats
+    const statsEl = document.getElementById('kundenStats');
+    if(statsEl){
+      statsEl.innerHTML = `
+        <div class="scard" style="padding:12px 16px;min-width:120px">
+          <div class="slabel">Registriert</div>
+          <div class="sval">${kundenDaten.length}</div>
+        </div>
+        <div class="scard gn" style="padding:12px 16px;min-width:120px">
+          <div class="slabel">Mit Adresse</div>
+          <div class="sval">${kundenDaten.filter(k=>k.adresse).length}</div>
+        </div>
+        <div class="scard or" style="padding:12px 16px;min-width:120px">
+          <div class="slabel">Mit Aufträgen</div>
+          <div class="sval">${kundenDaten.filter(k=>k.anzahlBestellungen>0).length}</div>
+        </div>`;
+    }
+
+    filterKunden();
+  } catch(e){ console.error('Kunden laden:', e); }
+}
+
+function filterKunden(){
+  const su = (document.getElementById('kundenSuche')?.value||'').toLowerCase();
+  const liste = kundenDaten.filter(k => {
+    return !su || [k.name,k.email,k.ort||'',k.plz||''].some(s=>(s||'').toLowerCase().includes(su));
+  });
+
+  const tb = document.getElementById('tKunden');
+  if(!tb) return;
+
+  if(!liste.length){
+    tb.innerHTML = `<tr><td colspan="7" class="emp">Keine Kunden gefunden.</td></tr>`;
+    return;
+  }
+
+  tb.innerHTML = liste.map(k => {
+    const adresse = k.adresse
+      ? `${x(k.adresse)}<br><span style="font-size:.82em;color:var(--t3)">${x(k.plz)} ${x(k.ort)}</span>`
+      : `<span style="color:#ccc;font-size:.82em">Keine Adresse</span>`;
+
+    const bestellBadge = k.anzahlBestellungen > 0
+      ? `<span class="bdg bgn">${k.anzahlBestellungen} Auftrag${k.anzahlBestellungen>1?'e':''}</span>`
+      : `<span class="bdg bgr">Noch keine</span>`;
+
+    return `<tr>
+      <td>
+        <div style="font-weight:600;font-size:.93em">${x(k.name)}</div>
+      </td>
+      <td>
+        <a href="mailto:${x(k.email)}" style="color:var(--bl);font-size:.88em">${x(k.email)}</a>
+      </td>
+      <td style="font-size:.88em">
+        ${k.telefon
+          ? `<a href="tel:${x(k.telefon)}" style="color:var(--t2)">${x(k.telefon)}</a>`
+          : `<span style="color:#ccc">—</span>`}
+      </td>
+      <td style="font-size:.85em">${adresse}</td>
+      <td style="font-size:.82em;color:var(--t3);white-space:nowrap">${x(k.erstellt||'—')}</td>
+      <td>${bestellBadge}</td>
+      <td>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <a href="mailto:${x(k.email)}"
+            style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e3f0ff;color:var(--bl);border-radius:7px;font-size:.78em;font-weight:600;text-decoration:none"
+            title="E-Mail an ${x(k.name)}">
+            ✉ E-Mail
+          </a>
+          ${k.telefon ? `<a href="tel:${x(k.telefon)}"
+            style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e8f5e9;color:var(--gn2);border-radius:7px;font-size:.78em;font-weight:600;text-decoration:none"
+            title="Anrufen">
+            📞 Anrufen
+          </a>` : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HILFSFUNKTIONEN
+═══════════════════════════════════════════════════════════ */
+function laden(an){ document.getElementById('ladeWrap').style.display=an?'flex':'none'; }
+
+function x(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
+
+function badge(st){
+  const m={
+    'Anfrage eingegangen':'bbl','In Bearbeitung':'byw',
+    'Im Druck':'bli','Qualitätsprüfung':'byw',
+    'Versandbereit':'bgn','Abgeschlossen':'bgn','Storniert':'brd'
+  };
+  return `<span class="bdg ${m[st]||'bgr'}">${x(st)}</span>`;
+}
+function badgeHtml(st){ return badge(st); }
+</script>
+</body>
+</html>
