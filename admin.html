@@ -416,10 +416,14 @@ tr:hover td{background:#fafcff}
           </div>
           <div class="field" id="lProduktField" style="display:none">
             <label>Produktart</label>
-            <select id="lProdukt">
+            <select id="lProdukt" onchange="lagerMaterialWechsel()">
               <option value="Anhänger">Anhänger</option>
               <option value="Visitenkarten/Karten">Visitenkarten / Karten</option>
             </select>
+          </div>
+          <div class="field fcol" id="lUntertypField" style="display:none">
+            <label>Maße / Form (frei eintragen)</label>
+            <input type="text" id="lUntertyp" placeholder="z.B. 40x25mm oval, Hundemarke rund Ø30mm, Herzform 35mm">
           </div>
           <div class="field">
             <label>Material-Typ</label>
@@ -819,9 +823,16 @@ function lagerMaterialWechsel(){
   const mat = document.getElementById('lMat').value;
   const farbeField = document.getElementById('lFarbeField');
   const produktField = document.getElementById('lProduktField');
+  const untertypField = document.getElementById('lUntertypField');
   const brauchtProdukt = verfahren==='Lasern' && mat !== LASER_OHNE_FARBE_AUSNAHME;
   farbeField.style.display = brauchtProdukt ? 'none' : '';
   produktField.style.display = brauchtProdukt ? '' : 'none';
+
+  // Bei Edelstahl-Anhängern kann zusätzlich eine Maß-/Formangabe frei eingetragen werden
+  const produkt = document.getElementById('lProdukt').value;
+  const brauchtUntertyp = brauchtProdukt && mat==='Edelstahl' && produkt==='Anhänger';
+  untertypField.style.display = brauchtUntertyp ? '' : 'none';
+  if(!brauchtUntertyp) document.getElementById('lUntertyp').value = '';
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -952,7 +963,9 @@ async function filamentAdd(){
   const brauchtProdukt = verfahren==='Lasern' && mat !== LASER_OHNE_FARBE_AUSNAHME;
   const farbe = brauchtProdukt ? '' : document.getElementById('lFarbe').value.trim();
   const produktart = brauchtProdukt ? document.getElementById('lProdukt').value : '';
-  const bezeichnung = brauchtProdukt ? produktart : farbe;
+  const brauchtUntertyp = brauchtProdukt && mat==='Edelstahl' && produktart==='Anhänger';
+  const untertyp = brauchtUntertyp ? document.getElementById('lUntertyp').value.trim() : '';
+  const bezeichnung = brauchtProdukt ? (untertyp ? `${produktart} – ${untertyp}` : produktart) : farbe;
 
   if(verfahren==='Drucken' && !her){ alert('Bitte Hersteller angeben!'); return; }
   if(!brauchtProdukt && !farbe){ alert('Bitte eine Bezeichnung/Farbe angeben!'); return; }
@@ -968,6 +981,7 @@ async function filamentAdd(){
     if(error) throw error;
     document.getElementById('lHer').value='';
     document.getElementById('lFarbe').value='';
+    document.getElementById('lUntertyp').value='';
     document.getElementById('lPre').value='';
     lagerVerfahrenWechsel();
     await ladeDaten();
