@@ -241,8 +241,10 @@ tr:hover td{background:#fafcff}
   <button class="ntab" onclick="tab('p-anfragen',this)">
     📥 Bestellanfragen <span class="nbadge" id="nbAnfragen" style="display:none">0</span>
   </button>
+  <button class="ntab" onclick="tab('p-archiv',this)">🗄️ Archiv</button>
   <button class="ntab" onclick="tab('p-lager',this)">🧵 Filamentlager</button>
   <button class="ntab" onclick="tab('p-historie',this)">📋 Auftragshistorie</button>
+  <button class="ntab" onclick="tab('p-privat',this)">🏠 Privatgebrauch</button>
   <button class="ntab" onclick="tab('p-auftrag',this)">➕ Neuer Auftrag</button>
   <button class="ntab" onclick="tab('p-kunden',this)">👥 Kundenliste</button>
 </div>
@@ -319,12 +321,19 @@ tr:hover td{background:#fafcff}
 
     <div class="card">
       <div class="chead">
-        <h2>📥 Alle Kundenanfragen</h2>
+        <h2>📥 Offene Kundenanfragen</h2>
         <button class="btn b-bl bsm" onclick="ladeAnfragen()">↻ Aktualisieren</button>
       </div>
+      <p style="font-size:.78em;color:var(--t3);margin:-10px 0 14px">Abgeschlossene &amp; stornierte Aufträge findest du im <strong>🗄️ Archiv</strong>-Tab.</p>
 
       <!-- Filter -->
       <div class="fbar">
+        <select id="fVerfahren" onchange="filterAnfragen()">
+          <option value="">— Alle Verfahren —</option>
+          <option value="Drucken">🖨️ 3D-Druck</option>
+          <option value="Lasern">🔥 Lasern</option>
+          <option value="Plottern">✂️ Plottern</option>
+        </select>
         <select id="fStatus" onchange="filterAnfragen()">
           <option value="">— Alle Status —</option>
           <option>Anfrage eingegangen</option>
@@ -332,8 +341,6 @@ tr:hover td{background:#fafcff}
           <option>Im Druck</option>
           <option>Qualitätsprüfung</option>
           <option>Versandbereit</option>
-          <option>Abgeschlossen</option>
-          <option>Storniert</option>
         </select>
         <input type="text" id="fSuche" placeholder="🔍 Name, Projekt, E-Mail, Bestellnr. …" oninput="filterAnfragen()">
       </div>
@@ -348,6 +355,38 @@ tr:hover td{background:#fafcff}
             </tr>
           </thead>
           <tbody id="tAnfragen"><tr><td colspan="10" class="emp">Lade…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAB: ARCHIV (abgeschlossen/storniert) ─────── -->
+  <div class="panel" id="p-archiv">
+    <div class="card">
+      <div class="chead">
+        <h2>🗄️ Archiv – Abgeschlossene &amp; stornierte Aufträge</h2>
+        <button class="btn b-bl bsm" onclick="ladeAnfragen()">↻ Aktualisieren</button>
+      </div>
+      <div class="fbar">
+        <select id="arVerfahren" onchange="renderArchiv()">
+          <option value="">— Alle Verfahren —</option>
+          <option value="Drucken">🖨️ 3D-Druck</option>
+          <option value="Lasern">🔥 Lasern</option>
+          <option value="Plottern">✂️ Plottern</option>
+        </select>
+        <select id="arStatus" onchange="renderArchiv()">
+          <option value="">— Alle —</option>
+          <option value="Abgeschlossen">Abgeschlossen</option>
+          <option value="Storniert">Storniert</option>
+        </select>
+        <input type="text" id="arSuche" placeholder="🔍 Name, Projekt, Bestellnr. …" oninput="renderArchiv()">
+      </div>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr><th>Datum</th><th>Bestellnr.</th><th>Kunde</th><th>Projekt</th><th>Verfahren</th><th>Status</th><th>Preis</th><th>Aktionen</th></tr>
+          </thead>
+          <tbody id="tArchiv"><tr><td colspan="8" class="emp">Lade…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -371,13 +410,20 @@ tr:hover td{background:#fafcff}
             <label>Hersteller</label>
             <input type="text" id="lHer" placeholder="z.B. Anycubic">
           </div>
-          <div class="field">
+          <div class="field" id="lFarbeField">
             <label>Farbe / Bezeichnung</label>
             <input type="text" id="lFarbe" placeholder="z.B. Schwarz">
           </div>
+          <div class="field" id="lProduktField" style="display:none">
+            <label>Produktart</label>
+            <select id="lProdukt">
+              <option value="Anhänger">Anhänger</option>
+              <option value="Visitenkarten/Karten">Visitenkarten / Karten</option>
+            </select>
+          </div>
           <div class="field">
             <label>Material-Typ</label>
-            <select id="lMat"></select>
+            <select id="lMat" onchange="lagerMaterialWechsel()"></select>
           </div>
           <div class="field">
             <label id="lGewLabel">Startgewicht (g)</label>
@@ -426,6 +472,24 @@ tr:hover td{background:#fafcff}
             <tr><th>Datum</th><th>Projekt</th><th>Kunde</th><th>Material</th><th>Menge</th><th>Preis</th><th>Aktionen</th></tr>
           </thead>
           <tbody id="tHistorie"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAB: PRIVATGEBRAUCH ────────────────────────── -->
+  <div class="panel" id="p-privat">
+    <div class="card">
+      <div class="chead">
+        <h2>🏠 Privatgebrauch – Ausbuchungen</h2>
+        <button class="btn b-bl bsm" onclick="ladeDaten()">↻ Aktualisieren</button>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr><th>Datum</th><th>Grund</th><th>Material</th><th>Menge</th><th>Aktionen</th></tr>
+          </thead>
+          <tbody id="tPrivat"><tr><td colspan="5" class="emp">Lade…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -704,9 +768,11 @@ function tab(id,btn){
    VERFAHREN / MATERIAL-TYPEN / EINHEITEN
 ═══════════════════════════════════════════════════════════ */
 // Einheit je Verfahren (Standardwert für neue Einträge)
-const VERFAHREN_EINHEIT = { 'Drucken':'g', 'Lasern':'Blatt', 'Plottern':'m' };
+const VERFAHREN_EINHEIT = { 'Drucken':'g', 'Lasern':'Blatt', 'Plottern':'Bogen' };
 const VERFAHREN_LABEL   = { 'Drucken':'🖨️ 3D-Druck', 'Lasern':'🔥 Lasern', 'Plottern':'✂️ Plottern' };
-const EINHEIT_LABEL     = { 'g':'g', 'Blatt':'Blatt', 'm':'lfm' };
+const EINHEIT_LABEL     = { 'g':'g', 'Blatt':'Blatt', 'Bogen':'Bögen' };
+// Laser-Materialien, bei denen KEINE Farbe, sondern eine Produktart abgefragt wird
+const LASER_OHNE_FARBE_AUSNAHME = 'Holz (Sperrholz)'; // Holz behält Farbauswahl
 
 // Material-Typ-Optionen je Verfahren für das "Neues Material hinzufügen"-Formular
 const MATERIAL_TYP_OPTIONEN = {
@@ -743,7 +809,19 @@ function lagerVerfahrenWechsel(){
   const gewFeld = document.getElementById('lGew');
   if(verfahren==='Drucken'){ label.textContent='Startgewicht (g)'; gewFeld.value = gewFeld.value||1000; }
   else if(verfahren==='Lasern'){ label.textContent='Anzahl Blätter'; gewFeld.value = 1; }
-  else { label.textContent='Länge auf Rolle (m)'; gewFeld.value = 10; }
+  else { label.textContent='Anzahl Bögen'; gewFeld.value = 1; }
+  lagerMaterialWechsel();
+}
+
+// Bei Lasern (außer Holz) gibt es keine Farbe, sondern eine Produktart (Anhänger / Visitenkarten)
+function lagerMaterialWechsel(){
+  const verfahren = document.getElementById('lVerfahren').value;
+  const mat = document.getElementById('lMat').value;
+  const farbeField = document.getElementById('lFarbeField');
+  const produktField = document.getElementById('lProduktField');
+  const brauchtProdukt = verfahren==='Lasern' && mat !== LASER_OHNE_FARBE_AUSNAHME;
+  farbeField.style.display = brauchtProdukt ? 'none' : '';
+  produktField.style.display = brauchtProdukt ? '' : 'none';
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -842,6 +920,7 @@ async function filamentPrivat(id, material, restGewicht){
   laden(true);
   try{
     const neuesRest = restGewicht - gramm;
+    const s = lager.find(f=>f.id===id);
     await SB.from('FilamentLager').update({ restGewicht: neuesRest.toString() }).eq('id', id);
     // In Auftragshistorie eintragen
     await SB.from('auftragsHistorie').insert([{
@@ -853,7 +932,8 @@ async function filamentPrivat(id, material, restGewicht){
       kunde: 'Privatgebrauch',
       material: material,
       verbrauchG: gramm,
-      kosten: 0
+      kosten: 0,
+      verfahren: s?.verfahren || 'Drucken'
     }]);
     await ladeDaten();
   }catch(e){
@@ -865,19 +945,23 @@ async function filamentPrivat(id, material, restGewicht){
 async function filamentAdd(){
   const verfahren=document.getElementById('lVerfahren').value;
   const her=document.getElementById('lHer').value.trim();
-  const farbe=document.getElementById('lFarbe').value.trim();
   const mat=document.getElementById('lMat').value;
   const gew=parseFloat(document.getElementById('lGew').value)||0;
   const pre=parseFloat(document.getElementById('lPre').value)||0;
   const einheit = VERFAHREN_EINHEIT[verfahren] || 'g';
+  const brauchtProdukt = verfahren==='Lasern' && mat !== LASER_OHNE_FARBE_AUSNAHME;
+  const farbe = brauchtProdukt ? '' : document.getElementById('lFarbe').value.trim();
+  const produktart = brauchtProdukt ? document.getElementById('lProdukt').value : '';
+  const bezeichnung = brauchtProdukt ? produktart : farbe;
+
   if(verfahren==='Drucken' && !her){ alert('Bitte Hersteller angeben!'); return; }
-  if(!farbe){ alert('Bitte eine Bezeichnung/Farbe angeben!'); return; }
+  if(!brauchtProdukt && !farbe){ alert('Bitte eine Bezeichnung/Farbe angeben!'); return; }
   if(!gew){ alert('Bitte eine gültige Menge eingeben!'); return; }
   laden(true);
   try {
     const { error } = await SB.from('FilamentLager').insert([{
       id:'s_'+Date.now(), Hertseller:her||null,
-      Material:`${mat} (${farbe})`,
+      Material: bezeichnung ? `${mat} (${bezeichnung})` : mat,
       startGewicht:gew.toString(), restGewicht:gew.toString(), Preis:pre.toString(),
       verfahren, einheit, gesperrt:false, sperr_grund:''
     }]);
@@ -917,17 +1001,39 @@ function renderFilamentDropdown(){
 /* ─── AUFTRAGSHISTORIE ────────────────────────────── */
 function renderHistorie(){
   const tb=document.getElementById('tHistorie');
-  if(!historie.length){ tb.innerHTML=`<tr><td colspan="7" class="emp">Noch keine Aufträge.</td></tr>`; return; }
-  tb.innerHTML=historie.map(h=>
+  const oeffentlich = historie.filter(h=>h.kunde!=='Privatgebrauch');
+  if(!oeffentlich.length){ tb.innerHTML=`<tr><td colspan="7" class="emp">Noch keine Aufträge.</td></tr>`; }
+  else {
+    tb.innerHTML=oeffentlich.map(h=>
+      `<tr>
+        <td style="font-size:.83em;white-space:nowrap">${x(h.datum)}</td>
+        <td><strong>${x(h.projekt)}</strong></td>
+        <td>${x(h.kunde)}</td>
+        <td style="font-size:.83em">${x(h.material)}</td>
+        <td>${h.verbrauchG}</td>
+        <td><strong style="color:var(--gn)">${parseFloat(h.kosten||0).toFixed(2)} €</strong></td>
+        <td style="display:flex;gap:5px">
+          <button class="btn b-or bsm" onclick="historiePreisAendern('${h.id}','${h.kosten}')">✏ Preis</button>
+          <button class="btn b-rd bsm" onclick="historieDel('${h.id}',${h.verbrauchG},'${h.spuled||''}')">✕</button>
+        </td>
+      </tr>`
+    ).join('');
+  }
+  renderPrivat();
+}
+
+function renderPrivat(){
+  const tb=document.getElementById('tPrivat');
+  if(!tb) return;
+  const privat = historie.filter(h=>h.kunde==='Privatgebrauch');
+  if(!privat.length){ tb.innerHTML=`<tr><td colspan="5" class="emp">Noch keine privaten Ausbuchungen.</td></tr>`; return; }
+  tb.innerHTML=privat.map(h=>
     `<tr>
       <td style="font-size:.83em;white-space:nowrap">${x(h.datum)}</td>
       <td><strong>${x(h.projekt)}</strong></td>
-      <td>${x(h.kunde)}</td>
       <td style="font-size:.83em">${x(h.material)}</td>
       <td>${h.verbrauchG}</td>
-      <td><strong style="color:var(--gn)">${parseFloat(h.kosten||0).toFixed(2)} €</strong></td>
       <td style="display:flex;gap:5px">
-        <button class="btn b-or bsm" onclick="historiePreisAendern('${h.id}','${h.kosten}')">✏ Preis</button>
         <button class="btn b-rd bsm" onclick="historieDel('${h.id}',${h.verbrauchG},'${h.spuled||''}')">✕</button>
       </td>
     </tr>`
@@ -1146,8 +1252,52 @@ async function ladeAnfragen(){
   try{
     const {data}=await SB.from('bestellAnfragen').select('*').order('erstellt_am',{ascending:false});
     anfragen=data||[];
-    filterAnfragen(); statsUpdate();
+    filterAnfragen(); statsUpdate(); renderArchiv();
   }catch(e){ console.error('Anfragen:',e); }
+}
+
+/* ─── ARCHIV (abgeschlossene & stornierte Bestellanfragen) ─── */
+function renderArchiv(){
+  const tb=document.getElementById('tArchiv');
+  if(!tb) return;
+  const vf=document.getElementById('arVerfahren')?.value||'';
+  const sf=document.getElementById('arStatus')?.value||'';
+  const su=(document.getElementById('arSuche')?.value||'').toLowerCase();
+  const list=anfragen.filter(a=>{
+    if(a.status!=='Abgeschlossen'&&a.status!=='Storniert') return false;
+    const ms=!sf||a.status===sf;
+    const mv=!vf||(a.verfahren||'Drucken')===vf;
+    const mx=!su||`${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
+    return ms&&mv&&mx;
+  });
+  if(!list.length){ tb.innerHTML=`<tr><td colspan="8" class="emp">Noch nichts im Archiv.</td></tr>`; return; }
+  tb.innerHTML=list.map(a=>{
+    const kundenname = a.gastname || a.kunde || '(Kundenkonto)';
+    const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
+    return `<tr>
+      <td style="font-size:.81em;color:var(--t3);white-space:nowrap">${x(a.datum)}</td>
+      <td style="font-family:monospace;font-size:.79em">${x(a.id)}</td>
+      <td>${x(kundenname)}</td>
+      <td><strong>${x(a.projekt)}</strong></td>
+      <td style="font-size:.82em">${VERFAHREN_LABEL[a.verfahren||'Drucken']||a.verfahren||'—'}</td>
+      <td>${badge(a.status)}</td>
+      <td>${pr}</td>
+      <td style="min-width:110px">
+        <button class="btn b-out bsm" style="margin-bottom:4px;width:100%" onclick="archivWiederherstellen('${a.id}')">↺ Wiederherstellen</button>
+        <button class="btn b-rd bsm" style="width:100%" onclick="auftragLoeschen('${a.id}','${x(kundenname).replace(/'/g,'')}','${x(a.projekt).replace(/'/g,'')}')">🗑 Löschen</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function archivWiederherstellen(id){
+  if(!confirm('Auftrag wiederherstellen? Er erscheint danach wieder bei den offenen Bestellanfragen.')) return;
+  laden(true);
+  try{
+    await SB.from('bestellAnfragen').update({status:'Versandbereit'}).eq('id',id);
+    await ladeAnfragen();
+  }catch(e){ alert('Fehler: '+(e.message||e)); }
+  finally{ laden(false); }
 }
 
 function statsUpdate(){
@@ -1166,11 +1316,14 @@ function statsUpdate(){
 
 function filterAnfragen(){
   const sf=document.getElementById('fStatus').value;
+  const vf=document.getElementById('fVerfahren')?.value||'';
   const su=document.getElementById('fSuche').value.toLowerCase();
   const list=anfragen.filter(a=>{
+    if(a.status==='Abgeschlossen'||a.status==='Storniert') return false; // liegt im Archiv
     const ms=!sf||a.status===sf;
+    const mv=!vf||(a.verfahren||'Drucken')===vf;
     const mx=!su||`${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
-    return ms&&mx;
+    return ms&&mv&&mx;
   });
   const tb=document.getElementById('tAnfragen');
   if(!list.length){ tb.innerHTML=`<tr><td colspan="10" class="emp">Keine Einträge gefunden.</td></tr>`; return; }
@@ -1224,7 +1377,8 @@ async function auftragAbschliessen(id){
       kunde:a.gastname||'(Kundenkonto)',
       material:a.material_wunsch||'Unbekannt',
       verbrauchG:0,
-      kosten:parseFloat(a.kosten)||0
+      kosten:parseFloat(a.kosten)||0,
+      verfahren:a.verfahren||'Drucken'
     }]);
     // Status auf Abgeschlossen + E-Mail senden
     await SB.from('bestellAnfragen').update({status:'Abgeschlossen'}).eq('id',id);
@@ -1451,7 +1605,7 @@ async function modSave(){
 
     const idx2=anfragen.findIndex(e=>e.id===modId);
     if(idx2>-1) anfragen[idx2]={...anfragen[idx2],status,kosten,grundpreis,rabatt_pct,admin_notiz:adminMsgs.length?JSON.stringify(adminMsgs):null};
-    filterAnfragen(); statsUpdate(); modClose();
+    filterAnfragen(); statsUpdate(); renderArchiv(); modClose();
   }catch(e){ alert('Fehler beim Speichern!'); console.error(e); }
   finally{ laden(false); }
 }
@@ -1642,7 +1796,8 @@ async function auftragBuchen(){
       id:'job_'+Date.now(), spuled:sid, erledigt:false,
       datum:new Date().toLocaleDateString('de-DE'),
       projekt:pro, kunde:kun, material:s.Material,
-      verbrauchG:g, kosten:aktKosten
+      verbrauchG:g, kosten:aktKosten,
+      verfahren: document.getElementById('jVerfahren')?.value || 'Drucken'
     }]);
     const nr=parseFloat(s.restGewicht)-g;
     await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',sid);
