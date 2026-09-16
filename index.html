@@ -781,7 +781,7 @@
             <div class="form-grid">
                 <div class="field">
                     <label>Verfahren *</label>
-                    <select id="bVerfahren" onchange="materialAktualisieren('b')">
+                    <select id="bVerfahren" onchange="verfahrenWechsel('b')">
                         <option value="Drucken">3D-Druck</option>
                         <option value="Lasern">Lasern</option>
                         <option value="Plottern">Plottern</option>
@@ -791,14 +791,46 @@
                     <label>Projektname / Bezeichnung *</label>
                     <input type="text" id="bProjekt" placeholder="z.B. Halterung für Monitor">
                 </div>
-                <div class="field">
+
+                <div class="field col-full" id="bDruckmodusWrap">
+                    <label>Druckmodus</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px">
+                        <label id="bDM1" onclick="druckmodusWechseln('b','einfarbig')"
+                            style="border:2px solid var(--primary);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:0.88em;font-weight:600;color:var(--primary);background:#e3f0ff;transition:all .2s">
+                            <input type="radio" name="bDM" value="einfarbig" checked style="accent-color:var(--primary)"> 🎨 Einfarbig
+                        </label>
+                        <label id="bDM2" onclick="druckmodusWechseln('b','multicolor')"
+                            style="border:2px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:0.88em;font-weight:600;color:var(--text-m);transition:all .2s">
+                            <input type="radio" name="bDM" value="multicolor" style="accent-color:var(--primary)"> 🌈 Multicolor (bis 4 Farben)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field" id="bEinfarbigWrap">
                     <label>Material-Wunsch</label>
                     <select id="bMaterial"></select>
                 </div>
+
+                <div class="field col-full" id="bMulticolorWrap" style="display:none">
+                    <label style="margin-bottom:6px">Farben wählen (Farbe 1 Pflicht, Rest optional)</label>
+                    <div class="form-grid">
+                        <div class="field"><select id="bMC0"></select></div>
+                        <div class="field"><select id="bMC1"></select></div>
+                        <div class="field"><select id="bMC2"></select></div>
+                        <div class="field"><select id="bMC3"></select></div>
+                    </div>
+                </div>
+
                 <div class="field col-full">
                     <label>Beschreibung &amp; Anforderungen</label>
                     <textarea id="bBeschreibung"
                         placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz. Besonderheiten: ..."></textarea>
+                </div>
+
+                <div class="field col-full">
+                    <label>Datei hochladen (optional)</label>
+                    <input type="file" id="bDatei" multiple accept=".stl,.obj,.3mf,.step,.stp,.svg,.pdf,.ai,image/*">
+                    <span style="font-size:0.78em;color:var(--text-l)">3D-Modell, Vorlage oder Referenzbild – mehrere Dateien möglich.</span>
                 </div>
             </div>
 
@@ -860,7 +892,7 @@
             <div class="form-grid">
                 <div class="field">
                     <label>Verfahren *</label>
-                    <select id="gVerfahren" onchange="materialAktualisieren('g')">
+                    <select id="gVerfahren" onchange="verfahrenWechsel('g')">
                         <option value="Drucken">3D-Druck</option>
                         <option value="Lasern">Lasern</option>
                         <option value="Plottern">Plottern</option>
@@ -870,14 +902,46 @@
                     <label>Projektname *</label>
                     <input type="text" id="gProjekt" placeholder="z.B. Halterung für Monitor">
                 </div>
-                <div class="field">
+
+                <div class="field col-full" id="gDruckmodusWrap">
+                    <label>Druckmodus</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px">
+                        <label id="gDM1" onclick="druckmodusWechseln('g','einfarbig')"
+                            style="border:2px solid var(--primary);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:0.88em;font-weight:600;color:var(--primary);background:#e3f0ff;transition:all .2s">
+                            <input type="radio" name="gDM" value="einfarbig" checked style="accent-color:var(--primary)"> 🎨 Einfarbig
+                        </label>
+                        <label id="gDM2" onclick="druckmodusWechseln('g','multicolor')"
+                            style="border:2px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:0.88em;font-weight:600;color:var(--text-m);transition:all .2s">
+                            <input type="radio" name="gDM" value="multicolor" style="accent-color:var(--primary)"> 🌈 Multicolor (bis 4 Farben)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field" id="gEinfarbigWrap">
                     <label>Material-Wunsch</label>
                     <select id="gMaterial"></select>
                 </div>
+
+                <div class="field col-full" id="gMulticolorWrap" style="display:none">
+                    <label style="margin-bottom:6px">Farben wählen (Farbe 1 Pflicht, Rest optional)</label>
+                    <div class="form-grid">
+                        <div class="field"><select id="gMC0"></select></div>
+                        <div class="field"><select id="gMC1"></select></div>
+                        <div class="field"><select id="gMC2"></select></div>
+                        <div class="field"><select id="gMC3"></select></div>
+                    </div>
+                </div>
+
                 <div class="field col-full">
                     <label>Beschreibung &amp; Anforderungen</label>
                     <textarea id="gBeschreibung"
                         placeholder="z.B. Datei sende ich per E-Mail. Maße ca. 10×5×3 cm. Farbe: Schwarz."></textarea>
+                </div>
+
+                <div class="field col-full">
+                    <label>Datei hochladen (optional)</label>
+                    <input type="file" id="gDatei" multiple accept=".stl,.obj,.3mf,.step,.stp,.svg,.pdf,.ai,image/*">
+                    <span style="font-size:0.78em;color:var(--text-l)">3D-Modell, Vorlage oder Referenzbild – mehrere Dateien möglich.</span>
                 </div>
             </div>
 
@@ -1062,6 +1126,75 @@ async function materialAktualisieren(prefix) {
     select.innerHTML = optionenHtml;
 }
 
+// Multicolor-Farbauswahl (4 Slots) mit den konkreten, verfügbaren 3D-Druck-Materialien befüllen
+async function multicolorOptionenLaden(prefix) {
+    const alle = await materialienLaden();
+    const verfuegbar = alle.filter(f => (f.verfahren || 'Drucken') === 'Drucken' && !f.gesperrt);
+    for (let i = 0; i < 4; i++) {
+        const select = document.getElementById(prefix + 'MC' + i);
+        if (!select) continue;
+        const pflicht = i === 0;
+        let html = pflicht ? '<option value="">— Farbe wählen —</option>' : '<option value="">— Keine —</option>';
+        html += verfuegbar.map(f => `<option value="${(f.Material||'').replace(/"/g,'&quot;')}">${f.Material}</option>`).join('');
+        select.innerHTML = html;
+    }
+}
+
+// Beim Wechsel des Verfahrens: Material-Dropdown + Druckmodus-Sichtbarkeit aktualisieren
+function verfahrenWechsel(prefix) {
+    const verfahren = document.getElementById(prefix + 'Verfahren').value;
+    const istDruck  = verfahren === 'Drucken';
+    document.getElementById(prefix + 'DruckmodusWrap').style.display = istDruck ? '' : 'none';
+    if (!istDruck) {
+        // Bei Lasern/Plottern gibt es kein Multicolor – zurück auf Einfarbig
+        druckmodusWechseln(prefix, 'einfarbig');
+    }
+    materialAktualisieren(prefix);
+    if (istDruck) multicolorOptionenLaden(prefix);
+}
+
+// Umschalten zwischen Einfarbig und Multicolor
+function druckmodusWechseln(prefix, modus) {
+    const istMC = modus === 'multicolor';
+    const dm1 = document.getElementById(prefix + 'DM1');
+    const dm2 = document.getElementById(prefix + 'DM2');
+    if (dm1) { dm1.style.borderColor = istMC ? 'var(--border)' : 'var(--primary)'; dm1.style.background = istMC ? '' : '#e3f0ff'; dm1.style.color = istMC ? 'var(--text-m)' : 'var(--primary)'; }
+    if (dm2) { dm2.style.borderColor = istMC ? 'var(--primary)' : 'var(--border)'; dm2.style.background = istMC ? '#e3f0ff' : ''; dm2.style.color = istMC ? 'var(--primary)' : 'var(--text-m)'; }
+    const dm1Radio = dm1 ? dm1.querySelector('input[type=radio]') : null;
+    const dm2Radio = dm2 ? dm2.querySelector('input[type=radio]') : null;
+    if (dm1Radio) dm1Radio.checked = !istMC;
+    if (dm2Radio) dm2Radio.checked = istMC;
+    document.getElementById(prefix + 'EinfarbigWrap').style.display = istMC ? 'none' : '';
+    document.getElementById(prefix + 'MulticolorWrap').style.display = istMC ? '' : 'none';
+}
+
+// Ausgewählte Dateien in den Supabase-Storage-Bucket "anfragen" hochladen, Public-URLs zurückgeben
+async function dateienHochladen(prefix, orderId) {
+    const input = document.getElementById(prefix + 'Datei');
+    if (!input || !input.files || !input.files.length) return [];
+    const urls = [];
+    for (const file of input.files) {
+        const pfad = `${orderId}/${Date.now()}_${file.name}`.replace(/\s+/g, '_');
+        try {
+            const { error } = await sb.storage.from('anfragen').upload(pfad, file);
+            if (error) { console.error('Datei-Upload fehlgeschlagen:', error); continue; }
+            const { data } = sb.storage.from('anfragen').getPublicUrl(pfad);
+            if (data?.publicUrl) urls.push(data.publicUrl);
+        } catch (e) { console.error('Datei-Upload Fehler:', e); }
+    }
+    return urls;
+}
+
+// Ausgewählte Multicolor-Materialien einsammeln (leere Slots werden übersprungen)
+function multicolorAuswahlSammeln(prefix) {
+    const farben = [];
+    for (let i = 0; i < 4; i++) {
+        const select = document.getElementById(prefix + 'MC' + i);
+        if (select && select.value) farben.push(select.value);
+    }
+    return farben;
+}
+
 
 /* ================================================
    HILFSFUNKTIONEN
@@ -1146,7 +1279,8 @@ function zeige(viewId) {
     // Adressfelder + Verfahren/Material beim Öffnen vorausfüllen
     if (viewId === 'view-bestellung') {
         document.getElementById('bVerfahren').value = 'Drucken';
-        materialAktualisieren('b');
+        druckmodusWechseln('b', 'einfarbig');
+        verfahrenWechsel('b');
         if (aktKunde) {
             document.getElementById('bAdresse').value = aktKunde.adresse || '';
             document.getElementById('bPlz').value     = aktKunde.plz     || '';
@@ -1158,7 +1292,8 @@ function zeige(viewId) {
 
     if (viewId === 'view-gast') {
         document.getElementById('gVerfahren').value = 'Drucken';
-        materialAktualisieren('g');
+        druckmodusWechseln('g', 'einfarbig');
+        verfahrenWechsel('g');
     }
 
     if (viewId === 'view-profil' && aktKunde) {
@@ -1440,12 +1575,24 @@ async function gastBestellung() {
     const email   = document.getElementById('gEmail').value.trim();
     const tel     = document.getElementById('gTelefon').value.trim();
     const projekt = document.getElementById('gProjekt').value.trim();
-    const mat     = document.getElementById('gMaterial').value;
     const desc    = document.getElementById('gBeschreibung').value.trim();
     const adresse = document.getElementById('gAdresse').value.trim();
     const plz     = document.getElementById('gPlz').value.trim();
     const ort     = document.getElementById('gOrt').value.trim();
     const hinweis = document.getElementById('gHinweis').value.trim();
+
+    const istMulticolor = verfahren === 'Drucken' && document.querySelector('input[name="gDM"]:checked')?.value === 'multicolor';
+    const druckmodus = istMulticolor ? 'multicolor' : 'einfarbig';
+    let mat = document.getElementById('gMaterial').value;
+    let multicolorFarben = [];
+    if (istMulticolor) {
+        multicolorFarben = multicolorAuswahlSammeln('g');
+        if (!multicolorFarben.length) {
+            alert$('gastFehler', '❌ Bitte mindestens Farbe 1 für Multicolor auswählen.');
+            return;
+        }
+        mat = `Multicolor: ${multicolorFarben.join(', ')}`;
+    }
 
     if (!name || !email || !projekt || !adresse || !plz || !ort) {
         alert$('gastFehler', '❌ Bitte alle Pflichtfelder (*) ausfüllen.');
@@ -1462,6 +1609,8 @@ async function gastBestellung() {
     const orderId = genId();
 
     try {
+        const dateiUrls = await dateienHochladen('g', orderId);
+
         const { error } = await sb.from('bestellAnfragen').insert([{
             id:              orderId,
             kunden_id:       null,
@@ -1472,6 +1621,9 @@ async function gastBestellung() {
             projekt,
             beschreibung:    desc,
             material_wunsch: mat,
+            druckmodus,
+            multicolor_materialien: istMulticolor ? JSON.stringify(multicolorFarben) : null,
+            datei_urls:      dateiUrls.length ? dateiUrls.join(',') : null,
             adresse,
             plz,
             ort,
@@ -1486,8 +1638,10 @@ async function gastBestellung() {
         // Formular leeren
         ['gName','gEmail','gTelefon','gProjekt','gBeschreibung','gAdresse','gPlz','gOrt','gHinweis']
             .forEach(id => { document.getElementById(id).value = ''; });
+        document.getElementById('gDatei').value = '';
         document.getElementById('gVerfahren').value = 'Drucken';
-        materialAktualisieren('g');
+        druckmodusWechseln('g', 'einfarbig');
+        verfahrenWechsel('g');
 
         // Bestätigung anzeigen
         document.getElementById('confirmId').textContent = orderId;
@@ -1518,12 +1672,24 @@ async function bestellungAbschicken() {
 
     const verfahren = document.getElementById('bVerfahren').value;
     const projekt = document.getElementById('bProjekt').value.trim();
-    const mat     = document.getElementById('bMaterial').value;
     const desc    = document.getElementById('bBeschreibung').value.trim();
     const adresse = document.getElementById('bAdresse').value.trim();
     const plz     = document.getElementById('bPlz').value.trim();
     const ort     = document.getElementById('bOrt').value.trim();
     const hinweis = document.getElementById('bHinweis').value.trim();
+
+    const istMulticolor = verfahren === 'Drucken' && document.querySelector('input[name="bDM"]:checked')?.value === 'multicolor';
+    const druckmodus = istMulticolor ? 'multicolor' : 'einfarbig';
+    let mat = document.getElementById('bMaterial').value;
+    let multicolorFarben = [];
+    if (istMulticolor) {
+        multicolorFarben = multicolorAuswahlSammeln('b');
+        if (!multicolorFarben.length) {
+            alert$('bestellFehler', '❌ Bitte mindestens Farbe 1 für Multicolor auswählen.');
+            return;
+        }
+        mat = `Multicolor: ${multicolorFarben.join(', ')}`;
+    }
 
     if (!projekt || !adresse || !plz || !ort) {
         alert$('bestellFehler', '❌ Bitte alle Pflichtfelder (*) ausfüllen.');
@@ -1536,6 +1702,8 @@ async function bestellungAbschicken() {
     const orderId = genId();
 
     try {
+        const dateiUrls = await dateienHochladen('b', orderId);
+
         const { error } = await sb.from('bestellAnfragen').insert([{
             id:              orderId,
             kunden_id:       aktKunde.id,
@@ -1546,6 +1714,9 @@ async function bestellungAbschicken() {
             projekt,
             beschreibung:    desc,
             material_wunsch: mat,
+            druckmodus,
+            multicolor_materialien: istMulticolor ? JSON.stringify(multicolorFarben) : null,
+            datei_urls:      dateiUrls.length ? dateiUrls.join(',') : null,
             adresse,
             plz,
             ort,
@@ -1568,8 +1739,10 @@ async function bestellungAbschicken() {
         ['bProjekt','bBeschreibung','bHinweis'].forEach(id => {
             document.getElementById(id).value = '';
         });
+        document.getElementById('bDatei').value = '';
         document.getElementById('bVerfahren').value = 'Drucken';
-        materialAktualisieren('b');
+        druckmodusWechseln('b', 'einfarbig');
+        verfahrenWechsel('b');
 
         document.getElementById('confirmId').textContent = orderId;
         document.getElementById('confirmButtons').innerHTML = `
@@ -1659,9 +1832,9 @@ function escHtml(str) {
    INITIALISIERUNG
 ================================================ */
 window.addEventListener('DOMContentLoaded', () => {
-    // Material-Dropdowns beim Start einmal befüllen
-    materialAktualisieren('b');
-    materialAktualisieren('g');
+    // Material-Dropdowns + Multicolor-Auswahl beim Start einmal befüllen
+    verfahrenWechsel('b');
+    verfahrenWechsel('g');
 
     const session = sessionLaden();
     if (session) {
