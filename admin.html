@@ -411,7 +411,7 @@ tr:hover td{background:#fafcff}
             <input type="text" id="lHer" placeholder="z.B. Anycubic">
           </div>
           <div class="field" id="lFarbeField">
-            <label>Farbe / Bezeichnung</label>
+            <label id="lFarbeLabel">Farbe / Bezeichnung</label>
             <input type="text" id="lFarbe" placeholder="z.B. Schwarz">
           </div>
           <div class="field" id="lProduktField" style="display:none">
@@ -419,11 +419,16 @@ tr:hover td{background:#fafcff}
             <select id="lProdukt" onchange="lagerMaterialWechsel()">
               <option value="Anhänger">Anhänger</option>
               <option value="Visitenkarten/Karten">Visitenkarten / Karten</option>
+              <option value="Freitext">Sonstiges (Freitext)</option>
             </select>
           </div>
           <div class="field fcol" id="lUntertypField" style="display:none">
             <label>Maße / Form (frei eintragen)</label>
             <input type="text" id="lUntertyp" placeholder="z.B. 40x25mm oval, Hundemarke rund Ø30mm, Herzform 35mm">
+          </div>
+          <div class="field fcol" id="lProduktFreitextField" style="display:none">
+            <label>Beschreibung (frei eintragen)</label>
+            <input type="text" id="lProduktFreitext" placeholder="z.B. Gravurplatte 10x15cm, Schlüsselbrett, Deko-Element">
           </div>
           <div class="field">
             <label>Material-Typ</label>
@@ -776,7 +781,8 @@ const VERFAHREN_EINHEIT = { 'Drucken':'g', 'Lasern':'Blatt', 'Plottern':'Bogen' 
 const VERFAHREN_LABEL   = { 'Drucken':'🖨️ 3D-Druck', 'Lasern':'🔥 Lasern', 'Plottern':'✂️ Plottern' };
 const EINHEIT_LABEL     = { 'g':'g', 'Blatt':'Blatt', 'Bogen':'Bögen' };
 // Laser-Materialien, bei denen KEINE Farbe, sondern eine Produktart abgefragt wird
-const LASER_OHNE_FARBE_AUSNAHME = 'Holz (Sperrholz)'; // Holz behält Farbauswahl
+const LASER_HOLZ = 'Holz (Sperrholz)'; // Holz behält Farbauswahl
+const LASER_MIT_PRODUKTAUSWAHL = 'Edelstahl'; // einziges Lasermaterial mit fester Produktart-Auswahl statt Freitext
 
 // Material-Typ-Optionen je Verfahren für das "Neues Material hinzufügen"-Formular
 const MATERIAL_TYP_OPTIONEN = {
@@ -822,17 +828,36 @@ function lagerMaterialWechsel(){
   const verfahren = document.getElementById('lVerfahren').value;
   const mat = document.getElementById('lMat').value;
   const farbeField = document.getElementById('lFarbeField');
+  const farbeLabel = document.getElementById('lFarbeLabel');
+  const farbeInput = document.getElementById('lFarbe');
   const produktField = document.getElementById('lProduktField');
   const untertypField = document.getElementById('lUntertypField');
-  const brauchtProdukt = verfahren==='Lasern' && mat !== LASER_OHNE_FARBE_AUSNAHME;
+  const produktFreitextField = document.getElementById('lProduktFreitextField');
+
+  // Nur Edelstahl nutzt noch die feste Produktart-Auswahl (Anhänger/Karten/Freitext);
+  // alle anderen Lasermaterialien (und Holz) werden per Freitext beschrieben.
+  const brauchtProdukt = verfahren==='Lasern' && mat===LASER_MIT_PRODUKTAUSWAHL;
   farbeField.style.display = brauchtProdukt ? 'none' : '';
   produktField.style.display = brauchtProdukt ? '' : 'none';
 
+  if(verfahren==='Lasern' && mat!==LASER_HOLZ){
+    farbeLabel.textContent = 'Bezeichnung / Verwendungszweck';
+    farbeInput.placeholder = 'z.B. Schlüsselanhänger 5cm, Namensschild, Deko-Element';
+  } else {
+    farbeLabel.textContent = 'Farbe / Bezeichnung';
+    farbeInput.placeholder = 'z.B. Schwarz';
+  }
+
   // Bei Edelstahl-Anhängern kann zusätzlich eine Maß-/Formangabe frei eingetragen werden
   const produkt = document.getElementById('lProdukt').value;
-  const brauchtUntertyp = brauchtProdukt && mat==='Edelstahl' && produkt==='Anhänger';
+  const brauchtUntertyp = brauchtProdukt && produkt==='Anhänger';
   untertypField.style.display = brauchtUntertyp ? '' : 'none';
   if(!brauchtUntertyp) document.getElementById('lUntertyp').value = '';
+
+  // Bei Edelstahl + "Sonstiges" gibt es ein freies Beschreibungsfeld
+  const brauchtProduktFreitext = brauchtProdukt && produkt==='Freitext';
+  produktFreitextField.style.display = brauchtProduktFreitext ? '' : 'none';
+  if(!brauchtProduktFreitext) document.getElementById('lProduktFreitext').value = '';
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -960,15 +985,23 @@ async function filamentAdd(){
   const gew=parseFloat(document.getElementById('lGew').value)||0;
   const pre=parseFloat(document.getElementById('lPre').value)||0;
   const einheit = VERFAHREN_EINHEIT[verfahren] || 'g';
-  const brauchtProdukt = verfahren==='Lasern' && mat !== LASER_OHNE_FARBE_AUSNAHME;
+  const brauchtProdukt = verfahren==='Lasern' && mat===LASER_MIT_PRODUKTAUSWAHL;
   const farbe = brauchtProdukt ? '' : document.getElementById('lFarbe').value.trim();
   const produktart = brauchtProdukt ? document.getElementById('lProdukt').value : '';
-  const brauchtUntertyp = brauchtProdukt && mat==='Edelstahl' && produktart==='Anhänger';
+  const brauchtUntertyp = brauchtProdukt && produktart==='Anhänger';
   const untertyp = brauchtUntertyp ? document.getElementById('lUntertyp').value.trim() : '';
-  const bezeichnung = brauchtProdukt ? (untertyp ? `${produktart} – ${untertyp}` : produktart) : farbe;
+  const produktFreitext = (brauchtProdukt && produktart==='Freitext') ? document.getElementById('lProduktFreitext').value.trim() : '';
+
+  let bezeichnung;
+  if(brauchtProdukt){
+    if(produktart==='Freitext') bezeichnung = produktFreitext;
+    else bezeichnung = untertyp ? `${produktart} – ${untertyp}` : produktart;
+  } else {
+    bezeichnung = farbe;
+  }
 
   if(verfahren==='Drucken' && !her){ alert('Bitte Hersteller angeben!'); return; }
-  if(!brauchtProdukt && !farbe){ alert('Bitte eine Bezeichnung/Farbe angeben!'); return; }
+  if(!bezeichnung){ alert('Bitte eine Bezeichnung angeben!'); return; }
   if(!gew){ alert('Bitte eine gültige Menge eingeben!'); return; }
   laden(true);
   try {
@@ -982,6 +1015,7 @@ async function filamentAdd(){
     document.getElementById('lHer').value='';
     document.getElementById('lFarbe').value='';
     document.getElementById('lUntertyp').value='';
+    document.getElementById('lProduktFreitext').value='';
     document.getElementById('lPre').value='';
     lagerVerfahrenWechsel();
     await ladeDaten();
