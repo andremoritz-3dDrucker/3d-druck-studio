@@ -350,7 +350,7 @@ tr:hover td{background:#fafcff}
           <thead>
             <tr>
               <th>Datum</th><th>Bestellnr.</th><th>Kunde / Kontakt</th>
-              <th>Projekt</th><th>Verfahren</th><th>Material</th><th>Lieferadresse</th>
+              <th>Projekt</th><th>Verfahren</th><th>Material</th><th>Versand</th>
               <th>Status</th><th>Preis</th><th>Aktionen</th>
             </tr>
           </thead>
@@ -381,14 +381,8 @@ tr:hover td{background:#fafcff}
         </select>
         <input type="text" id="arSuche" placeholder="🔍 Name, Projekt, Bestellnr. …" oninput="renderArchiv()">
       </div>
-      <div class="twrap">
-        <table>
-          <thead>
-            <tr><th>Datum</th><th>Bestellnr.</th><th>Kunde</th><th>Projekt</th><th>Verfahren</th><th>Status</th><th>Preis</th><th>Aktionen</th></tr>
-          </thead>
-          <tbody id="tArchiv"><tr><td colspan="8" class="emp">Lade…</td></tr></tbody>
-        </table>
-      </div>
+      <div id="arGesamt" style="font-size:.85em;color:var(--t3);margin-bottom:12px"></div>
+      <div id="tArchiv"><div class="emp">Lade…</div></div>
     </div>
   </div>
 
@@ -478,9 +472,9 @@ tr:hover td{background:#fafcff}
       <div class="twrap">
         <table>
           <thead>
-            <tr><th>Datum</th><th>Projekt</th><th>Kunde</th><th>Material</th><th>Menge</th><th>Preis</th><th>Aktionen</th></tr>
+            <tr><th>Datum</th><th>Projekt</th><th>Kunde</th><th>Material</th><th>Menge</th><th>Versand</th><th>Preis</th><th>Aktionen</th></tr>
           </thead>
-          <tbody id="tHistorie"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
+          <tbody id="tHistorie"><tr><td colspan="8" class="emp">Lade…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -577,7 +571,49 @@ tr:hover td{background:#fafcff}
           </div>
           <div class="field">
             <label>Verschleiß / Strom (€ fest)</label>
-            <input type="number" id="jFix" value="4.50" step="0.01" oninput="berechne()">
+            <input type="number" id="jFix" value="5.15" step="0.01" oninput="berechne()">
+          </div>
+
+          <!-- Versand / Abholung -->
+          <div class="field fcol">
+            <label>Versand / Abholung</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px">
+              <label id="jVA1" onclick="jVersandWechseln(false)"
+                style="border:2px solid var(--bl);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:.88em;font-weight:600;color:var(--bl);background:#e3f0ff;transition:all .2s">
+                <input type="radio" name="jVersand" value="abholung" checked style="accent-color:var(--bl)"> 🏠 Abholung
+              </label>
+              <label id="jVA2" onclick="jVersandWechseln(true)"
+                style="border:2px solid var(--br);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:.88em;font-weight:600;color:var(--t2);transition:all .2s">
+                <input type="radio" name="jVersand" value="versand" style="accent-color:var(--bl)"> 📦 Versand
+              </label>
+            </div>
+          </div>
+          <div class="field fcol" id="jVersandDetails" style="display:none">
+            <div class="fgrid">
+              <div class="field">
+                <label>Paketgröße</label>
+                <select id="jPaketgroesse" onchange="berechne()"></select>
+              </div>
+              <div class="field">
+                <label>Versandart</label>
+                <select id="jVersandart" onchange="berechne()">
+                  <option value="Normal">Normal</option>
+                  <option value="Express">Express (Aufpreis)</option>
+                </select>
+              </div>
+              <div class="field fcol">
+                <label>Straße &amp; Hausnummer</label>
+                <input type="text" id="jAdresse" placeholder="Musterstraße 12">
+              </div>
+              <div class="field">
+                <label>PLZ</label>
+                <input type="text" id="jPlz" placeholder="12345">
+              </div>
+              <div class="field">
+                <label>Ort</label>
+                <input type="text" id="jOrt" placeholder="Musterstadt">
+              </div>
+            </div>
           </div>
         </div>
 
@@ -585,6 +621,7 @@ tr:hover td{background:#fafcff}
           <span id="jMcKosten"></span>
           Material: <span id="kMat">0,00</span> €<br>
           Verschleiß/Strom: <span id="kFix">4,50</span> €<br>
+          <span id="kVersandZeile" style="display:none">Versand: <span id="kVersand">0,00</span> €<br></span>
           Zwischensumme: <span id="kZwi">4,50</span> €<br>
           Rabatt: <span id="kRab" style="color:var(--gn)">- 0,00</span> €<br>
           <span class="ktotal">Endpreis: <span id="kEnd">4,50</span> €</span>
@@ -754,6 +791,7 @@ function startAdmin(){
   ['topbar','nav','wrap'].forEach(id=>document.getElementById(id).style.display=id==='topbar'?'flex':id==='nav'?'flex':'block');
   lagerVerfahrenWechsel();
   jVerfahrenWechsel();
+  jVersandWechseln(false);
   ladeDaten(); ladeAnfragen(); ladePostfach(); ladeKunden();
 }
 window.addEventListener('DOMContentLoaded',()=>{
@@ -778,6 +816,31 @@ function tab(id,btn){
 ═══════════════════════════════════════════════════════════ */
 // Einheit je Verfahren (Standardwert für neue Einträge)
 const VERFAHREN_EINHEIT = { 'Drucken':'g', 'Lasern':'Blatt', 'Plottern':'Bogen' };
+// Standard-Fixkosten (Verschleiß/Strom/Arbeitszeit) je Verfahren – im Modal/Formular frei anpassbar
+const VERFAHREN_FIX_STANDARD = { 'Drucken':5.15, 'Lasern':3.00, 'Plottern':3.00 };
+// Materialien mit dieser Einheit werden immer auf ganze Einheiten aufgerundet abgerechnet (z.B. Vinylfolie/HTV je Bogen)
+const GANZE_EINHEIT_ABRECHNEN = ['Bogen'];
+
+// DHL-Paketpreise (Stand 2026) – S/M für kleinere Teile, L/XL für größere Bauteile
+const DHL_VERSAND_PREISE = {
+  'S':  { preis: 4.19,  label: 'S – Päckchen (bis 2 kg, bis 35×25×10 cm)' },
+  'M':  { preis: 5.19,  label: 'M – Päckchen (bis 2 kg, bis 60×30×15 cm)' },
+  'L':  { preis: 7.69,  label: 'L – Paket (bis 5 kg)' },
+  'XL': { preis: 10.49, label: 'XL – Paket für größere Bauteile (bis 10 kg)' }
+};
+const VERSAND_EXPRESS_AUFSCHLAG = 5.00;
+
+function versandKostenBerechnen(groesse, art){
+  const basis = DHL_VERSAND_PREISE[groesse]?.preis || 0;
+  return basis + (art==='Express' ? VERSAND_EXPRESS_AUFSCHLAG : 0);
+}
+
+function paketgroesseOptionenBauen(selectId){
+  const select = document.getElementById(selectId);
+  if(!select) return;
+  select.innerHTML = Object.entries(DHL_VERSAND_PREISE)
+    .map(([key,v])=>`<option value="${key}">${v.label} – ${v.preis.toFixed(2).replace('.',',')} €</option>`).join('');
+}
 const VERFAHREN_LABEL   = { 'Drucken':'🖨️ 3D-Druck', 'Lasern':'🔥 Lasern', 'Plottern':'✂️ Plottern' };
 const EINHEIT_LABEL     = { 'g':'g', 'Blatt':'Blatt', 'Bogen':'Bögen' };
 // Laser-Materialien, bei denen KEINE Farbe, sondern eine Produktart abgefragt wird
@@ -796,7 +859,7 @@ const MATERIAL_TYP_OPTIONEN = {
     { gruppe:'Spezialmaterialien', opts:['Resin (Standard)','Resin (ABS-Like)','Resin (Water Washable)','PET','PPA (Polyphthalamid)','PPS (Polyphenylensulfid)','PAHT','PLA Aero'] }
   ],
   'Lasern': [
-    { gruppe:'Laser-Material', opts:['Holz (Sperrholz)','Leder','Kork','Pappe / Karton','Acryl (dunkel)','Edelstahl','Aluminium'] }
+    { gruppe:'Laser-Material', opts:['Holz (Sperrholz)','Leder','Kork','Pappe / Karton','Acryl (dunkel)','Edelstahl','Aluminium','Schiefer'] }
   ],
   'Plottern': [
     { gruppe:'Plotter-Material', opts:['Vinylfolie','Hitzetransfer-Vinylfolie'] }
@@ -1050,7 +1113,7 @@ function renderFilamentDropdown(){
 function renderHistorie(){
   const tb=document.getElementById('tHistorie');
   const oeffentlich = historie.filter(h=>h.kunde!=='Privatgebrauch');
-  if(!oeffentlich.length){ tb.innerHTML=`<tr><td colspan="7" class="emp">Noch keine Aufträge.</td></tr>`; }
+  if(!oeffentlich.length){ tb.innerHTML=`<tr><td colspan="8" class="emp">Noch keine Aufträge.</td></tr>`; }
   else {
     tb.innerHTML=oeffentlich.map(h=>
       `<tr>
@@ -1059,6 +1122,7 @@ function renderHistorie(){
         <td>${x(h.kunde)}</td>
         <td style="font-size:.83em">${x(h.material)}</td>
         <td>${h.verbrauchG}</td>
+        <td style="font-size:.8em">${h.versand_gewuenscht?`📦 ${x(h.versand_art||'Versand')}${h.versand_kosten!=null?' – '+parseFloat(h.versand_kosten).toFixed(2)+' €':''}<br><span style="color:var(--t3)">${x(h.adresse||'')} ${x(h.plz||'')} ${x(h.ort||'')}</span>`:'🏠 Abholung'}</td>
         <td><strong style="color:var(--gn)">${parseFloat(h.kosten||0).toFixed(2)} €</strong></td>
         <td style="display:flex;gap:5px">
           <button class="btn b-or bsm" onclick="historiePreisAendern('${h.id}','${h.kosten}')">✏ Preis</button>
@@ -1305,24 +1369,21 @@ async function ladeAnfragen(){
 }
 
 /* ─── ARCHIV (abgeschlossene & stornierte Bestellanfragen) ─── */
-function renderArchiv(){
-  const tb=document.getElementById('tArchiv');
-  if(!tb) return;
-  const vf=document.getElementById('arVerfahren')?.value||'';
-  const sf=document.getElementById('arStatus')?.value||'';
-  const su=(document.getElementById('arSuche')?.value||'').toLowerCase();
-  const list=anfragen.filter(a=>{
-    if(a.status!=='Abgeschlossen'&&a.status!=='Storniert') return false;
-    const ms=!sf||a.status===sf;
-    const mv=!vf||(a.verfahren||'Drucken')===vf;
-    const mx=!su||`${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
-    return ms&&mv&&mx;
-  });
-  if(!list.length){ tb.innerHTML=`<tr><td colspan="8" class="emp">Noch nichts im Archiv.</td></tr>`; return; }
-  tb.innerHTML=list.map(a=>{
-    const kundenname = a.gastname || a.kunde || '(Kundenkonto)';
-    const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
-    return `<tr>
+const MONATS_NAMEN = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+function archivDatumParse(datum){
+  if(!datum) return null;
+  const teile = String(datum).split('.');
+  if(teile.length!==3) return null;
+  const monat=parseInt(teile[1],10), jahr=parseInt(teile[2],10);
+  if(!jahr||!monat) return null;
+  return {jahr, monat};
+}
+
+function archivZeile(a){
+  const kundenname = a.gastname || a.kunde || '(Kundenkonto)';
+  const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
+  return `<tr>
       <td style="font-size:.81em;color:var(--t3);white-space:nowrap">${x(a.datum)}</td>
       <td style="font-family:monospace;font-size:.79em">${x(a.id)}</td>
       <td>${x(kundenname)}</td>
@@ -1335,7 +1396,82 @@ function renderArchiv(){
         <button class="btn b-rd bsm" style="width:100%" onclick="auftragLoeschen('${a.id}','${x(kundenname).replace(/'/g,'')}','${x(a.projekt).replace(/'/g,'')}')">🗑 Löschen</button>
       </td>
     </tr>`;
-  }).join('');
+}
+
+function renderArchiv(){
+  const tb=document.getElementById('tArchiv');
+  const gesamtEl=document.getElementById('arGesamt');
+  if(!tb) return;
+  const vf=document.getElementById('arVerfahren')?.value||'';
+  const sf=document.getElementById('arStatus')?.value||'';
+  const su=(document.getElementById('arSuche')?.value||'').toLowerCase();
+  const list=anfragen.filter(a=>{
+    if(a.status!=='Abgeschlossen'&&a.status!=='Storniert') return false;
+    const ms=!sf||a.status===sf;
+    const mv=!vf||(a.verfahren||'Drucken')===vf;
+    const mx=!su||`${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
+    return ms&&mv&&mx;
+  });
+
+  if(!list.length){
+    tb.innerHTML=`<div class="emp">Noch nichts im Archiv.</div>`;
+    if(gesamtEl) gesamtEl.textContent='';
+    return;
+  }
+
+  const gesamtUmsatz = list.reduce((s,a)=>s+parseFloat(a.kosten||0),0);
+  if(gesamtEl) gesamtEl.innerHTML = `<strong>${list.length}</strong> Aufträge insgesamt &middot; Gesamtumsatz: <strong style="color:var(--gn)">${gesamtUmsatz.toFixed(2)} €</strong>`;
+
+  // Nach Jahr → Monat gruppieren
+  const gruppen = {};
+  list.forEach(a=>{
+    const d = archivDatumParse(a.datum);
+    const jKey = d ? d.jahr : 'Unbekannt';
+    const mKey = d ? d.monat : 0;
+    gruppen[jKey] = gruppen[jKey] || {};
+    gruppen[jKey][mKey] = gruppen[jKey][mKey] || [];
+    gruppen[jKey][mKey].push(a);
+  });
+
+  const jahre = Object.keys(gruppen).sort((a,b)=> (b==='Unbekannt'?0:b) - (a==='Unbekannt'?0:a));
+  let html='';
+  jahre.forEach((jahr, jIdx)=>{
+    const monateObj = gruppen[jahr];
+    const monatsKeys = Object.keys(monateObj).sort((a,b)=>b-a);
+    let jahrGesamt=0, jahrAnzahl=0;
+    monatsKeys.forEach(m=>{ monateObj[m].forEach(a=>{ jahrAnzahl++; jahrGesamt += parseFloat(a.kosten||0); }); });
+
+    html += `<details ${jIdx===0?'open':''} style="margin-bottom:10px;border:1.5px solid var(--br);border-radius:10px;overflow:hidden">
+      <summary style="cursor:pointer;padding:12px 16px;background:#f8fafc;font-weight:700;font-size:.95em;display:flex;justify-content:space-between;align-items:center;list-style:none">
+        <span>📅 ${jahr}</span>
+        <span style="font-weight:600;font-size:.82em;color:var(--t3)">${jahrAnzahl} Aufträge &middot; <span style="color:var(--gn)">${jahrGesamt.toFixed(2)} €</span></span>
+      </summary>
+      <div style="padding:10px 14px">`;
+
+    monatsKeys.forEach((m, mIdx)=>{
+      const eintraege = monateObj[m].slice().sort((a,b)=> (b.id||'').localeCompare(a.id||''));
+      const monatName = MONATS_NAMEN[parseInt(m,10)-1] || 'Unbekanntes Datum';
+      let monatGesamt=0;
+      eintraege.forEach(a=>{ monatGesamt += parseFloat(a.kosten||0); });
+
+      html += `<details ${jIdx===0 && mIdx===0 ? 'open':''} style="margin-bottom:8px;border:1px solid #eef2f8;border-radius:8px;overflow:hidden">
+        <summary style="cursor:pointer;padding:9px 13px;background:#fafcff;font-weight:600;font-size:.87em;display:flex;justify-content:space-between;align-items:center;list-style:none">
+          <span>${monatName}</span>
+          <span style="font-weight:500;font-size:.82em;color:var(--t3)">${eintraege.length} Aufträge &middot; <span style="color:var(--gn)">${monatGesamt.toFixed(2)} €</span></span>
+        </summary>
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Datum</th><th>Bestellnr.</th><th>Kunde</th><th>Projekt</th><th>Verfahren</th><th>Status</th><th>Preis</th><th>Aktionen</th></tr></thead>
+            <tbody>${eintraege.map(archivZeile).join('')}</tbody>
+          </table>
+        </div>
+      </details>`;
+    });
+
+    html += `</div></details>`;
+  });
+
+  tb.innerHTML = html;
 }
 
 async function archivWiederherstellen(id){
@@ -1380,6 +1516,9 @@ function filterAnfragen(){
       ?`${x(a.gastname)}<br><span style="font-size:.78em;color:var(--t3)">(Gast) ${a.gast_email?`<a href="mailto:${x(a.gast_email)}">${x(a.gast_email)}</a>`:''}</span>`
       :`<span style="color:var(--bl);font-weight:600">🔑 Kundenkonto</span>`;
     const adr=a.adresse?`<span style="font-size:.82em">${x(a.adresse)}<br>${x(a.plz)} ${x(a.ort)}</span>`:`<span style="color:#ccc">—</span>`;
+    const versandZelle = a.versand_gewuenscht
+      ? `<span class="bdg bbl">📦 ${x(a.versand_art||'Versand')}${a.versand_kosten!=null?' – '+parseFloat(a.versand_kosten).toFixed(2)+' €':''}</span><br>${adr}`
+      : `<span class="bdg bgr">🏠 Abholung</span>`;
     const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
     const hasMsg=a.admin_notiz&&a.admin_notiz.trim().length>0;
     // Kundenname: Gast oder aus Kundenkonto
@@ -1395,7 +1534,7 @@ function filterAnfragen(){
       <td><strong>${x(a.projekt)}</strong>${a.beschreibung?`<div style="font-size:.78em;color:#999;margin-top:2px">${x(a.beschreibung.slice(0,50))}${a.beschreibung.length>50?'…':''}</div>`:''}</td>
       <td style="font-size:.82em">${VERFAHREN_LABEL[a.verfahren||'Drucken']||a.verfahren||'—'}</td>
       <td style="font-size:.83em">${x(a.material_wunsch)}${a.ca_gramm?`<br><span style="color:var(--t3);font-size:.82em">ca. ${a.ca_gramm} g</span>`:''}</td>
-      <td>${adr}</td>
+      <td style="font-size:.82em">${versandZelle}</td>
       <td>${badge(a.status)}</td>
       <td>${pr}</td>
       <td style="min-width:110px">
@@ -1490,6 +1629,13 @@ function modOpen(id){
       <div class="iitem full"><div class="ilbl">Projekt / Beschreibung</div><div class="ival"><strong>${x(a.projekt)}</strong>${a.beschreibung?'<br>'+x(a.beschreibung):''}</div></div>
     </div>
 
+    <div class="msec">📦 Versand / Abholung</div>
+    <div class="igrid">
+      <div class="iitem full"><div class="ilbl">Art</div><div class="ival">
+        ${a.versand_gewuenscht?`📦 Versand${a.versand_art?' – '+x(a.versand_art):''}${a.versand_groesse?' (Paket '+x(a.versand_groesse)+')':''}${a.versand_kosten!=null?` – <strong>${parseFloat(a.versand_kosten).toFixed(2)} €</strong>`:''}`:'🏠 Abholung im Studio'}
+      </div></div>
+    </div>
+
     <div class="msec">📍 Lieferadresse</div>
     <div class="igrid">
       <div class="iitem full"><div class="ilbl">Adresse</div><div class="ival">
@@ -1536,6 +1682,12 @@ function modOpen(id){
           oninput="modBerechne()">
       </div>
       <div class="field">
+        <label id="mFixLabel">Verschleiß / Fixkosten (€)</label>
+        <input type="number" id="mFix" step="0.01" min="0"
+          value="${VERFAHREN_FIX_STANDARD[verfahrenAnfrage] ?? 2.00}"
+          oninput="modBerechne()">
+      </div>
+      <div class="field">
         <label>Endpreis für Kunden (€)</label>
         <input type="number" id="mKosten" step="0.01" min="0"
           value="${a.kosten!=null?a.kosten:''}"
@@ -1566,18 +1718,22 @@ function modClose(){
 }
 
 function modBerechne(){
-  const PAUSCHALE = 4.50;
   const filSel = document.getElementById('mFilament');
-  const gramm  = parseFloat(document.getElementById('mGramm')?.value) || 0;
+  let gramm  = parseFloat(document.getElementById('mGramm')?.value) || 0;
   const rabatt = parseFloat(document.getElementById('mRabatt')?.value) || 0;
+  const PAUSCHALE = parseFloat(document.getElementById('mFix')?.value) || 0;
   const kBox   = document.getElementById('mKalkulationBox');
   const kText  = document.getElementById('mKalkulationText');
   const kostenFeld = document.getElementById('mKosten');
   const gLabel = document.getElementById('mGrammLabel');
+  const aktAnfrage = anfragen.find(e=>e.id===modId);
+  const versandKosten = aktAnfrage?.versand_gewuenscht ? (parseFloat(aktAnfrage.versand_kosten)||0) : 0;
 
   let grundpreis = 0;
   let kalkuliert = false;
   const einheit = filSel?.options[filSel.selectedIndex]?.dataset?.einheit || 'g';
+  // Bei Materialien, die pro Bogen abgerechnet werden (z.B. Vinylfolie/HTV), wird auf ganze Bögen aufgerundet
+  if(GANZE_EINHEIT_ABRECHNEN.includes(einheit) && gramm > 0) gramm = Math.ceil(gramm);
   if(gLabel) gLabel.textContent = `Verbrauch (${EINHEIT_LABEL[einheit]||einheit}) – anpassen falls nötig`;
 
   if(filSel && filSel.value && gramm > 0){
@@ -1585,7 +1741,7 @@ function modBerechne(){
     const preis = parseFloat(opt?.dataset?.preis) || 0;
     const start = parseFloat(opt?.dataset?.start) || 1000;
     const matKosten = (preis / start) * gramm;
-    grundpreis = matKosten + PAUSCHALE;
+    grundpreis = matKosten + PAUSCHALE + versandKosten;
     kalkuliert = true;
 
     if(kBox && kText){
@@ -1594,6 +1750,7 @@ function modBerechne(){
       kText.innerHTML =
         `Material (${gramm} ${EINHEIT_LABEL[einheit]||einheit} × ${(preis/start).toFixed(4)} €/${EINHEIT_LABEL[einheit]||einheit}): <strong>${matKosten.toFixed(2)} €</strong><br>` +
         `Strom &amp; Verschleiß: <strong>${PAUSCHALE.toFixed(2)} €</strong><br>` +
+        (versandKosten > 0 ? `Versand (${x(aktAnfrage.versand_art||'')}, Paket ${x(aktAnfrage.versand_groesse||'')}): <strong>${versandKosten.toFixed(2)} €</strong><br>` : '') +
         `Grundpreis: <strong>${grundpreis.toFixed(2)} €</strong><br>` +
         (rabatt > 0
           ? `Rabatt (${rabatt}%): <strong style="color:var(--gn)">- ${rabattBetrag.toFixed(2)} €</strong><br>`
@@ -1701,7 +1858,24 @@ function jVerfahrenWechsel(){
     document.getElementById('jEinfarbigBlock').style.display = 'contents';
     document.getElementById('jMulticolorBlock').style.display = 'none';
   }
+  const fixFeld = document.getElementById('jFix');
+  if(fixFeld) fixFeld.value = VERFAHREN_FIX_STANDARD[verfahren] ?? 2.00;
   renderFilamentDropdown();
+  berechne();
+}
+
+// Versand/Abholung beim manuellen Auftrag umschalten
+function jVersandWechseln(versand){
+  const va1 = document.getElementById('jVA1');
+  const va2 = document.getElementById('jVA2');
+  if(va1){ va1.style.borderColor = versand?'var(--br)':'var(--bl)'; va1.style.background = versand?'':'#e3f0ff'; va1.style.color = versand?'var(--t2)':'var(--bl)'; }
+  if(va2){ va2.style.borderColor = versand?'var(--bl)':'var(--br)'; va2.style.background = versand?'#e3f0ff':''; va2.style.color = versand?'var(--bl)':'var(--t2)'; }
+  const r1 = va1?va1.querySelector('input[type=radio]'):null;
+  const r2 = va2?va2.querySelector('input[type=radio]'):null;
+  if(r1) r1.checked = !versand;
+  if(r2) r2.checked = versand;
+  document.getElementById('jVersandDetails').style.display = versand ? '' : 'none';
+  if(versand) paketgroesseOptionenBauen('jPaketgroesse');
   berechne();
 }
 
@@ -1802,9 +1976,9 @@ function jMcGetFarben(){
 ═══════════════════════════════════════════════════════════ */
 function berechne(){
   const sid=document.getElementById('jSpu').value;
-  const g=parseFloat(document.getElementById('jGra').value)||0;
+  let g=parseFloat(document.getElementById('jGra').value)||0;
   const dis=parseFloat(document.getElementById('jDis').value)||0;
-  const fix=parseFloat(document.getElementById('jFix').value)||4.5;
+  const fix=parseFloat(document.getElementById('jFix').value)||2.00;
   const w=document.getElementById('warnGew');
   const gLabel=document.getElementById('jGraLabel');
   let mat=0;
@@ -1813,12 +1987,23 @@ function berechne(){
     const s=lager.find(f=>f.id===sid);
     if(s){
       einheit=lagerEinheit(s);
+      // Bei Materialien, die pro Bogen abgerechnet werden (z.B. Vinylfolie/HTV), auf ganze Bögen aufrunden
+      if(GANZE_EINHEIT_ABRECHNEN.includes(einheit) && g>0) g=Math.ceil(g);
       mat=(parseFloat(s.Preis)/parseFloat(s.startGewicht))*g;
       w.style.display=g>parseFloat(s.restGewicht)?'block':'none';
     }
   } else w.style.display='none';
   if(gLabel) gLabel.textContent = `Verbrauch (${EINHEIT_LABEL[einheit]||einheit})`;
-  const zwi=mat+fix, rab=zwi*(dis/100);
+
+  const istVersand = document.querySelector('input[name="jVersand"]:checked')?.value === 'versand';
+  const versandKosten = istVersand
+    ? versandKostenBerechnen(document.getElementById('jPaketgroesse')?.value, document.getElementById('jVersandart')?.value)
+    : 0;
+  const kVersandZeile = document.getElementById('kVersandZeile');
+  if(kVersandZeile){ kVersandZeile.style.display = istVersand ? '' : 'none'; }
+  document.getElementById('kVersand').textContent = versandKosten.toFixed(2).replace('.',',');
+
+  const zwi=mat+fix+versandKosten, rab=zwi*(dis/100);
   aktKosten=zwi-rab;
   document.getElementById('kMat').textContent=mat.toFixed(2).replace('.',',');
   document.getElementById('kFix').textContent=fix.toFixed(2).replace('.',',');
@@ -1832,11 +2017,22 @@ function berechne(){
 ═══════════════════════════════════════════════════════════ */
 async function auftragBuchen(){
   const sid=document.getElementById('jSpu').value;
-  const g=parseFloat(document.getElementById('jGra').value)||0;
+  let g=parseFloat(document.getElementById('jGra').value)||0;
   const pro=document.getElementById('jPro').value.trim();
   const kun=document.getElementById('jKun').value.trim();
   if(!sid||!g||!pro||!kun){ alert('Bitte Projekt, Kunde, Material und Menge angeben!'); return; }
   const s=lager.find(f=>f.id===sid); if(!s) return;
+  if(GANZE_EINHEIT_ABRECHNEN.includes(lagerEinheit(s))) g=Math.ceil(g);
+
+  const versandGewuenscht = document.querySelector('input[name="jVersand"]:checked')?.value === 'versand';
+  const versandArt = versandGewuenscht ? document.getElementById('jVersandart').value : null;
+  const versandGroesse = versandGewuenscht ? document.getElementById('jPaketgroesse').value : null;
+  const versandKosten = versandGewuenscht ? versandKostenBerechnen(versandGroesse, versandArt) : null;
+  const jAdresse = versandGewuenscht ? document.getElementById('jAdresse').value.trim() : '';
+  const jPlz     = versandGewuenscht ? document.getElementById('jPlz').value.trim() : '';
+  const jOrt     = versandGewuenscht ? document.getElementById('jOrt').value.trim() : '';
+  if(versandGewuenscht && (!jAdresse||!jPlz||!jOrt)){ alert('Bitte Adresse für den Versand angeben!'); return; }
+
   document.getElementById('btnBuchen').disabled=true;
   laden(true);
   try{
@@ -1845,12 +2041,16 @@ async function auftragBuchen(){
       datum:new Date().toLocaleDateString('de-DE'),
       projekt:pro, kunde:kun, material:s.Material,
       verbrauchG:g, kosten:aktKosten,
-      verfahren: document.getElementById('jVerfahren')?.value || 'Drucken'
+      verfahren: document.getElementById('jVerfahren')?.value || 'Drucken',
+      versand_gewuenscht: versandGewuenscht, versand_art: versandArt,
+      versand_groesse: versandGroesse, versand_kosten: versandKosten,
+      adresse: jAdresse, plz: jPlz, ort: jOrt
     }]);
     const nr=parseFloat(s.restGewicht)-g;
     await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',sid);
-    ['jPro','jKun','jGra'].forEach(i=>document.getElementById(i).value='');
+    ['jPro','jKun','jGra','jAdresse','jPlz','jOrt'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('jDis').value='0';
+    jVersandWechseln(false);
     if(nr<=0) alert('⚠ ACHTUNG: Dieser Posten ist jetzt leer!');
     await ladeDaten();
   }catch(e){ alert('Fehler beim Buchen!'); console.error(e); }
