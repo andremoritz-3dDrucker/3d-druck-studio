@@ -834,10 +834,38 @@
                 </div>
             </div>
 
-            <div class="section-sep">📍 Lieferadresse</div>
+            <div class="section-sep">📦 Versand oder Abholung</div>
             <div class="form-grid">
+                <div class="field col-full" id="bVersandWrap">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px">
+                        <label id="bVA1" onclick="versandWechseln('b',false)"
+                            style="border:2px solid var(--primary);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:0.88em;font-weight:600;color:var(--primary);background:#e3f0ff;transition:all .2s">
+                            <input type="radio" name="bVersand" value="abholung" checked style="accent-color:var(--primary)"> 🏠 Abholung im Studio
+                        </label>
+                        <label id="bVA2" onclick="versandWechseln('b',true)"
+                            style="border:2px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:0.88em;font-weight:600;color:var(--text-m);transition:all .2s">
+                            <input type="radio" name="bVersand" value="versand" style="accent-color:var(--primary)"> 📦 Versand
+                        </label>
+                    </div>
+                </div>
+                <div class="field col-full" id="bVersandartWrap" style="display:none">
+                    <label>Versandart</label>
+                    <select id="bVersandart" onchange="versandKostenAnzeigen('b')">
+                        <option value="Normal">Normal</option>
+                        <option value="Express">Express (Aufpreis)</option>
+                    </select>
+                </div>
+                <div class="field col-full" id="bPaketgroesseWrap" style="display:none">
+                    <label>Paketgröße</label>
+                    <select id="bPaketgroesse" onchange="versandKostenAnzeigen('b')"></select>
+                    <span style="font-size:0.85em;color:var(--primary);font-weight:600;margin-top:4px;display:block" id="bVersandKostenAnzeige"></span>
+                </div>
+            </div>
+
+            <div class="section-sep" id="bLieferSep">📍 Lieferadresse</div>
+            <div class="form-grid" id="bLieferFelder">
                 <div class="field col-full">
-                    <label>Straße &amp; Hausnummer *</label>
+                    <label id="bAdresseLabel">Straße &amp; Hausnummer *</label>
                     <input type="text" id="bAdresse" placeholder="Musterstraße 12" autocomplete="street-address">
                 </div>
                 <div class="field">
@@ -850,7 +878,7 @@
                 </div>
                 <div class="field col-full">
                     <label>Lieferhinweis (optional)</label>
-                    <input type="text" id="bHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung bevorzugt, …">
+                    <input type="text" id="bHinweis" placeholder="z.B. Klingel 2. OG, Packstation-Nummer, …">
                 </div>
             </div>
 
@@ -945,10 +973,38 @@
                 </div>
             </div>
 
-            <div class="section-sep">📍 Lieferadresse</div>
+            <div class="section-sep">📦 Versand oder Abholung</div>
             <div class="form-grid">
+                <div class="field col-full" id="gVersandWrap">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px">
+                        <label id="gVA1" onclick="versandWechseln('g',false)"
+                            style="border:2px solid var(--primary);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:0.88em;font-weight:600;color:var(--primary);background:#e3f0ff;transition:all .2s">
+                            <input type="radio" name="gVersand" value="abholung" checked style="accent-color:var(--primary)"> 🏠 Abholung im Studio
+                        </label>
+                        <label id="gVA2" onclick="versandWechseln('g',true)"
+                            style="border:2px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:0.88em;font-weight:600;color:var(--text-m);transition:all .2s">
+                            <input type="radio" name="gVersand" value="versand" style="accent-color:var(--primary)"> 📦 Versand
+                        </label>
+                    </div>
+                </div>
+                <div class="field col-full" id="gVersandartWrap" style="display:none">
+                    <label>Versandart</label>
+                    <select id="gVersandart" onchange="versandKostenAnzeigen('g')">
+                        <option value="Normal">Normal</option>
+                        <option value="Express">Express (Aufpreis)</option>
+                    </select>
+                </div>
+                <div class="field col-full" id="gPaketgroesseWrap" style="display:none">
+                    <label>Paketgröße</label>
+                    <select id="gPaketgroesse" onchange="versandKostenAnzeigen('g')"></select>
+                    <span style="font-size:0.85em;color:var(--primary);font-weight:600;margin-top:4px;display:block" id="gVersandKostenAnzeige"></span>
+                </div>
+            </div>
+
+            <div class="section-sep" id="gLieferSep">📍 Lieferadresse</div>
+            <div class="form-grid" id="gLieferFelder">
                 <div class="field col-full">
-                    <label>Straße &amp; Hausnummer *</label>
+                    <label id="gAdresseLabel">Straße &amp; Hausnummer *</label>
                     <input type="text" id="gAdresse" placeholder="Musterstraße 12" autocomplete="street-address">
                 </div>
                 <div class="field">
@@ -961,7 +1017,7 @@
                 </div>
                 <div class="field col-full">
                     <label>Lieferhinweis (optional)</label>
-                    <input type="text" id="gHinweis" placeholder="z.B. Klingel 2. OG, Selbstabholung, …">
+                    <input type="text" id="gHinweis" placeholder="z.B. Klingel 2. OG, Packstation-Nummer, …">
                 </div>
             </div>
 
@@ -988,6 +1044,7 @@
                 <h2>Auftrag erfolgreich eingegangen!</h2>
                 <p style="color:var(--text-l);margin:10px 0 5px;font-size:0.88em">Deine Bestellnummer:</p>
                 <div class="confirm-id" id="confirmId">—</div>
+                <div id="confirmVersandHinweis"></div>
                 <p style="color:var(--text-l);font-size:0.85em;max-width:400px;margin:0 auto 26px;line-height:1.65">
                     Wir haben deine Anfrage erhalten und melden uns zeitnah mit einer Bestätigung sowie dem Preis bei dir. Bitte notiere deine Bestellnummer.
                 </p>
@@ -1168,6 +1225,60 @@ function druckmodusWechseln(prefix, modus) {
     document.getElementById(prefix + 'MulticolorWrap').style.display = istMC ? '' : 'none';
 }
 
+// Umschalten zwischen Abholung und Versand
+// DHL-Paketpreise (Stand 2026) – S/M für kleinere Teile, L/XL für größere Bauteile
+const DHL_VERSAND_PREISE = {
+    'S':  { preis: 4.19,  label: 'S – Päckchen (bis 2 kg, bis 35×25×10 cm)' },
+    'M':  { preis: 5.19,  label: 'M – Päckchen (bis 2 kg, bis 60×30×15 cm)' },
+    'L':  { preis: 7.69,  label: 'L – Paket (bis 5 kg)' },
+    'XL': { preis: 10.49, label: 'XL – Paket für größere Bauteile (bis 10 kg)' }
+};
+
+function versandKostenBerechnen(groesse, art) {
+    const basis = DHL_VERSAND_PREISE[groesse]?.preis || 0;
+    const expressAufschlag = art === 'Express' ? 5.00 : 0; // Pauschaler Express-Aufschlag, im Admin anpassbar
+    return basis + expressAufschlag;
+}
+
+function versandKostenAnzeigen(prefix) {
+    const groesse = document.getElementById(prefix + 'Paketgroesse').value;
+    const art = document.getElementById(prefix + 'Versandart')?.value || 'Normal';
+    const kosten = versandKostenBerechnen(groesse, art);
+    const anzeige = document.getElementById(prefix + 'VersandKostenAnzeige');
+    if (anzeige) anzeige.textContent = `Versandkosten: ${kosten.toFixed(2).replace('.', ',')} €`;
+    return kosten;
+}
+
+function paketgroesseOptionenBauen(prefix) {
+    const select = document.getElementById(prefix + 'Paketgroesse');
+    if (!select) return;
+    select.innerHTML = Object.entries(DHL_VERSAND_PREISE)
+        .map(([key, v]) => `<option value="${key}">${v.label} – ${v.preis.toFixed(2).replace('.', ',')} €</option>`)
+        .join('');
+}
+
+function versandWechseln(prefix, versand) {
+    const va1 = document.getElementById(prefix + 'VA1');
+    const va2 = document.getElementById(prefix + 'VA2');
+    if (va1) { va1.style.borderColor = versand ? 'var(--border)' : 'var(--primary)'; va1.style.background = versand ? '' : '#e3f0ff'; va1.style.color = versand ? 'var(--text-m)' : 'var(--primary)'; }
+    if (va2) { va2.style.borderColor = versand ? 'var(--primary)' : 'var(--border)'; va2.style.background = versand ? '#e3f0ff' : ''; va2.style.color = versand ? 'var(--primary)' : 'var(--text-m)'; }
+    const va1Radio = va1 ? va1.querySelector('input[type=radio]') : null;
+    const va2Radio = va2 ? va2.querySelector('input[type=radio]') : null;
+    if (va1Radio) va1Radio.checked = !versand;
+    if (va2Radio) va2Radio.checked = versand;
+
+    document.getElementById(prefix + 'VersandartWrap').style.display = versand ? '' : 'none';
+    document.getElementById(prefix + 'PaketgroesseWrap').style.display = versand ? '' : 'none';
+    document.getElementById(prefix + 'LieferFelder').style.display = versand ? '' : 'none';
+    document.getElementById(prefix + 'LieferSep').textContent = versand ? '📍 Lieferadresse' : '📍 Adresse (optional, z.B. für Rückfragen)';
+    const adresseLabel = document.getElementById(prefix + 'AdresseLabel');
+    if (adresseLabel) adresseLabel.textContent = versand ? 'Straße & Hausnummer *' : 'Straße & Hausnummer';
+    if (versand) {
+        paketgroesseOptionenBauen(prefix);
+        versandKostenAnzeigen(prefix);
+    }
+}
+
 // Ausgewählte Dateien in den Supabase-Storage-Bucket "anfragen" hochladen, Public-URLs zurückgeben
 async function dateienHochladen(prefix, orderId) {
     const input = document.getElementById(prefix + 'Datei');
@@ -1281,6 +1392,7 @@ function zeige(viewId) {
         document.getElementById('bVerfahren').value = 'Drucken';
         druckmodusWechseln('b', 'einfarbig');
         verfahrenWechsel('b');
+        versandWechseln('b', false);
         if (aktKunde) {
             document.getElementById('bAdresse').value = aktKunde.adresse || '';
             document.getElementById('bPlz').value     = aktKunde.plz     || '';
@@ -1294,6 +1406,7 @@ function zeige(viewId) {
         document.getElementById('gVerfahren').value = 'Drucken';
         druckmodusWechseln('g', 'einfarbig');
         verfahrenWechsel('g');
+        versandWechseln('g', false);
     }
 
     if (viewId === 'view-profil' && aktKunde) {
@@ -1528,7 +1641,9 @@ async function ladeDashboard() {
                 <td style="font-size:0.83em">${escHtml(VERFAHREN_LABEL[a.verfahren] || a.verfahren || '—')}</td>
                 <td style="font-size:0.83em">${escHtml(a.material_wunsch)}</td>
                 <td style="font-size:0.82em">
-                    ${a.adresse ? `${escHtml(a.adresse)}<br>${escHtml(a.plz)} ${escHtml(a.ort)}` : '—'}
+                    ${a.versand_gewuenscht
+                        ? `📦 Versand${a.versand_art ? ' ('+escHtml(a.versand_art)+')' : ''}${a.versand_kosten!=null?` – <strong>${parseFloat(a.versand_kosten).toFixed(2)} €</strong>`:''}<br>${escHtml(a.adresse||'')}<br>${escHtml(a.plz||'')} ${escHtml(a.ort||'')}`
+                        : '🏠 Abholung'}
                 </td>
                 <td>${badge(a.status)}</td>
                 <td style="white-space:nowrap">
@@ -1547,7 +1662,7 @@ async function ladeDashboard() {
                             <th>Projekt</th>
                             <th>Verfahren</th>
                             <th>Material</th>
-                            <th>Lieferadresse</th>
+                            <th>Versand</th>
                             <th>Status</th>
                             <th>Kosten</th>
                         </tr>
@@ -1594,8 +1709,17 @@ async function gastBestellung() {
         mat = `Multicolor: ${multicolorFarben.join(', ')}`;
     }
 
-    if (!name || !email || !projekt || !adresse || !plz || !ort) {
+    const versandGewuenscht = document.querySelector('input[name="gVersand"]:checked')?.value === 'versand';
+    const versandArt = versandGewuenscht ? document.getElementById('gVersandart').value : null;
+    const versandGroesse = versandGewuenscht ? document.getElementById('gPaketgroesse').value : null;
+    const versandKosten = versandGewuenscht ? versandKostenBerechnen(versandGroesse, versandArt) : null;
+
+    if (!name || !email || !projekt) {
         alert$('gastFehler', '❌ Bitte alle Pflichtfelder (*) ausfüllen.');
+        return;
+    }
+    if (versandGewuenscht && (!adresse || !plz || !ort)) {
+        alert$('gastFehler', '❌ Bitte Adresse für den Versand angeben.');
         return;
     }
     if (!validEmail(email)) {
@@ -1624,9 +1748,13 @@ async function gastBestellung() {
             druckmodus,
             multicolor_materialien: istMulticolor ? JSON.stringify(multicolorFarben) : null,
             datei_urls:      dateiUrls.length ? dateiUrls.join(',') : null,
-            adresse,
-            plz,
-            ort,
+            versand_gewuenscht: versandGewuenscht,
+            versand_art:     versandArt,
+            versand_groesse: versandGroesse,
+            versand_kosten:  versandKosten,
+            adresse:         versandGewuenscht ? adresse : '',
+            plz:             versandGewuenscht ? plz : '',
+            ort:             versandGewuenscht ? ort : '',
             liefer_hinweis:  hinweis,
             status:          'Anfrage eingegangen',
             datum:           new Date().toLocaleDateString('de-DE'),
@@ -1642,9 +1770,13 @@ async function gastBestellung() {
         document.getElementById('gVerfahren').value = 'Drucken';
         druckmodusWechseln('g', 'einfarbig');
         verfahrenWechsel('g');
+        versandWechseln('g', false);
 
         // Bestätigung anzeigen
         document.getElementById('confirmId').textContent = orderId;
+        document.getElementById('confirmVersandHinweis').innerHTML = versandGewuenscht
+            ? `<p style="color:var(--primary);font-weight:600;font-size:0.95em;margin:4px 0 10px">📦 Versand (${versandArt}, Paket ${versandGroesse}): ${versandKosten.toFixed(2).replace('.', ',')} €</p>`
+            : `<p style="color:var(--text-l);font-size:0.85em;margin:4px 0 10px">🏠 Abholung im Studio</p>`;
         document.getElementById('confirmButtons').innerHTML = `
             <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
                 <button class="btn btn-outline btn-sm" onclick="zeige('view-start')">Zur Startseite</button>
@@ -1691,8 +1823,17 @@ async function bestellungAbschicken() {
         mat = `Multicolor: ${multicolorFarben.join(', ')}`;
     }
 
-    if (!projekt || !adresse || !plz || !ort) {
+    const versandGewuenscht = document.querySelector('input[name="bVersand"]:checked')?.value === 'versand';
+    const versandArt = versandGewuenscht ? document.getElementById('bVersandart').value : null;
+    const versandGroesse = versandGewuenscht ? document.getElementById('bPaketgroesse').value : null;
+    const versandKosten = versandGewuenscht ? versandKostenBerechnen(versandGroesse, versandArt) : null;
+
+    if (!projekt) {
         alert$('bestellFehler', '❌ Bitte alle Pflichtfelder (*) ausfüllen.');
+        return;
+    }
+    if (versandGewuenscht && (!adresse || !plz || !ort)) {
+        alert$('bestellFehler', '❌ Bitte Adresse für den Versand angeben.');
         return;
     }
 
@@ -1717,9 +1858,13 @@ async function bestellungAbschicken() {
             druckmodus,
             multicolor_materialien: istMulticolor ? JSON.stringify(multicolorFarben) : null,
             datei_urls:      dateiUrls.length ? dateiUrls.join(',') : null,
-            adresse,
-            plz,
-            ort,
+            versand_gewuenscht: versandGewuenscht,
+            versand_art:     versandArt,
+            versand_groesse: versandGroesse,
+            versand_kosten:  versandKosten,
+            adresse:         versandGewuenscht ? adresse : '',
+            plz:             versandGewuenscht ? plz : '',
+            ort:             versandGewuenscht ? ort : '',
             liefer_hinweis:  hinweis,
             status:          'Anfrage eingegangen',
             datum:           new Date().toLocaleDateString('de-DE'),
@@ -1728,8 +1873,8 @@ async function bestellungAbschicken() {
 
         if (error) throw error;
 
-        // Adresse im Profil aktualisieren, falls geändert
-        if (adresse !== aktKunde.adresse || plz !== aktKunde.plz || ort !== aktKunde.ort) {
+        // Adresse im Profil aktualisieren, falls geändert (nur bei Versand)
+        if (versandGewuenscht && (adresse !== aktKunde.adresse || plz !== aktKunde.plz || ort !== aktKunde.ort)) {
             await sb.from('kunden').update({ adresse, plz, ort }).eq('id', aktKunde.id);
             aktKunde = { ...aktKunde, adresse, plz, ort };
             sessionSpeichern(aktKunde);
@@ -1743,8 +1888,12 @@ async function bestellungAbschicken() {
         document.getElementById('bVerfahren').value = 'Drucken';
         druckmodusWechseln('b', 'einfarbig');
         verfahrenWechsel('b');
+        versandWechseln('b', false);
 
         document.getElementById('confirmId').textContent = orderId;
+        document.getElementById('confirmVersandHinweis').innerHTML = versandGewuenscht
+            ? `<p style="color:var(--primary);font-weight:600;font-size:0.95em;margin:4px 0 10px">📦 Versand (${versandArt}, Paket ${versandGroesse}): ${versandKosten.toFixed(2).replace('.', ',')} €</p>`
+            : `<p style="color:var(--text-l);font-size:0.85em;margin:4px 0 10px">🏠 Abholung im Studio</p>`;
         document.getElementById('confirmButtons').innerHTML = `
             <button class="btn btn-primary btn-sm"
                 onclick="ladeDashboard().then(() => zeige('view-dashboard'))">
@@ -1835,6 +1984,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // Material-Dropdowns + Multicolor-Auswahl beim Start einmal befüllen
     verfahrenWechsel('b');
     verfahrenWechsel('g');
+    versandWechseln('b', false);
+    versandWechseln('g', false);
 
     const session = sessionLaden();
     if (session) {
