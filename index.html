@@ -1171,8 +1171,8 @@ async function materialAktualisieren(prefix) {
     const alle = await materialienLaden();
     const verfuegbar = alle.filter(f => (f.verfahren || 'Drucken') === verfahren && !f.gesperrt);
 
-    // Nach Material-Typ gruppieren (ohne Hersteller/Farbe-Zusatz in Klammern), Duplikate entfernen
-    const typen = [...new Set(verfuegbar.map(f => (f.Material || '').replace(/\s*\([^)]*\)\s*$/, '').trim()).filter(Boolean))];
+    // Nach Material-Typ gruppieren (z.B. PLA, PLA+, PETG…), Duplikate entfernen, alphabetisch sortiert
+    const typen = [...new Set(verfuegbar.map(materialTypVon).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'de'));
 
     let optionenHtml = '<option value="Keine Präferenz">Keine Präferenz (Admin wählt)</option>';
     if (typen.length) {
@@ -1183,17 +1183,30 @@ async function materialAktualisieren(prefix) {
     select.innerHTML = optionenHtml;
 }
 
+// Materialtyp (z.B. PLA, PETG, Holz...) eines Lagereintrags ermitteln
+function materialTypVon(f) {
+    return f.material_typ || (f.Material || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
+
 // Multicolor-Farbauswahl (4 Slots) mit den konkreten, verfügbaren 3D-Druck-Materialien befüllen
 async function multicolorOptionenLaden(prefix) {
     const alle = await materialienLaden();
     const verfuegbar = alle.filter(f => (f.verfahren || 'Drucken') === 'Drucken' && !f.gesperrt);
+    // Nach Material-Typ gruppieren, damit z.B. alle PLA-Farben zusammenstehen
+    const gruppen = {};
+    verfuegbar.forEach(f => {
+        const typ = materialTypVon(f) || 'Sonstige';
+        (gruppen[typ] = gruppen[typ] || []).push(f);
+    });
+    const typenSortiert = Object.keys(gruppen).sort((a, b) => a.localeCompare(b, 'de'));
+    const optionenHtml = typenSortiert.map(typ =>
+        `<optgroup label="── ${typ} ──">${gruppen[typ].map(f => `<option value="${(f.Material||'').replace(/"/g,'&quot;')}">${f.Material}</option>`).join('')}</optgroup>`
+    ).join('');
     for (let i = 0; i < 4; i++) {
         const select = document.getElementById(prefix + 'MC' + i);
         if (!select) continue;
         const pflicht = i === 0;
-        let html = pflicht ? '<option value="">— Farbe wählen —</option>' : '<option value="">— Keine —</option>';
-        html += verfuegbar.map(f => `<option value="${(f.Material||'').replace(/"/g,'&quot;')}">${f.Material}</option>`).join('');
-        select.innerHTML = html;
+        select.innerHTML = (pflicht ? '<option value="">— Farbe wählen —</option>' : '<option value="">— Keine —</option>') + optionenHtml;
     }
 }
 
