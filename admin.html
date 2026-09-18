@@ -454,7 +454,7 @@ tr:hover td{background:#fafcff}
         </div>
         <div class="twrap">
           <table>
-            <thead><tr><th>Verfahren</th><th>Material</th><th>Hersteller</th><th>Rest</th><th>Preis €</th><th>Status</th><th>Aktionen</th></tr></thead>
+            <thead><tr><th>Verfahren</th><th>Filament-Typ</th><th>Material</th><th>Hersteller</th><th>Rest</th><th>Preis €</th><th>Status</th><th>Aktionen</th></tr></thead>
             <tbody id="tLager"><tr><td colspan="7" class="emp">Lade…</td></tr></tbody>
           </table>
         </div>
@@ -851,7 +851,7 @@ const LASER_MIT_PRODUKTAUSWAHL = 'Edelstahl'; // einziges Lasermaterial mit fest
 const MATERIAL_TYP_OPTIONEN = {
   'Drucken': [
     { gruppe:'PLA Varianten', opts:['PLA','PLA+','PLA Silk','PLA Matt','PLA High Speed','XPLA','PLA-CF (Carbon)','PLA Wood Fill','PLA Metal Fill','PLA Marble'] },
-    { gruppe:'PETG Varianten', opts:['PETG','PETG-CF (Carbon)','PETG-GF (Glasfaser)'] },
+    { gruppe:'PETG Varianten', opts:['PETG','PETG-CF (Carbon)','PETG-GF (Glasfaser)','PETG Translucent'] },
     { gruppe:'Nylon / PA', opts:['Nylon PA6','Nylon PA12','Nylon PA-CF (Carbon)','Nylon PA-GF (Glasfaser)'] },
     { gruppe:'Technische Filamente', opts:['ABS','ABS-CF (Carbon)','ASA','ASA-CF (Carbon)','PC (Polycarbonat)','PC-CF (Carbon)','PP (Polypropylen)','HIPS','POM (Delrin)'] },
     { gruppe:'Glasfaser (GF)', opts:['GF-PLA (Glasfaser)','GF-PETG (Glasfaser)','GF-PA12 (Glasfaser)','GF30-PA (30% Glasfaser)'] },
@@ -957,7 +957,7 @@ function renderLager(){
   const tb=document.getElementById('tLager');
   const filter = document.getElementById('lFilterVerfahren')?.value || '';
   const liste = filter ? lager.filter(f=>(f.verfahren||'Drucken')===filter) : lager;
-  if(!liste.length){ tb.innerHTML=`<tr><td colspan="7" class="emp">📭 Kein Material in dieser Kategorie – bitte oben hinzufügen.</td></tr>`; return; }
+  if(!liste.length){ tb.innerHTML=`<tr><td colspan="8" class="emp">📭 Kein Material in dieser Kategorie – bitte oben hinzufügen.</td></tr>`; return; }
   tb.innerHTML=liste.map(f=>{
     const verfahren=f.verfahren||'Drucken';
     const einheit=lagerEinheit(f);
@@ -978,6 +978,7 @@ function renderLager(){
       :`<button class="btn b-or bsm" onclick="filamentSperren('${f.id}',true)" title="Für Kunden sperren">🔒 Sperren</button>`;
     return `<tr style="${rowStyle}">
       <td style="font-size:.82em">${VERFAHREN_LABEL[verfahren]||verfahren}</td>
+      <td style="font-size:.82em;font-weight:600">${x(f.material_typ || (f.Material||'').replace(/\s*\(.*$/,''))}</td>
       <td>${x(f.Material)}</td>
       <td style="font-size:.82em;color:var(--t3)">${x(f.Hertseller)||'—'}</td>
       <td style="${restStyle}">${rZeigen}</td>
@@ -1072,7 +1073,7 @@ async function filamentAdd(){
       id:'s_'+Date.now(), Hertseller:her||null,
       Material: bezeichnung ? `${mat} (${bezeichnung})` : mat,
       startGewicht:gew.toString(), restGewicht:gew.toString(), Preis:pre.toString(),
-      verfahren, einheit, gesperrt:false, sperr_grund:''
+      verfahren, einheit, gesperrt:false, sperr_grund:'', material_typ: mat
     }]);
     if(error) throw error;
     document.getElementById('lHer').value='';
@@ -1093,19 +1094,33 @@ async function filamentDel(id){
   if(confirm('Eintrag wirklich löschen?')){ laden(true); await SB.from('FilamentLager').delete().eq('id',id); await ladeDaten(); }
 }
 
+// Materialtyp (z.B. PLA, PETG, Holz...) für Gruppierung in Auswahl-Dropdowns
+function lagerMaterialTyp(f){ return f.material_typ || (f.Material||'').replace(/\s*\(.*$/,'') || 'Sonstige'; }
+
+// Baut ein <select> mit <optgroup>-Unterteilung je Filament-/Material-Typ
+function materialDropdownGruppiertBauen(liste, optionBauen){
+  const gruppen = {};
+  liste.forEach(f=>{
+    const typ = lagerMaterialTyp(f);
+    gruppen[typ] = gruppen[typ] || [];
+    gruppen[typ].push(f);
+  });
+  return Object.keys(gruppen).sort().map(typ =>
+    `<optgroup label="── ${x(typ)} ──">${gruppen[typ].map(optionBauen).join('')}</optgroup>`
+  ).join('');
+}
+
 function renderFilamentDropdown(){
   const dd=document.getElementById('jSpu');
   if(!dd) return;
   const verfahren = document.getElementById('jVerfahren')?.value || 'Drucken';
-  dd.innerHTML='<option value="">— Material wählen —</option>';
-  lager.filter(f=>(f.verfahren||'Drucken')===verfahren).forEach(f=>{
+  const verfuegbar = lager.filter(f=>(f.verfahren||'Drucken')===verfahren && !f.gesperrt);
+  dd.innerHTML='<option value="">— Material wählen —</option>' + materialDropdownGruppiertBauen(verfuegbar, f=>{
     const einheit=lagerEinheit(f);
     const r=parseFloat(f.restGewicht);
-    // Gesperrte Einträge nicht anzeigen
-    if(f.gesperrt) return;
     const tag=isNaN(r)?'':(r<=0?' ⚠ LEER':(r<(einheit==='g'?100:1)?' ⚠ gering':''));
     const restTxt = isNaN(r)?'':` (${r.toFixed(einheit==='g'?0:2)} ${EINHEIT_LABEL[einheit]||einheit})`;
-    dd.innerHTML+=`<option value="${f.id}" data-einheit="${einheit}">${x(f.Material)}${f.Hertseller?' | '+x(f.Hertseller):''}${restTxt}${tag}</option>`;
+    return `<option value="${f.id}" data-einheit="${einheit}">${x(f.Material)}${f.Hertseller?' | '+x(f.Hertseller):''}${restTxt}${tag}</option>`;
   });
 }
 
@@ -1662,10 +1677,10 @@ function modOpen(id){
         <label>Verwendetes Material (für Kalkulation)</label>
         <select id="mFilament" onchange="modBerechne()" style="font-size:13px">
           <option value="">— Material wählen (optional) —</option>
-          ${materialOptionenModal.map(f=>`<option value="${f.id}"
+          ${materialDropdownGruppiertBauen(materialOptionenModal, f=>`<option value="${f.id}"
             data-preis="${f.Preis}" data-start="${f.startGewicht}" data-einheit="${lagerEinheit(f)}"
             ${a.material_wunsch&&x(f.Material).toLowerCase().includes(a.material_wunsch.toLowerCase())?'selected':''}>
-            ${x(f.Material)}${f.Hertseller?' | '+x(f.Hertseller):''}</option>`).join('')}
+            ${x(f.Material)}${f.Hertseller?' | '+x(f.Hertseller):''}</option>`)}
         </select>
       </div>
       <div class="field">
@@ -1945,12 +1960,12 @@ function jMcEntfernen(idx){
 }
 
 function jMcOptionen(){
-  return '<option value="">— Spule wählen —</option>' +
-    lager.filter(f=>!f.gesperrt && (f.verfahren||'Drucken')==='Drucken').map(f => {
-      const r = parseFloat(f.restGewicht);
-      const tag = r<=0?' ⚠ LEER':r<100?' ⚠ gering':'';
-      return `<option value="${f.id}">${x(f.Material)} | ${x(f.Hertseller)} (${r.toFixed(0)} g)${tag}</option>`;
-    }).join('');
+  const verfuegbar = lager.filter(f=>!f.gesperrt && (f.verfahren||'Drucken')==='Drucken');
+  return '<option value="">— Spule wählen —</option>' + materialDropdownGruppiertBauen(verfuegbar, f => {
+    const r = parseFloat(f.restGewicht);
+    const tag = r<=0?' ⚠ LEER':r<100?' ⚠ gering':'';
+    return `<option value="${f.id}">${x(f.Material)} | ${x(f.Hertseller)} (${r.toFixed(0)} g)${tag}</option>`;
+  });
 }
 
 function jIstMulticolor(){
