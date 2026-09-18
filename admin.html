@@ -445,11 +445,14 @@ tr:hover td{background:#fafcff}
       <div class="card">
         <div class="chead"><h2>📦 Aktueller Bestand</h2></div>
         <div class="fbar" style="margin-bottom:14px">
-          <select id="lFilterVerfahren" onchange="renderLager()">
+          <select id="lFilterVerfahren" onchange="lagerFilterVerfahrenGeaendert()">
             <option value="">— Alle Verfahren —</option>
             <option value="Drucken">🖨️ 3D-Druck</option>
             <option value="Lasern">🔥 Lasern</option>
             <option value="Plottern">✂️ Plottern</option>
+          </select>
+          <select id="lFilterTyp" onchange="renderLager()">
+            <option value="">— Alle Filament-/Material-Typen —</option>
           </select>
         </div>
         <div class="twrap">
@@ -940,7 +943,7 @@ async function ladeDaten(){
     let {data:hd}=await SB.from('auftragsHistorie').select('*');
     historie=(hd||[]).sort((a,b)=>b.id.localeCompare(a.id));
 
-    renderLager(); renderHistorie(); renderFilamentDropdown();
+    renderLager(); renderHistorie(); renderFilamentDropdown(); renderArchiv();
     document.getElementById('onlineStatus').textContent='🟢 Online';
   }catch(e){
     document.getElementById('onlineStatus').textContent='🔴 Fehler';
@@ -953,10 +956,30 @@ async function ladeDaten(){
 /* ─── LAGER ──────────────────────────────────────── */
 function lagerEinheit(f){ return f.einheit || VERFAHREN_EINHEIT[f.verfahren||'Drucken'] || 'g'; }
 
+function lagerFilterVerfahrenGeaendert(){
+  lagerFilterTypOptionenBauen();
+  renderLager();
+}
+
+function lagerFilterTypOptionenBauen(){
+  const typSelect = document.getElementById('lFilterTyp');
+  if(!typSelect) return;
+  const verfahrenFilter = document.getElementById('lFilterVerfahren')?.value || '';
+  const basis = verfahrenFilter ? lager.filter(f=>(f.verfahren||'Drucken')===verfahrenFilter) : lager;
+  const typen = [...new Set(basis.map(lagerMaterialTyp))].sort();
+  const bisher = typSelect.value;
+  typSelect.innerHTML = '<option value="">— Alle Filament-/Material-Typen —</option>' +
+    typen.map(t=>`<option value="${x(t)}">${x(t)}</option>`).join('');
+  if(typen.includes(bisher)) typSelect.value = bisher;
+}
+
 function renderLager(){
   const tb=document.getElementById('tLager');
+  lagerFilterTypOptionenBauen();
   const filter = document.getElementById('lFilterVerfahren')?.value || '';
-  const liste = filter ? lager.filter(f=>(f.verfahren||'Drucken')===filter) : lager;
+  const typFilter = document.getElementById('lFilterTyp')?.value || '';
+  let liste = filter ? lager.filter(f=>(f.verfahren||'Drucken')===filter) : lager;
+  if(typFilter) liste = liste.filter(f=>lagerMaterialTyp(f)===typFilter);
   if(!liste.length){ tb.innerHTML=`<tr><td colspan="8" class="emp">📭 Kein Material in dieser Kategorie – bitte oben hinzufügen.</td></tr>`; return; }
   tb.innerHTML=liste.map(f=>{
     const verfahren=f.verfahren||'Drucken';
@@ -1033,6 +1056,7 @@ async function filamentPrivat(id, material, restGewicht){
       material: material,
       verbrauchG: gramm,
       kosten: 0,
+      quelle: 'privat',
       verfahren: s?.verfahren || 'Drucken'
     }]);
     await ladeDaten();
@@ -1176,9 +1200,14 @@ async function historiePreisAendern(id, alt){
 }
 
 async function historieDel(id, g, spuId){
-  if(!confirm(`Auftrag löschen?\n${g} wird zurückgebucht.`)) return;
+  const eintrag = historie.find(h=>h.id===id);
+  const istPrivat = eintrag && (eintrag.quelle==='privat' || eintrag.kunde==='Privatgebrauch');
+  const hinweis = istPrivat
+    ? 'Privatausbuchung löschen? Das Material wird NICHT zurückgebucht (es wurde ja tatsächlich verbraucht).'
+    : `Auftrag löschen?\n${g} wird zurückgebucht.`;
+  if(!confirm(hinweis)) return;
   laden(true);
-  if(spuId){ const s=lager.find(f=>f.id===spuId); if(s){ const nr=parseFloat(s.restGewicht)+g; await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',spuId); } }
+  if(!istPrivat && spuId){ const s=lager.find(f=>f.id===spuId); if(s){ const nr=parseFloat(s.restGewicht)+g; await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',spuId); } }
   await SB.from('auftragsHistorie').delete().eq('id',id);
   await ladeDaten();
 }
@@ -1398,17 +1427,24 @@ function archivDatumParse(datum){
 function archivZeile(a){
   const kundenname = a.gastname || a.kunde || '(Kundenkonto)';
   const pr=a.kosten!=null?`<strong style="color:var(--gn)">${parseFloat(a.kosten).toFixed(2)} €</strong>`:`<span style="color:#bbb;font-size:.82em">Offen</span>`;
+  const istManuell = a._archivTyp === 'manuell';
+  const statusZelle = istManuell
+    ? `<span class="bdg bgr">✋ Manuell gebucht</span>`
+    : badge(a.status);
+  const aktionen = istManuell
+    ? `<button class="btn b-rd bsm" style="width:100%" onclick="historieDel('${a.id}',${a.verbrauchG||0},'${a.spuled||''}')">🗑 Löschen</button>`
+    : `<button class="btn b-out bsm" style="margin-bottom:4px;width:100%" onclick="archivWiederherstellen('${a.id}')">↺ Wiederherstellen</button>
+       <button class="btn b-rd bsm" style="width:100%" onclick="auftragLoeschen('${a.id}','${x(kundenname).replace(/'/g,'')}','${x(a.projekt).replace(/'/g,'')}')">🗑 Löschen</button>`;
   return `<tr>
       <td style="font-size:.81em;color:var(--t3);white-space:nowrap">${x(a.datum)}</td>
       <td style="font-family:monospace;font-size:.79em">${x(a.id)}</td>
       <td>${x(kundenname)}</td>
       <td><strong>${x(a.projekt)}</strong></td>
       <td style="font-size:.82em">${VERFAHREN_LABEL[a.verfahren||'Drucken']||a.verfahren||'—'}</td>
-      <td>${badge(a.status)}</td>
+      <td>${statusZelle}</td>
       <td>${pr}</td>
       <td style="min-width:110px">
-        <button class="btn b-out bsm" style="margin-bottom:4px;width:100%" onclick="archivWiederherstellen('${a.id}')">↺ Wiederherstellen</button>
-        <button class="btn b-rd bsm" style="width:100%" onclick="auftragLoeschen('${a.id}','${x(kundenname).replace(/'/g,'')}','${x(a.projekt).replace(/'/g,'')}')">🗑 Löschen</button>
+        ${aktionen}
       </td>
     </tr>`;
 }
@@ -1420,13 +1456,25 @@ function renderArchiv(){
   const vf=document.getElementById('arVerfahren')?.value||'';
   const sf=document.getElementById('arStatus')?.value||'';
   const su=(document.getElementById('arSuche')?.value||'').toLowerCase();
-  const list=anfragen.filter(a=>{
+
+  const ausAnfragen = anfragen.filter(a=>{
     if(a.status!=='Abgeschlossen'&&a.status!=='Storniert') return false;
     const ms=!sf||a.status===sf;
     const mv=!vf||(a.verfahren||'Drucken')===vf;
     const mx=!su||`${a.gastname||''} ${a.gast_email||''} ${a.projekt||''} ${a.id||''}`.toLowerCase().includes(su);
     return ms&&mv&&mx;
-  });
+  }).map(a=>({...a, _archivTyp:'anfrage'}));
+
+  // Manuell gebuchte Aufträge (nicht über das Kundenportal, mit eingetragenem Gewinn) gehören ebenfalls ins Archiv
+  const ausManuell = historie.filter(h=>{
+    if(h.quelle!=='manuell' || h.kosten==null) return false;
+    const ms=!sf||sf==='Abgeschlossen'; // manuelle Aufträge zählen als abgeschlossen
+    const mv=!vf||(h.verfahren||'Drucken')===vf;
+    const mx=!su||`${h.kunde||''} ${h.projekt||''} ${h.id||''}`.toLowerCase().includes(su);
+    return ms&&mv&&mx;
+  }).map(h=>({...h, status:'Abgeschlossen', _archivTyp:'manuell'}));
+
+  const list = [...ausAnfragen, ...ausManuell];
 
   if(!list.length){
     tb.innerHTML=`<div class="emp">Noch nichts im Archiv.</div>`;
@@ -1580,7 +1628,8 @@ async function auftragAbschliessen(id){
       material:a.material_wunsch||'Unbekannt',
       verbrauchG:0,
       kosten:parseFloat(a.kosten)||0,
-      verfahren:a.verfahren||'Drucken'
+      verfahren:a.verfahren||'Drucken',
+      quelle:'bestellanfrage'
     }]);
     // Status auf Abgeschlossen + E-Mail senden
     await SB.from('bestellAnfragen').update({status:'Abgeschlossen'}).eq('id',id);
@@ -2059,7 +2108,7 @@ async function auftragBuchen(){
       verfahren: document.getElementById('jVerfahren')?.value || 'Drucken',
       versand_gewuenscht: versandGewuenscht, versand_art: versandArt,
       versand_groesse: versandGroesse, versand_kosten: versandKosten,
-      adresse: jAdresse, plz: jPlz, ort: jOrt
+      adresse: jAdresse, plz: jPlz, ort: jOrt, quelle: 'manuell'
     }]);
     const nr=parseFloat(s.restGewicht)-g;
     await SB.from('FilamentLager').update({restGewicht:nr.toString()}).eq('id',sid);
