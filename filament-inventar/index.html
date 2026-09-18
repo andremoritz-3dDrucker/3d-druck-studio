@@ -689,11 +689,11 @@
         ];
       } catch(e){ formats = undefined; }
 
-      var config = { fps: 10, qrbox: { width: 240, height: 160 } };
+      var config = { fps: 10, qrbox: { width: 280, height: 130 }, experimentalFeatures: { useBarCodeDetectorIfSupported: true } };
       if (formats) config.formatsToSupport = formats;
 
       html5QrCode.start(
-        { facingMode: "environment" },
+        { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
         config,
         function onScan(decodedText){
           if (!scannerRunning) return;
